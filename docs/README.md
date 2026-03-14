@@ -17,8 +17,3 @@ They focus on:
 - what is already proven
 - how the current release works
 - what an operator needs to know to install and use it
-
-They do not include:
-- private key material
-- unit-specific personal notes
-- raw scratchpad research
