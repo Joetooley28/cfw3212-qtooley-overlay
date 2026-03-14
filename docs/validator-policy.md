@@ -44,3 +44,8 @@ Examples:
 ## Goal
 
 The validator is meant to keep the browser terminal useful for real modem administration while still blocking the small set of commands most likely to disrupt access or cause an avoidable reboot/power event.
+
+Practical note:
+
+- band-setting commands such as `AT+QNWPREFCFG=...` are allowed
+- if a request gets blocked while testing band commands, the most likely cause is semicolon chaining or another formatting issue, not the band command family itself

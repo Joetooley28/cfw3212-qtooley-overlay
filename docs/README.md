@@ -11,8 +11,6 @@ This section collects the public-facing notes for the current standalone AT term
 
 ## Scope
 
-These docs are intentionally cleaner and narrower than the private working notes used during development.
-
 They focus on:
 - what is already proven
 - how the current release works
