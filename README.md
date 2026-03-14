@@ -2,6 +2,10 @@
 
 Standalone AT terminal for the Casa Systems CFW-3212 / Quectel RG520N-NA.
 
+Additional documentation:
+
+- [Docs index](docs/README.md)
+
 ## What This Is
 
 This package installs a small standalone Lua AT terminal page and backend on the router.
@@ -182,4 +186,3 @@ Remove files if desired:
 ## Version
 
 - `v0.1.0`
-
