@@ -19,7 +19,8 @@ Instead, it uses:
 
 Also blocked:
 
-- semicolon chaining
+- more than one command in a single send
+- semicolon chaining such as `AT;ATI`
 - multiline input
 - shell-like metacharacter junk that is not valid AT usage
 
@@ -48,4 +49,5 @@ The validator is meant to keep the browser terminal useful for real modem admini
 Practical note:
 
 - band-setting commands such as `AT+QNWPREFCFG=...` are allowed
-- if a request gets blocked while testing band commands, the most likely cause is semicolon chaining or another formatting issue, not the band command family itself
+- send one AT command at a time
+- if a request gets blocked while testing band commands, the most likely cause is multiple commands in one send, semicolon chaining, or another formatting issue, not the band command family itself
