@@ -20,6 +20,12 @@ Current intended browser access:
 
 - `http://192.168.1.1:8088/`
 
+Important:
+
+- in the current version, the AT terminal listens on the LAN bridge IP at `192.168.1.1:8088`
+- there is no separate authentication layer in front of the terminal
+- treat it as a trusted-LAN tool, not a hardened public-facing service
+
 ## How It Works
 
 This is **not** a generic host-PC-to-USB-modem design.
