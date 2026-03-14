@@ -2,6 +2,8 @@
 
 Standalone AT terminal for the Casa Systems CFW-3212 / Quectel RG520N-NA.
 
+Use at your own risk. This project is meant for people who are comfortable working on rooted carrier hardware and understand that modem settings can affect connectivity, access, and behavior.
+
 Additional documentation:
 
 - [Docs index](docs/README.md)
