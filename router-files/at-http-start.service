@@ -1,0 +1,9 @@
+[Unit]
+Description=Start standalone AT terminal
+After=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+KillMode=none
+ExecStart=/usrdata/start-at-http.sh

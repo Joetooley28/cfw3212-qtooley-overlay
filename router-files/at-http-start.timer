@@ -1,0 +1,11 @@
+[Unit]
+Description=Start standalone AT terminal 2 minutes after boot
+
+[Timer]
+OnBootSec=2min
+AccuracySec=15s
+Persistent=false
+Unit=at-http-start.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CFW-3212 AT Terminal</title>
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <main class="wrap">
+    <div class="topbar">
+      <div class="title-block">
+        <h1>CFW-3212 AT Terminal</h1>
+        <p class="subtitle">Quectel RG520N-NA modem</p>
+      </div>
+      <button id="theme-toggle" class="secondary" type="button" aria-pressed="false">Dark Mode</button>
+    </div>
+    <form id="at-form" class="controls">
+      <input id="command" name="command" type="text" autocomplete="off" spellcheck="false" placeholder="ATI" required>
+      <button id="send" type="submit">Send</button>
+    </form>
+    <div id="status" class="status status-ready">Ready</div>
+    <p class="note">History is session-only and clears on refresh.</p>
+    <div class="history-actions">
+      <button id="copy-top" class="secondary" type="button">Copy All</button>
+      <button id="clear-top" class="secondary" type="button">Clear</button>
+    </div>
+    <pre id="history" class="history" aria-live="polite"></pre>
+    <div class="history-actions history-actions-bottom">
+      <button id="copy-bottom" class="secondary" type="button">Copy All</button>
+      <button id="clear-bottom" class="secondary" type="button">Clear</button>
+    </div>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
