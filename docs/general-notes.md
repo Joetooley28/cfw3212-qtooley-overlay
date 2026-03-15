@@ -16,6 +16,11 @@ This section collects the public-facing notes that are useful for the broader de
 - Quectel RG520N-NA
 - Casa / US Cellular firmware
 
+### Tested Firmware
+
+- Router firmware: `USC_1.1.79.0`
+- Module firmware: `RG520NNADAR03A03M4G`
+
 ### Important Architectural Note
 
 This is **not** a normal host-PC + USB modem setup.

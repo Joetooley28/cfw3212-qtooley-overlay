@@ -2,6 +2,11 @@
 
 Standalone AT terminal for the Casa Systems CFW-3212 / Quectel RG520N-NA.
 
+Tested on:
+
+- router firmware `USC_1.1.79.0`
+- module firmware `RG520NNADAR03A03M4G`
+
 Use at your own risk. This project is meant for people who are comfortable working on rooted carrier hardware and understand that modem settings can affect connectivity, access, and behavior. You are responsible for what you send through the terminal.
 
 ![CFW-3212 AT Terminal screenshot](docs/images/at-terminal-screenshot.png)
