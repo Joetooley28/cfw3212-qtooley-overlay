@@ -9,6 +9,7 @@ Use at your own risk. This project is meant for people who are comfortable worki
 Additional documentation:
 
 - [Docs index](docs/README.md)
+- [General Notes](docs/general-notes.md)
 
 ## What This Is
 

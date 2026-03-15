@@ -8,6 +8,7 @@ This section collects the public-facing notes for the current standalone AT term
 - [ADB and SSH Persistence](adb-and-ssh-persistence.md)
 - [AT Terminal Usage](at-terminal-usage.md)
 - [Validator Policy](validator-policy.md)
+- [General Notes](general-notes.md)
 
 ## Scope
 
