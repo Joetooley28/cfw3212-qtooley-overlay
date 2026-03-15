@@ -1,13 +1,10 @@
-# CFW-3212 AT Terminal Docs
+# CFW-3212 Project Docs
 
-This section collects the public-facing notes for the current standalone AT terminal project.
+This section collects the public-facing notes for the current standalone AT terminal project and the surrounding device work.
 
 ## Sections
 
-- [Platform Notes](platform-notes.md)
-- [ADB and SSH Persistence](adb-and-ssh-persistence.md)
-- [AT Terminal Usage](at-terminal-usage.md)
-- [Validator Policy](validator-policy.md)
+- [AT Terminal Notes](at-terminal-notes.md)
 - [General Notes](general-notes.md)
 
 ## Scope
