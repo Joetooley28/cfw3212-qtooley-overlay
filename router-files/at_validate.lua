@@ -6,20 +6,6 @@ local FORBIDDEN_PATTERNS = {
     "[`|<>$]"
 }
 
-local BLOCKED_EXACT_COMMANDS = {
-    ["AT+QPOWD"] = true,
-    ["AT&F"] = true,
-    ["AT&W"] = true,
-    ["AT+CFUN=1,1"] = true
-}
-
-local QUERY_ONLY_QCFG_KEYS = {
-    ["usbnet"] = true,
-    ["data_interface"] = true,
-    ["pcie/mode"] = true,
-    ["usbspeed"] = true
-}
-
 local function trim(s)
     return (s:gsub("^%s+", ""):gsub("%s+$", ""))
 end
@@ -46,35 +32,6 @@ local function is_at_syntax(cmd)
     end
 
     return true
-end
-
-local function extract_qcfg_key(cmd)
-    return cmd:match('^AT%+QCFG="([^"]+)"')
-end
-
-local function is_qcfg_query_only_violation(cmd)
-    local key = extract_qcfg_key(cmd)
-    if not key or not QUERY_ONLY_QCFG_KEYS[key] then
-        return false
-    end
-
-    if cmd:match('^AT%+QCFG="[^"]+"$') or cmd:match('^AT%+QCFG="[^"]+"%?$') then
-        return false
-    end
-
-    return true
-end
-
-local function is_blocked_command(cmd)
-    if BLOCKED_EXACT_COMMANDS[cmd] then
-        return true
-    end
-
-    if is_qcfg_query_only_violation(cmd) then
-        return true
-    end
-
-    return false
 end
 
 function M.decode_request(JSON, body)
@@ -116,10 +73,6 @@ function M.validate_command(config, payload)
 
     if not is_at_syntax(cmd) then
         return nil, "invalid_command_format"
-    end
-
-    if is_blocked_command(cmd) then
-        return nil, "command_not_allowed"
     end
 
     return cmd, nil

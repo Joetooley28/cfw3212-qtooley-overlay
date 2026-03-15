@@ -2,7 +2,7 @@
 
 Standalone AT terminal for the Casa Systems CFW-3212 / Quectel RG520N-NA.
 
-Use at your own risk. This project is meant for people who are comfortable working on rooted carrier hardware and understand that modem settings can affect connectivity, access, and behavior.
+Use at your own risk. This project is meant for people who are comfortable working on rooted carrier hardware and understand that modem settings can affect connectivity, access, and behavior. You are responsible for what you send through the terminal.
 
 Additional documentation:
 
@@ -155,18 +155,7 @@ Open in browser:
 
 ## Validator Policy
 
-Broad single-line AT admin usage is allowed, but the browser terminal intentionally blocks a small set of disruptive commands.
-
-Blocked:
-- `AT+QPOWD`
-- `AT&F`
-- `AT&W`
-- `AT+CFUN=1,1`
-- protected `QCFG` write forms like:
-  - `AT+QCFG="usbnet",...`
-  - `AT+QCFG="data_interface",...`
-  - `AT+QCFG="pcie/mode",...`
-  - `AT+QCFG="usbspeed",...`
+The validator enforces one command at a time and blocks multiline / shell-junk input, but it does not maintain an explicit AT command denylist in the current release.
 
 ## Rollback
 
