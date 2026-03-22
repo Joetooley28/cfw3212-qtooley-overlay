@@ -5,6 +5,9 @@
 .ookla-page {
     background: linear-gradient(180deg, #f7f9fc 0%, #eef3f9 100%);
     border: 1px solid #dbe4ef;
+    box-sizing: border-box;
+    max-width: 100%;
+    overflow: hidden;
     padding: 22px;
 }
 
@@ -103,11 +106,14 @@
     gap: 14px;
     grid-template-columns: 1.4fr 0.8fr 0.7fr;
     margin-bottom: 18px;
+    min-width: 0;
 }
 
 .ookla-field {
     background: #ffffff;
     border: 1px solid #d8e0ea;
+    min-width: 0;
+    overflow: hidden;
     padding: 12px;
 }
 
@@ -118,7 +124,10 @@
     font-weight: 700;
     letter-spacing: 0.08em;
     margin-bottom: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
     text-transform: uppercase;
+    white-space: nowrap;
 }
 
 .ookla-select,
@@ -128,7 +137,10 @@
     color: #17324d;
     font-size: 14px;
     min-height: 44px;
+    overflow: hidden;
     padding: 10px 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     width: 100%;
 }
 
@@ -182,6 +194,23 @@
     letter-spacing: 0.08em;
     margin-bottom: 6px;
     text-transform: uppercase;
+}
+
+.ookla-ca-frozen-tag {
+    background: #e5dcd3;
+    border-radius: 4px;
+    color: #7a5a32;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    margin-left: 8px;
+    padding: 2px 7px;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
+.ookla-ca-card.is-snapshot {
+    opacity: 0.78;
 }
 
 .ookla-ca-caption {

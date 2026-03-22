@@ -762,7 +762,19 @@ function OoklaSpeedtestApiHandler:get(url, action)
 
     if action == "state" then
         local payload = speedtest.get_state()
-        if not payload.running then
+        if payload.running then
+            -- Serve the frozen CA snapshot captured at test start
+            local f = io.open("/tmp/ookla-speedtest-ca-snapshot.json", "r")
+            if f then
+                local raw = f:read("*a")
+                f:close()
+                local ok_decode, decoded = pcall(function() return JSON:decode(raw) end)
+                if ok_decode and type(decoded) == "table" then
+                    decoded.snapshot = true
+                    payload.ca_info = decoded
+                end
+            end
+        else
             local config = read_config()
             if config then
                 local ca_snapshot = run_locked_transaction(config, function()
@@ -823,6 +835,8 @@ end
 function OoklaSpeedtestApiHandler:post(url, action)
     action = normalize_action("ookla_speedtest_api", url, action)
     if action == "recover" then
+        os.remove("/tmp/ookla-speedtest-ca-snapshot.json")
+        os.remove("/tmp/ookla-speedtest-ca-snapshot.json.tmp")
         self:write(speedtest.recover_backend())
         return
     end
@@ -864,6 +878,33 @@ function OoklaSpeedtestApiHandler:post(url, action)
         self:set_status(400)
         self:write({ ok = false, error = iface_err })
         return
+    end
+
+    -- Snapshot CA bands before the test starts so they can be shown during the run
+    local config = read_config()
+    if config then
+        local ca_snapshot = run_locked_transaction(config, function()
+            local qcainfo_raw, qcainfo_err = soft_run_command(config, 'AT+QCAINFO')
+            local servingcell_raw, servingcell_err = soft_run_command(config, 'AT+QENG="servingcell"')
+            local qcainfo_summary = qcainfo_raw and summarize_response("AT+QCAINFO", qcainfo_raw) or ("unavailable: " .. tostring(qcainfo_err))
+            local servingcell_summary = servingcell_raw and summarize_response('AT+QENG="servingcell"', servingcell_raw) or ("unavailable: " .. tostring(servingcell_err))
+            return build_ca_snapshot(qcainfo_summary, servingcell_summary)
+        end)
+        if ca_snapshot then
+            ca_snapshot.snapshot = true
+            ca_snapshot.captured_at = os.date("!%Y-%m-%dT%H:%M:%SZ")
+            local encoded = JSON:encode(ca_snapshot)
+            if encoded then
+                local tmp = "/tmp/ookla-speedtest-ca-snapshot.json.tmp"
+                local dst = "/tmp/ookla-speedtest-ca-snapshot.json"
+                local f = io.open(tmp, "w")
+                if f then
+                    f:write(encoded)
+                    f:close()
+                    os.rename(tmp, dst)
+                end
+            end
+        end
     end
 
     self:write(speedtest.start_background({

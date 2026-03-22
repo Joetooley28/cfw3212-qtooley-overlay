@@ -287,12 +287,20 @@
     function buildCaBandsHtml() {
         var ca = state.ca_info || {};
         var bands = Array.isArray(ca.bands) ? ca.bands : [];
+        var isSnapshot = !!ca.snapshot;
         var comboText = ca.combo_text || (bands.length ? bands.join(" + ") : "Waiting for live CA data");
-        var caption = bands.length ? "Live carrier aggregation snapshot from QCAINFO." : "No active carrier aggregation bands reported right now.";
+        var caption;
+        if (isSnapshot && bands.length) {
+            caption = "Frozen at test start \u2014 live refresh resumes when the test finishes.";
+        } else if (bands.length) {
+            caption = "Live carrier aggregation snapshot from QCAINFO.";
+        } else {
+            caption = "No active carrier aggregation bands reported right now.";
+        }
         return [
-            "<div class='ookla-ca-card'>",
+            "<div class='ookla-ca-card", (isSnapshot ? " is-snapshot" : ""), "'>",
             "<div class='ookla-ca-copy'>",
-            "<div class='ookla-ca-label'>Band info</div>",
+            "<div class='ookla-ca-label'>Band info", (isSnapshot ? " <span class='ookla-ca-frozen-tag'>snapshot</span>" : ""), "</div>",
             "<div class='ookla-ca-caption'>", escapeHtml(caption), "</div>",
             "<div class='ookla-ca-combo'>", escapeHtml(comboText), "</div>",
             "</div>",

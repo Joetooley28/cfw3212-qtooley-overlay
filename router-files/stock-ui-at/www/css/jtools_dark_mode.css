@@ -303,12 +303,100 @@ button:disabled {
 }
 
 .at-command-input,
-.at-history,
+.at-history {
+    background: #383b40;
+    border: 1px solid #4a4d52;
+}
+
 .band-lock-rat-row select,
 .band-lock-indicator,
 .jtool-placeholder-item,
 .band-lock-status {
     border: 1px solid #3c3c3c;
+}
+
+.at-history::-webkit-scrollbar,
+.at-ref-table-wrap::-webkit-scrollbar {
+    width: 10px;
+}
+
+.at-history::-webkit-scrollbar-track,
+.at-ref-table-wrap::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+
+.at-history::-webkit-scrollbar-thumb,
+.at-ref-table-wrap::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 5px;
+}
+
+.at-history::-webkit-scrollbar-thumb:hover,
+.at-ref-table-wrap::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+
+.at-ref-details,
+.at-ref-card {
+    background: #2d2d30;
+}
+
+.at-ref-summary {
+    color: var(--jtools-soft-blue);
+}
+
+.at-ref-arrow {
+    border-color: var(--jtools-soft-blue);
+}
+
+.at-ref-body {
+    border-color: #3c3c3c;
+}
+
+.at-ref-note {
+    color: #9da3ad;
+}
+
+.at-ref-table th {
+    background: #25262a;
+    border-color: #3c3c3c;
+    color: #8fbcd6;
+}
+
+.at-ref-table td {
+    border-color: #3c3c3c;
+}
+
+.at-ref-section-row td {
+    background: #252526;
+    border-color: #3c3c3c;
+    color: #8fbcd6;
+}
+
+.at-ref-cmd code {
+    color: #dcdcaa;
+}
+
+.at-ref-desc {
+    color: #d4d4d4;
+}
+
+.at-ref-load {
+    background: #0f5f83;
+}
+
+.at-ref-load:hover,
+.at-ref-load:focus {
+    background: #0a4c69;
+}
+
+.at-ref-copy {
+    background: #3a4a58;
+}
+
+.at-ref-copy:hover,
+.at-ref-copy:focus {
+    background: #4a5a68;
 }
 
 .band-lock-indicator-idle {
@@ -585,6 +673,11 @@ form .title-box,
 
 .ookla-ca-label {
     color: #ff8a00;
+}
+
+.ookla-ca-frozen-tag {
+    background: #3a3020;
+    color: #d4a862;
 }
 
 .ookla-ca-combo {
