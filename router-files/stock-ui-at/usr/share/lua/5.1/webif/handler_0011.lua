@@ -20,6 +20,33 @@ local MODE_VALUES = {
     ["LTE:NR5G"] = true
 }
 
+local RAT_ACQ_ORDER_VALUES = {
+    ["LTE:NR5G"] = true,
+    ["NR5G:LTE"] = true,
+    ["LTE:NR5G:WCDMA"] = true,
+    ["NR5G:LTE:WCDMA"] = true,
+    ["WCDMA:LTE:NR5G"] = true,
+    ["LTE:WCDMA:NR5G"] = true,
+    ["NR5G:WCDMA:LTE"] = true,
+    ["WCDMA:NR5G:LTE"] = true,
+    ["LTE"] = true,
+    ["NR5G"] = true,
+    ["WCDMA"] = true,
+    ["LTE:WCDMA"] = true,
+    ["WCDMA:LTE"] = true,
+    ["NR5G:WCDMA"] = true,
+    ["WCDMA:NR5G"] = true,
+    ["NR5G-NSA:NR5G:LTE"] = true,
+    ["NR5G-NSA:LTE:NR5G"] = true,
+    ["LTE:NR5G-NSA:NR5G"] = true,
+    ["NR5G:NR5G-NSA:LTE"] = true
+}
+
+local NR5G_DISABLE_MODE_VALUES = {
+    ["0"] = true,
+    ["1"] = true
+}
+
 local BAND_VALUES = {
     lte_band = {
         ["2"] = true, ["4"] = true, ["5"] = true, ["7"] = true, ["12"] = true, ["13"] = true,
@@ -111,6 +138,28 @@ local function validate_mode_value(mode)
     return mode, nil
 end
 
+local function validate_rat_acq_order(order)
+    if type(order) ~= "string" then
+        return nil, "invalid_rat_acq_order"
+    end
+    order = order:gsub("^%s+", ""):gsub("%s+$", "")
+    if not RAT_ACQ_ORDER_VALUES[order] then
+        return nil, "invalid_rat_acq_order"
+    end
+    return order, nil
+end
+
+local function validate_nr5g_disable_mode(val)
+    if type(val) ~= "string" then
+        return nil, "invalid_nr5g_disable_mode"
+    end
+    val = val:gsub("^%s+", ""):gsub("%s+$", "")
+    if not NR5G_DISABLE_MODE_VALUES[val] then
+        return nil, "invalid_nr5g_disable_mode"
+    end
+    return val, nil
+end
+
 local function validate_band_group(group)
     if type(group) ~= "string" or not BAND_VALUES[group] then
         return nil, "invalid_band_group"
@@ -142,6 +191,291 @@ local function validate_band_value(group, raw_bands)
     return table.concat(out, ":"), nil
 end
 
+local CELL_LOCK_ACTIONS = {
+    lock_lte = true,
+    lock_nr5g = true,
+    unlock_lte = true,
+    unlock_nr5g = true
+}
+
+local SCS_VALUES = {
+    ["15"] = true, ["30"] = true, ["60"] = true, ["120"] = true, ["240"] = true
+}
+
+local SCS_CODE_TO_KHZ = {
+    ["0"] = "15", ["1"] = "30", ["2"] = "60", ["3"] = "120", ["4"] = "240"
+}
+
+local SCS_KHZ_TO_CODE = {
+    ["15"] = "0", ["30"] = "1", ["60"] = "2", ["120"] = "3", ["240"] = "4"
+}
+
+local function validate_cell_lock_action(action)
+    if type(action) ~= "string" or not CELL_LOCK_ACTIONS[action] then
+        return nil, "invalid_cell_lock_action"
+    end
+    return action, nil
+end
+
+local function validate_scs_value(scs)
+    if type(scs) ~= "string" then
+        scs = tostring(scs)
+    end
+    scs = scs:gsub("^%s+", ""):gsub("%s+$", "")
+    if not SCS_VALUES[scs] then
+        return nil, "invalid_scs_value"
+    end
+    return scs, nil
+end
+
+local function validate_numeric(val, name, min_val, max_val)
+    if type(val) ~= "string" then
+        val = tostring(val or "")
+    end
+    val = val:gsub("^%s+", ""):gsub("%s+$", "")
+    local num = tonumber(val)
+    if not num or num ~= math.floor(num) then
+        return nil, "invalid_" .. name .. "_not_integer"
+    end
+    if min_val and num < min_val then
+        return nil, "invalid_" .. name .. "_too_low"
+    end
+    if max_val and num > max_val then
+        return nil, "invalid_" .. name .. "_too_high"
+    end
+    return tostring(num), nil
+end
+
+local function validate_cell_pairs(json_str, num_cells)
+    if type(json_str) ~= "string" or json_str == "" then
+        return nil, "invalid_cell_pairs"
+    end
+    local ok_decode, pairs_array = pcall(function() return JSON:decode(json_str) end)
+    if not ok_decode or type(pairs_array) ~= "table" then
+        return nil, "invalid_cell_pairs_json"
+    end
+    local num = tonumber(num_cells) or 0
+    if #pairs_array < num then
+        return nil, "not_enough_cell_pairs"
+    end
+    local parts = {}
+    for i = 1, num do
+        local pair = pairs_array[i]
+        if type(pair) ~= "table" then
+            return nil, "invalid_cell_pair_entry"
+        end
+        local earfcn, e_err = validate_numeric(pair.earfcn or pair[1], "earfcn", 0, 999999)
+        if not earfcn then
+            return nil, e_err
+        end
+        local pci, p_err = validate_numeric(pair.pci or pair[2], "pci", 0, 503)
+        if not pci then
+            return nil, p_err
+        end
+        table.insert(parts, earfcn)
+        table.insert(parts, pci)
+    end
+    return parts, nil
+end
+
+local function parse_qnwlock_status(raw, key)
+    local lines = split_lines(raw)
+    for _, line in ipairs(lines) do
+        local pattern = '%+QNWLOCK:%s+"' .. key .. '",(.*)'
+        local rest = line:match(pattern)
+        if rest then
+            local first = rest:match("^(%d+)")
+            if first then
+                local locked = (first ~= "0")
+                return { locked = locked, detail = rest }
+            end
+        end
+    end
+    return { locked = false, detail = "" }
+end
+
+local function scs_code_to_khz(code)
+    if type(code) ~= "string" then
+        code = tostring(code or "")
+    end
+    return SCS_CODE_TO_KHZ[code] or code
+end
+
+local function parse_serving_cell(raw)
+    local cells = {}
+    local lines = split_lines(raw)
+    for _, line in ipairs(lines) do
+        if line:find('+QENG: "servingcell"') then
+            local parts = {}
+            for part in line:gmatch("([^,]+)") do
+                table.insert(parts, (part:gsub("^%s+", ""):gsub("%s+$", ""):gsub('"', '')))
+            end
+            if #parts >= 10 then
+                local rat = parts[3] or ""
+                if rat == "LTE" then
+                    table.insert(cells, {
+                        type = "lte_serving",
+                        serving = true,
+                        earfcn = parts[9] or "",
+                        pci = parts[8] or "",
+                        band = parts[10] or "",
+                        rsrp = parts[14] or "-",
+                        rsrq = parts[15] or "-",
+                        sinr = parts[17] or "-",
+                        scs = "-"
+                    })
+                elseif rat == "NR5G-SA" then
+                    table.insert(cells, {
+                        type = "nr5g_sa_serving",
+                        serving = true,
+                        earfcn = parts[10] or "",
+                        pci = parts[8] or "",
+                        band = parts[11] or "",
+                        rsrp = parts[13] or "-",
+                        rsrq = parts[14] or "-",
+                        sinr = parts[15] or "-",
+                        scs = scs_code_to_khz(parts[16] or "")
+                    })
+                end
+            end
+        end
+        if line:find('+QENG: "NR5G%-NSA"') or line:find('+QENG:"NR5G%-NSA"') then
+            local parts = {}
+            for part in line:gmatch("([^,]+)") do
+                table.insert(parts, (part:gsub("^%s+", ""):gsub("%s+$", ""):gsub('"', '')))
+            end
+            if #parts >= 8 then
+                table.insert(cells, {
+                    type = "nr5g_nsa_serving",
+                    serving = true,
+                    pci = parts[4] or "",
+                    rsrp = parts[5] or "-",
+                    sinr = parts[6] or "-",
+                    rsrq = parts[7] or "-",
+                    earfcn = parts[8] or "",
+                    band = parts[9] or "",
+                    scs = scs_code_to_khz(parts[11] or "")
+                })
+            end
+        end
+    end
+    return cells
+end
+
+local function parse_neighbour_cells(raw)
+    local cells = {}
+    local lines = split_lines(raw)
+    for _, line in ipairs(lines) do
+        if line:find("neighbourcell intra") or line:find("neighbourcell inter") then
+            local parts = {}
+            for part in line:gmatch("([^,]+)") do
+                table.insert(parts, (part:gsub("^%s+", ""):gsub("%s+$", ""):gsub('"', '')))
+            end
+            if #parts >= 6 then
+                local nbr_type = "lte_intra"
+                if line:find("neighbourcell inter") then
+                    nbr_type = "lte_inter"
+                end
+                local earfcn = parts[3] or ""
+                local pci = parts[4] or ""
+                if earfcn ~= "-" and earfcn ~= "" and pci ~= "-" and pci ~= "" then
+                    table.insert(cells, {
+                        type = nbr_type,
+                        serving = false,
+                        earfcn = earfcn,
+                        pci = pci,
+                        band = "-",
+                        rsrq = parts[5] or "-",
+                        rsrp = parts[6] or "-",
+                        sinr = parts[8] or "-",
+                        scs = "-"
+                    })
+                end
+            end
+        end
+        if line:find('"NR5G%-NSA"') and not line:find("servingcell") then
+            local parts = {}
+            for part in line:gmatch("([^,]+)") do
+                table.insert(parts, (part:gsub("^%s+", ""):gsub("%s+$", ""):gsub('"', '')))
+            end
+            if #parts >= 8 then
+                local pci = parts[4] or ""
+                local earfcn = parts[8] or ""
+                if pci ~= "-" and pci ~= "" and earfcn ~= "-" and earfcn ~= "" then
+                    table.insert(cells, {
+                        type = "nr5g_nsa",
+                        serving = false,
+                        pci = pci,
+                        rsrp = parts[5] or "-",
+                        sinr = parts[6] or "-",
+                        rsrq = parts[7] or "-",
+                        earfcn = earfcn,
+                        band = parts[9] or "-",
+                        scs = scs_code_to_khz(parts[11] or "")
+                    })
+                end
+            end
+        end
+    end
+    return cells
+end
+
+local function earfcn_to_nr_band(earfcn)
+    local e = tonumber(earfcn)
+    if not e then return "-" end
+    if e >= 123400 and e <= 130400 then return "71"
+    elseif e >= 620000 and e <= 680000 then return "77"
+    elseif e >= 620000 and e <= 653333 then return "78"
+    elseif e >= 386000 and e <= 398000 then return "25"
+    elseif e >= 173800 and e <= 178800 then return "41"
+    elseif e >= 151600 and e <= 160600 then return "66"
+    elseif e >= 143400 and e <= 145600 then return "48"
+    elseif e >= 149200 and e <= 160600 then return "2"
+    elseif e >= 171800 and e <= 178800 then return "38"
+    end
+    return "-"
+end
+
+local function parse_qscan_cells(raw)
+    local cells = {}
+    local lines = split_lines(raw)
+    for _, line in ipairs(lines) do
+        if line:find('+QSCAN:') then
+            local parts = {}
+            for part in line:gmatch("([^,]+)") do
+                table.insert(parts, (part:gsub("^%s+", ""):gsub("%s+$", ""):gsub('"', '')))
+            end
+            if #parts >= 8 then
+                local rat_raw = parts[1]:match(':%s*"?([^"]+)"?$') or parts[1]:match("QSCAN:%s*(.+)$") or ""
+                rat_raw = rat_raw:gsub('"', ''):gsub("^%s+", ""):gsub("%s+$", "")
+                local earfcn = parts[4] or ""
+                local pci = parts[5] or ""
+                if earfcn ~= "" and earfcn ~= "-" and pci ~= "" and pci ~= "-" then
+                    local is_nr = (rat_raw == "NR5G")
+                    local band = "-"
+                    if is_nr then
+                        band = earfcn_to_nr_band(earfcn)
+                    end
+                    table.insert(cells, {
+                        type = is_nr and "nr5g_scan" or "lte_scan",
+                        serving = false,
+                        earfcn = earfcn,
+                        pci = pci,
+                        band = band,
+                        rsrp = parts[6] or "-",
+                        rsrq = parts[7] or "-",
+                        sinr = parts[8] or "-",
+                        scs = "-",
+                        mcc = parts[2] or "-",
+                        mnc = parts[3] or "-"
+                    })
+                end
+            end
+        end
+    end
+    return cells
+end
+
 local function run_locked_transaction(config, fn)
     local fd, lock_err = at_lock.acquire(config.lock_path)
     if not fd then
@@ -169,7 +503,19 @@ local function run_command(config, command)
     if not result.ok and result.error then
         return nil, result.error
     end
-    return result.response or "", nil
+    local resp = result.response or ""
+    local cme = resp:match("%+CME ERROR:%s*(%d+)")
+    if cme then
+        return nil, "CME_ERROR_" .. cme
+    end
+    local cms = resp:match("%+CMS ERROR:%s*(%d+)")
+    if cms then
+        return nil, "CMS_ERROR_" .. cms
+    end
+    if resp:match("\nERROR%s*$") or resp:match("^ERROR%s*$") then
+        return nil, "AT_ERROR"
+    end
+    return resp, nil
 end
 
 local function must_run_command(config, command)
@@ -560,9 +906,6 @@ end
 
 function BandLockingApiHandler:get(url, action)
     action = normalize_action("band_locking_api", url, action)
-    if action ~= "state" then
-        error(turbo.web.HTTPError(404))
-    end
 
     local config, config_err = read_config()
     if not config then
@@ -571,38 +914,135 @@ function BandLockingApiHandler:get(url, action)
         return
     end
 
-    local payload, err = run_locked_transaction(config, function()
-        local mode_raw = must_run_command(config, 'AT+QNWPREFCFG="mode_pref"')
-        local lte_raw = must_run_command(config, 'AT+QNWPREFCFG="lte_band"')
-        local nsa_raw = must_run_command(config, 'AT+QNWPREFCFG="nsa_nr5g_band"')
-        local sa_raw = must_run_command(config, 'AT+QNWPREFCFG="nr5g_band"')
-        local qnwinfo_raw, qnwinfo_err = soft_run_command(config, 'AT+QNWINFO')
-        local qcainfo_raw, qcainfo_err = soft_run_command(config, 'AT+QCAINFO')
-        local servingcell_raw, servingcell_err = soft_run_command(config, 'AT+QENG="servingcell"')
+    if action == "state" then
+        local payload, err = run_locked_transaction(config, function()
+            local mode_raw = must_run_command(config, 'AT+QNWPREFCFG="mode_pref"')
+            local acq_raw = soft_run_command(config, 'AT+QNWPREFCFG="rat_acq_order"')
+            local nr5g_dis_raw = soft_run_command(config, 'AT+QNWPREFCFG="nr5g_disable_mode"')
+            local lte_raw = must_run_command(config, 'AT+QNWPREFCFG="lte_band"')
+            local nsa_raw = must_run_command(config, 'AT+QNWPREFCFG="nsa_nr5g_band"')
+            local sa_raw = must_run_command(config, 'AT+QNWPREFCFG="nr5g_band"')
+            local qnwinfo_raw, qnwinfo_err = soft_run_command(config, 'AT+QNWINFO')
+            local qcainfo_raw, qcainfo_err = soft_run_command(config, 'AT+QCAINFO')
+            local servingcell_raw, servingcell_err = soft_run_command(config, 'AT+QENG="servingcell"')
 
-        return {
-            ok = true,
-            mode_pref = parse_pref_value("mode_pref", mode_raw) or "AUTO",
-            lte_band_raw = parse_pref_value("lte_band", lte_raw) or "0",
-            nsa_nr5g_band_raw = parse_pref_value("nsa_nr5g_band", nsa_raw) or "0",
-            nr5g_band_raw = parse_pref_value("nr5g_band", sa_raw) or "0",
-            lte_band_list = split_band_string(parse_pref_value("lte_band", lte_raw) or "0"),
-            nsa_nr5g_band_list = split_band_string(parse_pref_value("nsa_nr5g_band", nsa_raw) or "0"),
-            nr5g_band_list = split_band_string(parse_pref_value("nr5g_band", sa_raw) or "0"),
-            qnwinfo_summary = qnwinfo_raw and summarize_response("AT+QNWINFO", qnwinfo_raw) or ("unavailable: " .. tostring(qnwinfo_err)),
-            qcainfo_summary = qcainfo_raw and summarize_response("AT+QCAINFO", qcainfo_raw) or ("unavailable: " .. tostring(qcainfo_err)),
-            servingcell_summary = servingcell_raw and summarize_response('AT+QENG="servingcell"', servingcell_raw) or ("unavailable: " .. tostring(servingcell_err))
-        }
-    end)
+            return {
+                ok = true,
+                mode_pref = parse_pref_value("mode_pref", mode_raw) or "AUTO",
+                rat_acq_order = acq_raw and parse_pref_value("rat_acq_order", acq_raw) or "",
+                nr5g_disable_mode = nr5g_dis_raw and parse_pref_value("nr5g_disable_mode", nr5g_dis_raw) or "0",
+                lte_band_raw = parse_pref_value("lte_band", lte_raw) or "0",
+                nsa_nr5g_band_raw = parse_pref_value("nsa_nr5g_band", nsa_raw) or "0",
+                nr5g_band_raw = parse_pref_value("nr5g_band", sa_raw) or "0",
+                lte_band_list = split_band_string(parse_pref_value("lte_band", lte_raw) or "0"),
+                nsa_nr5g_band_list = split_band_string(parse_pref_value("nsa_nr5g_band", nsa_raw) or "0"),
+                nr5g_band_list = split_band_string(parse_pref_value("nr5g_band", sa_raw) or "0"),
+                qnwinfo_summary = qnwinfo_raw and summarize_response("AT+QNWINFO", qnwinfo_raw) or ("unavailable: " .. tostring(qnwinfo_err)),
+                qcainfo_summary = qcainfo_raw and summarize_response("AT+QCAINFO", qcainfo_raw) or ("unavailable: " .. tostring(qcainfo_err)),
+                servingcell_summary = servingcell_raw and summarize_response('AT+QENG="servingcell"', servingcell_raw) or ("unavailable: " .. tostring(servingcell_err))
+            }
+        end)
 
-    if not payload then
-        local status = err == "at_channel_busy" and 409 or 502
-        self:set_status(status)
-        self:write({ ok = false, error = err })
+        if not payload then
+            local status = err == "at_channel_busy" and 409 or 502
+            self:set_status(status)
+            self:write({ ok = false, error = err })
+            return
+        end
+
+        self:write(payload)
         return
     end
 
-    self:write(payload)
+    if action == "cell_state" then
+        local payload, err = run_locked_transaction(config, function()
+            local lte_raw, lte_err = soft_run_command(config, 'AT+QNWLOCK="common/4g"')
+            local nr5g_raw, nr5g_err = soft_run_command(config, 'AT+QNWLOCK="common/5g"')
+
+            local lte_status = lte_raw and parse_qnwlock_status(lte_raw, "common/4g") or { locked = false, detail = "" }
+            local nr5g_status = nr5g_raw and parse_qnwlock_status(nr5g_raw, "common/5g") or { locked = false, detail = "" }
+
+            return {
+                ok = true,
+                lte_locked = lte_status.locked,
+                lte_detail = lte_status.detail,
+                nr5g_locked = nr5g_status.locked,
+                nr5g_detail = nr5g_status.detail
+            }
+        end)
+
+        if not payload then
+            local status = err == "at_channel_busy" and 409 or 502
+            self:set_status(status)
+            self:write({ ok = false, error = err })
+            return
+        end
+
+        self:write(payload)
+        return
+    end
+
+    if action == "cell_scan" then
+        local saved_read_timeout = config.read_timeout_ms
+        local saved_hard_timeout = config.hard_timeout_ms
+        config.read_timeout_ms = 30000
+        config.hard_timeout_ms = 60000
+        local payload, err = run_locked_transaction(config, function()
+            local serving_raw, serving_err = soft_run_command(config, 'AT+QENG="servingcell"')
+            local neighbour_raw, neighbour_err = soft_run_command(config, 'AT+QENG="neighbourcell"')
+            local qscan_raw, qscan_err = soft_run_command(config, 'AT+QSCAN=3')
+
+            local cells = {}
+            if serving_raw then
+                local serving_cells = parse_serving_cell(serving_raw)
+                for _, c in ipairs(serving_cells) do
+                    table.insert(cells, c)
+                end
+            end
+            if neighbour_raw then
+                local nbr_cells = parse_neighbour_cells(neighbour_raw)
+                for _, c in ipairs(nbr_cells) do
+                    table.insert(cells, c)
+                end
+            end
+
+            if qscan_raw then
+                local seen = {}
+                for _, c in ipairs(cells) do
+                    seen[c.earfcn .. ":" .. c.pci] = true
+                end
+                local scan_cells = parse_qscan_cells(qscan_raw)
+                for _, c in ipairs(scan_cells) do
+                    if not seen[c.earfcn .. ":" .. c.pci] then
+                        table.insert(cells, c)
+                        seen[c.earfcn .. ":" .. c.pci] = true
+                    end
+                end
+            end
+
+            return {
+                ok = true,
+                cells = cells,
+                serving_raw = serving_raw and summarize_response('AT+QENG="servingcell"', serving_raw) or ("unavailable: " .. tostring(serving_err)),
+                neighbour_raw = neighbour_raw and summarize_response('AT+QENG="neighbourcell"', neighbour_raw) or ("unavailable: " .. tostring(neighbour_err)),
+                qscan_raw = qscan_raw and summarize_response('AT+QSCAN=3', qscan_raw) or ("unavailable: " .. tostring(qscan_err))
+            }
+        end)
+        config.read_timeout_ms = saved_read_timeout
+        config.hard_timeout_ms = saved_hard_timeout
+
+        if not payload then
+            local status = err == "at_channel_busy" and 409 or 502
+            self:set_status(status)
+            self:write({ ok = false, error = err })
+            return
+        end
+
+        self:write(payload)
+        return
+    end
+
+    error(turbo.web.HTTPError(404))
 end
 
 function BandLockingApiHandler:post(url, action)
@@ -631,6 +1071,68 @@ function BandLockingApiHandler:post(url, action)
                 response = summarize_response(command, response),
                 applied_mode = parse_pref_value("mode_pref", readback_raw) or "",
                 readback_summary = summarize_response('AT+QNWPREFCFG="mode_pref"', readback_raw)
+            }
+        end)
+
+        if not result then
+            local status = err == "at_channel_busy" and 409 or 502
+            self:set_status(status)
+            self:write({ ok = false, error = err })
+            return
+        end
+
+        self:write(result)
+        return
+    end
+
+    if action == "rat_acq_order" then
+        local order, order_err = validate_rat_acq_order(self:get_argument("order", ""))
+        if not order then
+            self:set_status(400)
+            self:write({ ok = false, error = order_err })
+            return
+        end
+
+        local result, err = run_locked_transaction(config, function()
+            local command = 'AT+QNWPREFCFG="rat_acq_order",' .. order
+            local response = must_run_command(config, command)
+            local readback_raw = must_run_command(config, 'AT+QNWPREFCFG="rat_acq_order"')
+            return {
+                ok = true,
+                response = summarize_response(command, response),
+                applied_order = parse_pref_value("rat_acq_order", readback_raw) or "",
+                readback_summary = summarize_response('AT+QNWPREFCFG="rat_acq_order"', readback_raw)
+            }
+        end)
+
+        if not result then
+            local status = err == "at_channel_busy" and 409 or 502
+            self:set_status(status)
+            self:write({ ok = false, error = err })
+            return
+        end
+
+        self:write(result)
+        return
+    end
+
+    if action == "nr5g_disable" then
+        local val, val_err = validate_nr5g_disable_mode(self:get_argument("value", ""))
+        if not val then
+            self:set_status(400)
+            self:write({ ok = false, error = val_err })
+            return
+        end
+
+        local result, err = run_locked_transaction(config, function()
+            local command = 'AT+QNWPREFCFG="nr5g_disable_mode",' .. val
+            local response = must_run_command(config, command)
+            local readback_raw = must_run_command(config, 'AT+QNWPREFCFG="nr5g_disable_mode"')
+            return {
+                ok = true,
+                response = summarize_response(command, response),
+                applied_value = parse_pref_value("nr5g_disable_mode", readback_raw) or "",
+                readback_summary = summarize_response('AT+QNWPREFCFG="nr5g_disable_mode"', readback_raw)
             }
         end)
 
@@ -684,6 +1186,186 @@ function BandLockingApiHandler:post(url, action)
 
         self:write(result)
         return
+    end
+
+    if action == "cell_lock" then
+        local cell_action, ca_err = validate_cell_lock_action(self:get_argument("action", ""))
+        if not cell_action then
+            self:set_status(400)
+            self:write({ ok = false, error = ca_err })
+            return
+        end
+
+        local cfun_restart = self:get_argument("cfun_restart", "") == "1"
+
+        if cell_action == "lock_lte" then
+            local num_cells, nc_err = validate_numeric(self:get_argument("num_cells", ""), "num_cells", 1, 10)
+            if not num_cells then
+                self:set_status(400)
+                self:write({ ok = false, error = nc_err })
+                return
+            end
+
+            local pair_parts, pp_err = validate_cell_pairs(self:get_argument("pairs", ""), tonumber(num_cells))
+            if not pair_parts then
+                self:set_status(400)
+                self:write({ ok = false, error = pp_err })
+                return
+            end
+
+            local command = 'AT+QNWLOCK="common/4g",' .. num_cells .. "," .. table.concat(pair_parts, ",")
+            local saved_read_timeout = config.read_timeout_ms
+            config.read_timeout_ms = 10000
+            local result, err = run_locked_transaction(config, function()
+                if cfun_restart then
+                    soft_run_command(config, "AT+CFUN=0")
+                end
+                local response, cmd_err = soft_run_command(config, command)
+                if not response then
+                    return { ok = false, error = "Modem rejected LTE cell lock: " .. (cmd_err or "unknown error"), command_sent = command }
+                end
+                if cfun_restart then
+                    soft_run_command(config, "AT+CFUN=1")
+                end
+                local readback_raw, rb_err = soft_run_command(config, 'AT+QNWLOCK="common/4g"')
+                local lte_status = readback_raw and parse_qnwlock_status(readback_raw, "common/4g") or { locked = false, detail = "" }
+                return {
+                    ok = true,
+                    command_sent = command,
+                    response = summarize_response(command, response),
+                    lte_locked = lte_status.locked,
+                    lte_detail = lte_status.detail,
+                    message = lte_status.locked and "LTE cell lock applied successfully." or "LTE cell lock command sent."
+                }
+            end)
+            config.read_timeout_ms = saved_read_timeout
+
+            if not result then
+                local status = err == "at_channel_busy" and 409 or 502
+                self:set_status(status)
+                self:write({ ok = false, error = err })
+                return
+            end
+
+            self:write(result)
+            return
+        end
+
+        if cell_action == "lock_nr5g" then
+            local earfcn, e_err = validate_numeric(self:get_argument("earfcn", ""), "earfcn", 0, 999999)
+            if not earfcn then
+                self:set_status(400)
+                self:write({ ok = false, error = e_err })
+                return
+            end
+            local pci, p_err = validate_numeric(self:get_argument("pci", ""), "pci", 0, 1007)
+            if not pci then
+                self:set_status(400)
+                self:write({ ok = false, error = p_err })
+                return
+            end
+            local scs, s_err = validate_scs_value(self:get_argument("scs", ""))
+            if not scs then
+                self:set_status(400)
+                self:write({ ok = false, error = s_err })
+                return
+            end
+            local band, b_err = validate_numeric(self:get_argument("band", ""), "band", 1, 512)
+            if not band then
+                self:set_status(400)
+                self:write({ ok = false, error = b_err })
+                return
+            end
+
+            local command = 'AT+QNWLOCK="common/5g",' .. earfcn .. "," .. pci .. "," .. scs .. "," .. band
+            local saved_read_timeout = config.read_timeout_ms
+            config.read_timeout_ms = 10000
+            local result, err = run_locked_transaction(config, function()
+                if cfun_restart then
+                    soft_run_command(config, "AT+CFUN=0")
+                end
+                local response, cmd_err = soft_run_command(config, command)
+                if not response then
+                    return { ok = false, error = "Modem rejected NR5G-SA cell lock: " .. (cmd_err or "unknown error"), command_sent = command }
+                end
+                if cfun_restart then
+                    soft_run_command(config, "AT+CFUN=1")
+                end
+                local readback_raw, rb_err = soft_run_command(config, 'AT+QNWLOCK="common/5g"')
+                local nr5g_status = readback_raw and parse_qnwlock_status(readback_raw, "common/5g") or { locked = false, detail = "" }
+                return {
+                    ok = true,
+                    command_sent = command,
+                    response = summarize_response(command, response),
+                    nr5g_locked = nr5g_status.locked,
+                    nr5g_detail = nr5g_status.detail,
+                    message = nr5g_status.locked and "NR5G-SA cell lock applied successfully." or "NR5G-SA cell lock command sent."
+                }
+            end)
+            config.read_timeout_ms = saved_read_timeout
+
+            if not result then
+                local status = err == "at_channel_busy" and 409 or 502
+                self:set_status(status)
+                self:write({ ok = false, error = err })
+                return
+            end
+
+            self:write(result)
+            return
+        end
+
+        if cell_action == "unlock_lte" then
+            local command = 'AT+QNWLOCK="common/4g",0'
+            local result, err = run_locked_transaction(config, function()
+                local response = must_run_command(config, command)
+                local readback_raw, rb_err = soft_run_command(config, 'AT+QNWLOCK="common/4g"')
+                local lte_status = readback_raw and parse_qnwlock_status(readback_raw, "common/4g") or { locked = false, detail = "" }
+                return {
+                    ok = true,
+                    command_sent = command,
+                    response = summarize_response(command, response),
+                    lte_locked = lte_status.locked,
+                    message = not lte_status.locked and "LTE cell lock removed successfully." or "LTE unlock command sent."
+                }
+            end)
+
+            if not result then
+                local status = err == "at_channel_busy" and 409 or 502
+                self:set_status(status)
+                self:write({ ok = false, error = err })
+                return
+            end
+
+            self:write(result)
+            return
+        end
+
+        if cell_action == "unlock_nr5g" then
+            local command = 'AT+QNWLOCK="common/5g",0'
+            local result, err = run_locked_transaction(config, function()
+                local response = must_run_command(config, command)
+                local readback_raw, rb_err = soft_run_command(config, 'AT+QNWLOCK="common/5g"')
+                local nr5g_status = readback_raw and parse_qnwlock_status(readback_raw, "common/5g") or { locked = false, detail = "" }
+                return {
+                    ok = true,
+                    command_sent = command,
+                    response = summarize_response(command, response),
+                    nr5g_locked = nr5g_status.locked,
+                    message = not nr5g_status.locked and "NR5G-SA cell lock removed successfully." or "NR5G-SA unlock command sent."
+                }
+            end)
+
+            if not result then
+                local status = err == "at_channel_busy" and 409 or 502
+                self:set_status(status)
+                self:write({ ok = false, error = err })
+                return
+            end
+
+            self:write(result)
+            return
+        end
     end
 
     self:set_status(404)
@@ -994,7 +1676,12 @@ return {
         table.insert(handlers, 1, {"^/(jtools_general_api)/(state)$", JtoolGeneralApiHandler})
         table.insert(handlers, 1, {"^/(band_locking_api)/(state)$", BandLockingApiHandler})
         table.insert(handlers, 1, {"^/(band_locking_api)/(mode)$", BandLockingApiHandler})
+        table.insert(handlers, 1, {"^/(band_locking_api)/(rat_acq_order)$", BandLockingApiHandler})
+        table.insert(handlers, 1, {"^/(band_locking_api)/(nr5g_disable)$", BandLockingApiHandler})
         table.insert(handlers, 1, {"^/(band_locking_api)/(bands)$", BandLockingApiHandler})
+        table.insert(handlers, 1, {"^/(band_locking_api)/(cell_state)$", BandLockingApiHandler})
+        table.insert(handlers, 1, {"^/(band_locking_api)/(cell_scan)$", BandLockingApiHandler})
+        table.insert(handlers, 1, {"^/(band_locking_api)/(cell_lock)$", BandLockingApiHandler})
         table.insert(handlers, 1, {"^/(at_terminal_api)/(run)$", AtTerminalApiHandler})
     end
 }

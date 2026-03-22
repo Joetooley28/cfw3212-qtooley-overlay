@@ -78,6 +78,12 @@ local function terminal_status(data)
     if last == "ERROR" then
         return true, "ERROR"
     end
+    if last and last:find("^%+CME ERROR:") then
+        return true, "CME_ERROR"
+    end
+    if last and last:find("^%+CMS ERROR:") then
+        return true, "CMS_ERROR"
+    end
     return false, nil
 end
 

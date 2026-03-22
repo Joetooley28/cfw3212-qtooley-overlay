@@ -915,4 +915,103 @@ button.ookla-link-button[disabled],
     color: #d7dde4;
 }
 
+/* ── RAT control dark overrides ─────────────────────── */
+
+.rat-control-row label {
+    color: var(--jtools-soft-blue);
+}
+
+.rat-control-row select {
+    background: #252526;
+    border: 1px solid #3c3c3c;
+    color: #f5f5f5;
+}
+
+/* ── Cell locking dark overrides ────────────────────── */
+
+.cell-lock-status-label {
+    color: var(--jtools-soft-blue);
+}
+
+.cell-lock-status-unlocked {
+    background: #3a3f46;
+    color: #b9c2cc;
+}
+
+.cell-lock-status-locked {
+    background: #203529;
+    color: #89d185;
+}
+
+.cell-lock-small-btn {
+    background: linear-gradient(#0f6b95, #0a4f70);
+    border-color: #44627d;
+}
+
+.cell-lock-small-btn:hover,
+.cell-lock-small-btn:focus {
+    background: linear-gradient(#167cab, #0d5f87);
+}
+
+.cell-lock-scan-table th {
+    background: #25262a;
+    border-bottom-color: #3c3c3c;
+    color: #8fbcd6;
+}
+
+.cell-lock-scan-table td {
+    border-bottom-color: #3c3c3c;
+    color: #d4d4d4;
+}
+
+.cell-lock-scan-row:hover {
+    background: #2a3038;
+}
+
+.cell-lock-scan-serving td {
+    background: #1f2933;
+    color: var(--jtools-soft-blue);
+}
+
+.cell-lock-scan-serving:hover td {
+    background: #253040;
+}
+
+.cell-lock-scan-empty {
+    color: #9da3ad;
+}
+
+.cell-lock-fill-btn {
+    background: linear-gradient(#0f6b95, #0a4f70);
+    border-color: #44627d;
+}
+
+.cell-lock-fill-btn:hover,
+.cell-lock-fill-btn:focus {
+    background: linear-gradient(#167cab, #0d5f87);
+}
+
+.cell-lock-form-row label,
+.cell-lock-pair-row label,
+.cell-lock-checkbox-label {
+    color: var(--jtools-soft-blue);
+}
+
+.cell-lock-input {
+    background: #252526;
+    border-color: #3c3c3c;
+    color: #f5f5f5;
+}
+
+.cell-lock-notes {
+    border-top-color: #3c3c3c;
+    color: #9da3ad;
+}
+
+#cell-lock-status-msg {
+    background: #2d2d30;
+    border-color: #3c3c3c;
+    color: #d7dde4;
+}
+
 

@@ -507,6 +507,239 @@
     padding: 8px 10px;
 }
 
+/* ── RAT control ────────────────────────────────────── */
+
+.rat-control-row {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.rat-control-row label {
+    color: #355070;
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 140px;
+    text-align: right;
+}
+
+.rat-control-row select {
+    width: 200px;
+}
+
+.rat-control-row .band-lock-apply-button {
+    min-height: 32px;
+    min-width: 70px;
+    padding: 6px 14px;
+}
+
+.rat-control-row .band-lock-indicator {
+    min-width: 100px;
+}
+
+/* ── Cell locking ───────────────────────────────────── */
+
+.cell-lock-section {
+    margin-bottom: 14px;
+}
+
+.cell-lock-status-row {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    margin-bottom: 14px;
+}
+
+.cell-lock-status-label {
+    color: #355070;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.cell-lock-status-badge {
+    border-radius: 4px;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+}
+
+.cell-lock-status-unlocked {
+    background: #e8ecf0;
+    color: #5c6b7a;
+}
+
+.cell-lock-status-locked {
+    background: #d4edda;
+    color: #1e6b38;
+}
+
+.cell-lock-small-btn {
+    background: linear-gradient(#0d6fa5, #094c73);
+    border: 1px solid #0a5d8e;
+    border-radius: 3px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 11px;
+    margin-left: auto;
+    padding: 3px 10px;
+}
+
+.cell-lock-small-btn:hover,
+.cell-lock-small-btn:focus {
+    background: linear-gradient(#167cab, #0d5f87);
+}
+
+#cell-lock-status-msg {
+    margin-bottom: 12px;
+}
+
+.cell-lock-scan-section {
+    margin-bottom: 14px;
+}
+
+.cell-lock-scan-actions {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.cell-lock-scan-table {
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 6px;
+    width: 100%;
+}
+
+.cell-lock-scan-table th {
+    background: #edf1f5;
+    border-bottom: 2px solid #c8cdd3;
+    color: #355070;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 7px 8px;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+.cell-lock-scan-table td {
+    border-bottom: 1px solid #e0e4e8;
+    color: #1d313f;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    padding: 6px 8px;
+}
+
+.cell-lock-scan-row:hover {
+    background: #e8f0fa;
+}
+
+.cell-lock-scan-serving td {
+    background: #f0f8ff;
+    font-weight: 600;
+}
+
+.cell-lock-scan-serving:hover td {
+    background: #ddeefa;
+}
+
+.cell-lock-scan-empty {
+    color: #7a8a9a;
+    font-style: italic;
+    padding: 18px 8px;
+    text-align: center;
+}
+
+.cell-lock-fill-btn {
+    background: linear-gradient(#0d6fa5, #094c73);
+    border: 1px solid #0a5d8e;
+    border-radius: 3px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    padding: 3px 8px;
+}
+
+.cell-lock-fill-btn:hover,
+.cell-lock-fill-btn:focus {
+    background: linear-gradient(#167cab, #0d5f87);
+}
+
+.cell-lock-form {
+    margin-top: 14px;
+}
+
+.cell-lock-form-row {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.cell-lock-form-row label {
+    color: #355070;
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 110px;
+}
+
+.cell-lock-form-row select {
+    flex: 1;
+    max-width: 240px;
+}
+
+.cell-lock-pair-row {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.cell-lock-pair-row label {
+    color: #355070;
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 110px;
+}
+
+.cell-lock-input {
+    border: 1px solid #c8cdd3;
+    border-radius: 3px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    padding: 6px 8px;
+    width: 120px;
+}
+
+.cell-lock-input-sm {
+    width: 80px;
+}
+
+.cell-lock-checkbox-label {
+    align-items: center;
+    color: #355070;
+    cursor: pointer;
+    display: flex;
+    font-size: 13px;
+    gap: 8px;
+}
+
+.cell-lock-notes {
+    border-top: 1px solid #d8d8d8;
+    color: #7a8a9a;
+    font-size: 12px;
+    margin-top: 14px;
+    padding-top: 10px;
+}
+
+.cell-lock-notes p {
+    margin: 0 0 4px;
+}
+
 .jgd-page {
     --jgd-bg: #1e1e1e;
     --jgd-surface: #252526;
