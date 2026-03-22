@@ -1,0 +1,69 @@
+{{#loggedIn}}<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1100">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="format-detection" content="telephone=no">
+<link rel="stylesheet" href="/css/style.css?1.1.79.0">
+<link rel="stylesheet" href="/css/jquery-ui.css?1.1.79.0">
+<link rel="stylesheet" href="/css/validationEngine.jquery.css?1.1.79.0">
+<link rel="stylesheet" href="/css/at_terminal.css?jtools-ui-v20260320">
+<link rel="stylesheet" href="/css/ttl_helper.css?jtools-ttl-v20260321">
+<script>
+if (top !== self) top.location = self.location;
+var nas_installed = '<<<system.package.installed.nas>>>';
+var service_pppoe_server_0_enable = '<<<service.pppoe.server.0.enable>>>';
+var relUrlOfPage = 'ttl_helper.html';
+var user = '{{loggedInUser}}';
+var userGroup = '{{loggedInUserGroup}}';
+var userGroups = userGroup.split(',');
+var csrfToken = '{{csrfToken}}';
+var currentLanguage = '{{lang}}';
+var searchParams = new URLSearchParams(location.search);
+var queryParams = {};
+for (const [key, value] of searchParams) { queryParams[key] = value; }
+</script>
+<script src="/js/{{lang}}/xlat.js?1.1.79.0"></script>
+<script src="/js/jquery.min.js?1.1.79.0"></script>
+<script src="/js/jquery.validate.min.js?1.1.79.0"></script>
+<script src="/js/jquery.validationEngine.min.js?1.1.79.0"></script>
+<script src="/js/jquery.blockUI.min.js?1.1.79.0"></script>
+<script src="/js/jquery-ui.min.js?1.1.79.0"></script>
+<script src="/js/jquery.ui.touch-punch.min.js?1.1.79.0"></script>
+<script src="/js/NTC_UI.js?1.1.79.0"></script>
+<script src="/js/script.js?1.1.79.0"></script>
+<script src="/js/language_selection.js?1.1.79.0"></script>
+<script src="/js/generatedSupportedLanguages.js?1.1.79.0"></script>
+<script src="/js/generatedMenuEntries.js?jtools-menu-v20260321a"></script>
+<script src="/theme/js/genHeader.js?1.1.79.0"></script>
+<script src="/theme/js/genFooter.js?1.1.79.0"></script>
+<script src="/js/ttl_helper.js?jtools-ttl-v20260321"></script>
+<script>
+var pageData = {
+    title: "TTL helper",
+    menuPos: ["JtoolServices", "TtlHelper"],
+    pageObjects: [],
+    onReady: function () {
+        if (window.JtoolsTtlHelper) {
+            window.JtoolsTtlHelper.init();
+        }
+    }
+};
+if (pageData.disabled !== true) {
+    if (pageData.pageObjects.length) {
+        requestPageObjects();
+    } else {
+        $(document).ready(function () {
+            if (typeof pageData.onReady === "function") {
+                pageData.onReady();
+            }
+            setVisible("#body", "1");
+        });
+    }
+}
+</script>
+</head>
+<body id="body" style="display: none;"></body>
+</html>
+{{/loggedIn}}

@@ -1,0 +1,24 @@
+Jtools stock UI package
+Release date: 2026-03-20
+
+Current proven model
+- Keep payload in /usrdata/at-stock-ui
+- Build live trees in /usrdata/at-stock-ui/live
+- Bind-mount live/www onto /www
+- Bind-mount live/usr/share/lua/5.1/webif onto /usr/share/lua/5.1/webif
+- Restart turbontc.service after binding
+- Reapply late with jtools-stock-ui.timer
+
+Jtools asset tokens
+- generatedMenuEntries.js?jtools-menu-v20260320
+- at_terminal.css?jtools-ui-v20260320
+- general_dashboard_core.js?jtools-general-core-v20260320
+- general_dashboard.js?jtools-general-v20260320
+- at_terminal.js?jtools-at-v20260320
+- band_cell_locking_core.js?jtools-bandlock-core-v20260320
+- band_cell_locking.js?jtools-bandlock-v20260320
+
+Important reminders
+- Do not replace the late timer with early boot logic unless a better model is proven.
+- Do not remove the shared AT lock at /tmp/at-http.lock.
+- Verify bind mounts with /proc/self/mountinfo, not plain mount.

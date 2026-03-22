@@ -1,0 +1,10 @@
+[Unit]
+Description=Late start Jtools stock UI overlay
+
+[Timer]
+OnBootSec=2min
+Unit=jtools-stock-ui.service
+Persistent=true
+
+[Install]
+WantedBy=timers.target

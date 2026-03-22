@@ -1,0 +1,272 @@
+#ttl-panel {
+    margin-top: 20px;
+}
+
+.ttl-top-row {
+    display: flex;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.ttl-status-card {
+    background: #fff;
+    border: 1px solid #d8d8d8;
+    flex: 1;
+    padding: 18px;
+}
+
+.ttl-info-card {
+    background: #fff;
+    border: 1px solid #d8d8d8;
+    flex: 1;
+    padding: 18px;
+}
+
+.ttl-status-card h3 {
+    color: #355070;
+    font-size: 15px;
+    margin: 0 0 14px 0;
+}
+
+.ttl-status-row {
+    align-items: center;
+    display: flex;
+    gap: 14px;
+    margin-bottom: 10px;
+}
+
+.ttl-status-label {
+    color: #6a7f95;
+    font-size: 13px;
+    min-width: 120px;
+}
+
+.ttl-status-value {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.ttl-pill {
+    border-radius: 999px;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    min-width: 72px;
+    padding: 7px 10px;
+    text-align: center;
+}
+
+.ttl-pill-active {
+    background: #edf7ef;
+    color: #25613d;
+}
+
+.ttl-pill-inactive {
+    background: #f5f7fa;
+    color: #6a7f95;
+}
+
+.ttl-controls-card {
+    background: #fff;
+    border: 1px solid #d8d8d8;
+    margin-bottom: 18px;
+    padding: 18px;
+}
+
+.ttl-controls-card h3 {
+    color: #355070;
+    font-size: 15px;
+    margin: 0 0 14px 0;
+}
+
+.ttl-preset-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.ttl-preset-button {
+    background: #0f5f83;
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    min-height: 40px;
+    min-width: 80px;
+    padding: 8px 16px;
+}
+
+.ttl-preset-button:hover,
+.ttl-preset-button:focus {
+    background: #0a4c69;
+}
+
+.ttl-custom-row {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.ttl-custom-input {
+    background: #e8ecf0;
+    border: 1px solid #bfc7cf;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-family: monospace;
+    font-size: 16px;
+    padding: 12px 14px;
+    width: 120px;
+}
+
+.ttl-toggle-row {
+    align-items: center;
+    display: flex;
+    gap: 14px;
+    margin-top: 16px;
+}
+
+.ttl-toggle-label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.ttl-update-button {
+    background: #a63434;
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    min-height: 30px;
+    padding: 6px 18px;
+}
+
+.ttl-update-button:hover,
+.ttl-update-button:focus {
+    background: #872727;
+}
+
+.ttl-info-card h3 {
+    color: #355070;
+    font-size: 15px;
+    margin: 0 0 10px 0;
+}
+
+.ttl-info-card p {
+    color: #6a7f95;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 0 0 8px 0;
+}
+
+.ttl-banner {
+    border-radius: 4px;
+    font-size: 13px;
+    margin-bottom: 14px;
+    padding: 10px 14px;
+}
+
+.ttl-banner-ok {
+    background: #edf7ef;
+    border: 1px solid #b2dfc4;
+    color: #25613d;
+}
+
+.ttl-banner-error {
+    background: #fff1ef;
+    border: 1px solid #f5c6c0;
+    color: #8a1f11;
+}
+
+.ttl-banner-warn {
+    background: #fff7e8;
+    border: 1px solid #f0dca8;
+    color: #8b5b00;
+}
+
+.ttl-banner-hidden {
+    display: none;
+}
+
+.ttl-rules-card {
+    background: #fff;
+    border: 1px solid #d8d8d8;
+    margin-bottom: 18px;
+}
+
+.ttl-rules-header {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    gap: 10px;
+    padding: 14px 18px;
+    user-select: none;
+}
+
+.ttl-rules-header h3 {
+    color: #355070;
+    flex: 1;
+    font-size: 15px;
+    margin: 0;
+}
+
+.ttl-rules-arrow {
+    color: #6a7f95;
+    font-size: 12px;
+    width: 16px;
+}
+
+.ttl-rules-refresh {
+    background: #0f5f83;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 4px 12px;
+}
+
+.ttl-rules-refresh:hover {
+    background: #0a4c69;
+}
+
+.ttl-rules-body {
+    border-top: 1px solid #d8d8d8;
+    padding: 14px 18px;
+}
+
+.ttl-rules-section {
+    margin-bottom: 14px;
+}
+
+.ttl-rules-section:last-child {
+    margin-bottom: 0;
+}
+
+.ttl-rules-label {
+    color: #6a7f95;
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.ttl-rules-pre {
+    background: #f5f7fa;
+    border: 1px solid #d8d8d8;
+    border-radius: 4px;
+    color: #333;
+    font-family: monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 0;
+    max-height: 300px;
+    overflow: auto;
+    padding: 12px;
+    white-space: pre;
+}

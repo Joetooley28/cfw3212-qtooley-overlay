@@ -1,0 +1,663 @@
+#ookla-speedtest-panel {
+    margin-top: 20px;
+}
+
+.ookla-page {
+    background: linear-gradient(180deg, #f7f9fc 0%, #eef3f9 100%);
+    border: 1px solid #dbe4ef;
+    padding: 22px;
+}
+
+.ookla-hero-copy {
+    max-width: 720px;
+}
+
+.ookla-eyebrow {
+    color: #496d97;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.ookla-title {
+    background: transparent !important;
+    color: #0f2b46 !important;
+    font-size: 38px;
+    font-weight: 800;
+    line-height: 1.02;
+    margin: 0 0 10px 0;
+    padding: 0;
+}
+
+.ookla-subtitle {
+    color: #395471;
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 0;
+    max-width: 680px;
+}
+
+.ookla-run-button {
+    background: linear-gradient(180deg, #c54242 0%, #992b2b 100%);
+    min-width: 170px;
+}
+
+.ookla-run-button:hover,
+.ookla-run-button:focus {
+    background: linear-gradient(180deg, #d25454 0%, #ad3636 100%);
+}
+
+.ookla-secondary-button {
+    background: linear-gradient(180deg, #2b6f99 0%, #124d70 100%);
+    min-width: 160px;
+}
+
+.ookla-banner {
+    background: #edf4fb;
+    border: 1px solid #d3dfec;
+    color: #294867;
+    margin-bottom: 16px;
+    min-height: 18px;
+    padding: 12px 14px;
+}
+
+.ookla-banner.is-ok {
+    background: #edf7ef;
+    border-color: #cfe3d3;
+    color: #25613d;
+}
+
+.ookla-banner.is-error {
+    background: #fff1ef;
+    border-color: #efd0cc;
+    color: #8a1f11;
+}
+
+.ookla-banner.is-info {
+    background: #edf4fb;
+    border-color: #d3dfec;
+    color: #294867;
+}
+
+.ookla-banner.is-warn {
+    background: #fff7df;
+    border-color: #ecd08b;
+    color: #7a5b0b;
+}
+
+.ookla-banner-actions {
+    display: flex;
+    justify-content: flex-start;
+    margin: -4px 0 18px 0;
+}
+
+.ookla-recover-button {
+    background: linear-gradient(180deg, #2b6f99 0%, #124d70 100%);
+    min-width: 230px;
+}
+
+.ookla-toolbar {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: 1.4fr 0.8fr 0.7fr;
+    margin-bottom: 18px;
+}
+
+.ookla-field {
+    background: #ffffff;
+    border: 1px solid #d8e0ea;
+    padding: 12px;
+}
+
+.ookla-field label {
+    color: #4d6988;
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.ookla-select,
+.ookla-static {
+    border: 1px solid #c8d4e0;
+    box-sizing: border-box;
+    color: #17324d;
+    font-size: 14px;
+    min-height: 44px;
+    padding: 10px 12px;
+    width: 100%;
+}
+
+.ookla-select {
+    background: #ffffff;
+}
+
+.ookla-static {
+    background: #f5f8fb;
+}
+
+.ookla-grid {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: minmax(0, 1.55fr) minmax(280px, 0.75fr);
+    margin-bottom: 18px;
+}
+
+.ookla-grid-top {
+    grid-template-columns: 1fr;
+}
+
+.ookla-grid-lower {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-bottom: 0;
+}
+
+.ookla-stage-column {
+    display: grid;
+    gap: 18px;
+}
+
+.ookla-ca-card {
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #d8e0ea;
+    display: flex;
+    gap: 18px;
+    justify-content: space-between;
+    padding: 16px 18px;
+}
+
+.ookla-ca-copy {
+    min-width: 0;
+}
+
+.ookla-ca-label {
+    color: #b86118;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.ookla-ca-caption {
+    color: #56708e;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.ookla-ca-combo {
+    color: #1c3654;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-top: 8px;
+}
+
+.ookla-ca-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.ookla-ca-pill {
+    background: linear-gradient(180deg, #f9ede1 0%, #f4ddca 100%);
+    border: 1px solid #e1ba95;
+    border-radius: 999px;
+    color: #8a4d14;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    min-width: 74px;
+    padding: 10px 16px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.ookla-ca-pill.is-primary {
+    background: linear-gradient(180deg, #ffe792 0%, #ffd24a 100%);
+    border-color: #efbe29;
+    color: #5d4300;
+}
+
+.ookla-ca-pill.is-muted {
+    background: linear-gradient(180deg, #edf2f7 0%, #dbe3ec 100%);
+    border-color: #c0ccd8;
+    color: #6a7f97;
+}
+
+.ookla-stage-actions {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ookla-stage-actions .at-primary-button {
+    justify-self: center;
+}
+
+.ookla-gauges {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+}
+
+.ookla-card,
+.ookla-gauge-card {
+    background: #ffffff;
+    border: 1px solid #d8e0ea;
+    padding: 18px;
+}
+
+.ookla-card-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.ookla-details-card {
+    min-width: 0;
+}
+
+.ookla-card-bottom {
+    margin-top: 18px;
+}
+
+.ookla-card-title {
+    color: #b86118;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 14px;
+}
+
+.ookla-card-title-sub {
+    margin-top: 18px;
+}
+
+.ookla-gauge-head {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.ookla-gauge-kicker {
+    color: #547190;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.ookla-gauge-badge {
+    background: #aab7c6;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(170, 183, 198, 0.18);
+    height: 12px;
+    width: 12px;
+}
+
+.ookla-gauge-badge.is-live {
+    background: #f6bf45;
+    box-shadow: 0 0 0 4px rgba(246, 191, 69, 0.18);
+}
+
+.ookla-gauge-badge.is-done {
+    background: #5ec77f;
+    box-shadow: 0 0 0 4px rgba(94, 199, 127, 0.18);
+}
+
+.ookla-gauge-badge.is-failed {
+    background: #df6a5d;
+    box-shadow: 0 0 0 4px rgba(223, 106, 93, 0.18);
+}
+
+.ookla-gauge {
+    --ookla-gauge-turn: 0turn;
+    align-items: center;
+    background: conic-gradient(#d94f4f 0turn, #e79e5a var(--ookla-gauge-turn), #e5edf5 var(--ookla-gauge-turn), #e5edf5 1turn);
+    border-radius: 50%;
+    display: flex;
+    height: 260px;
+    justify-content: center;
+    margin: 0 auto 16px auto;
+    position: relative;
+    width: 260px;
+}
+
+.ookla-gauge-card.is-upload .ookla-gauge {
+    background: conic-gradient(#2a8bb9 0turn, #5bc2df var(--ookla-gauge-turn), #e5edf5 var(--ookla-gauge-turn), #e5edf5 1turn);
+}
+
+.ookla-gauge::after {
+    background: #ffffff;
+    border-radius: 50%;
+    content: "";
+    height: 184px;
+    position: absolute;
+    width: 184px;
+}
+
+.ookla-gauge-inner {
+    position: relative;
+    text-align: center;
+    z-index: 1;
+}
+
+.ookla-gauge-value {
+    color: #0f2b46;
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.ookla-gauge-unit,
+.ookla-gauge-scale,
+.ookla-gauge-subtitle {
+    color: #5a7594;
+}
+
+.ookla-gauge-unit {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    margin-top: 6px;
+    text-transform: uppercase;
+}
+
+.ookla-gauge-scale {
+    font-size: 13px;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.ookla-gauge-idle {
+    opacity: 0.92;
+}
+
+.ookla-gauge-subtitle {
+    font-size: 14px;
+    line-height: 1.45;
+    text-align: center;
+}
+
+.ookla-gauges.is-running .ookla-gauge {
+    animation: ooklaPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes ooklaPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.ookla-meta-grid {
+    display: grid;
+    gap: 12px;
+}
+
+.ookla-meta-item {
+    background: #f7fafc;
+    border: 1px solid #dce4ee;
+    padding: 12px;
+}
+
+.ookla-meta-label {
+    color: #597492;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.ookla-meta-value {
+    color: #18324d;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.ookla-action-grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ookla-live-strip {
+    background: linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%);
+    border: 1px solid #d8e0ea;
+    padding: 16px 18px;
+}
+
+.ookla-live-strip-top {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.ookla-live-stage {
+    color: #18405f;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.ookla-live-progress {
+    color: #587290;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.ookla-live-bar {
+    background: #dfe8f1;
+    height: 10px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    position: relative;
+}
+
+.ookla-live-bar span {
+    background: linear-gradient(90deg, #d75445 0%, #e59a49 45%, #4bb6df 100%);
+    display: block;
+    height: 100%;
+    transition: width 0.4s ease;
+}
+
+.ookla-live-metrics {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ookla-live-metric {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #d6e0ea;
+    padding: 12px;
+}
+
+.ookla-live-metric span {
+    color: #5e7895;
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.ookla-live-metric strong {
+    color: #15324f;
+    font-size: 16px;
+}
+
+.ookla-link-button {
+    align-items: center;
+    background: #153b5c;
+    border-radius: 10px;
+    border: 1px solid #153b5c;
+    color: #ffffff;
+    display: inline-flex;
+    font-size: 13px;
+    font-weight: 700;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0 14px;
+    text-decoration: none;
+}
+
+.ookla-link-button:hover,
+.ookla-link-button:focus,
+.ookla-link-button.is-primary {
+    background: #153b5c;
+    border-color: #153b5c;
+    color: #ffffff;
+}
+
+.ookla-link-button[disabled] {
+    background: #edf1f5;
+    border-color: #d8e0ea;
+    color: #8a98a6;
+}
+
+.ookla-summary {
+    display: grid;
+    gap: 10px;
+}
+
+.ookla-summary-line {
+    color: #284565;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.ookla-history {
+    display: grid;
+    gap: 12px;
+}
+
+.ookla-history-item {
+    background: #f7fafc;
+    border: 1px solid #dce4ee;
+    padding: 12px;
+}
+
+.ookla-history-top {
+    align-items: baseline;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.ookla-history-speed,
+.ookla-history-time,
+.ookla-history-meta {
+    color: #24415f;
+}
+
+.ookla-history-speed {
+    font-size: 14px;
+}
+
+.ookla-history-time {
+    font-size: 12px;
+}
+
+.ookla-history-meta {
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.ookla-history-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.ookla-empty {
+    background: #f7fafc;
+    border: 1px dashed #ced9e4;
+    color: #5f7692;
+    line-height: 1.5;
+    padding: 16px;
+}
+
+.ookla-empty-large {
+    min-height: 280px;
+}
+
+.ookla-details {
+    border-top: 1px solid #d8e0ea;
+    margin-top: 2px;
+    padding-top: 14px;
+}
+
+.ookla-details-summary {
+    color: #b86118;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 700;
+    list-style: none;
+    margin-bottom: 14px;
+}
+
+.ookla-details-summary::-webkit-details-marker {
+    display: none;
+}
+
+.ookla-details-summary::after {
+    content: "Show";
+    float: right;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.ookla-details[open] .ookla-details-summary::after {
+    content: "Hide";
+}
+
+@media (max-width: 1280px) {
+    .ookla-grid-lower {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 1180px) {
+    .ookla-grid-lower {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 900px) {
+    .ookla-toolbar,
+    .ookla-gauges,
+    .ookla-live-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .ookla-action-grid,
+    .ookla-stage-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .ookla-ca-card {
+        flex-direction: column;
+    }
+
+    .ookla-banner-actions {
+        justify-content: center;
+    }
+
+    .ookla-ca-pills {
+        justify-content: flex-start;
+    }
+}
