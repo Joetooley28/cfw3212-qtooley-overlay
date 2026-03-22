@@ -1,0 +1,109 @@
+{{#loggedIn}}<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="format-detection" content="telephone=no">
+<link rel="stylesheet" href="/css/style.css?1.1.79.0">
+<link rel="stylesheet" href="/css/jquery-ui.css?1.1.79.0">
+<link rel="stylesheet" href="/css/validationEngine.jquery.css?1.1.79.0">
+<link rel="stylesheet" href="/css/quick_overview.css?jtools-qo-v20260322a">
+<script>
+if (top !== self) top.location = self.location;
+var nas_installed = '<<<system.package.installed.nas>>>';
+var service_pppoe_server_0_enable = '<<<service.pppoe.server.0.enable>>>';
+var relUrlOfPage = 'quick_overview.html';
+var user = '{{loggedInUser}}';
+var userGroup = '{{loggedInUserGroup}}';
+var userGroups = userGroup.split(',');
+var csrfToken = '{{csrfToken}}';
+var currentLanguage = '{{lang}}';
+var searchParams = new URLSearchParams(location.search);
+var queryParams = {};
+for (const [key, value] of searchParams) { queryParams[key] = value; }
+</script>
+<script src="/js/{{lang}}/xlat.js?1.1.79.0"></script>
+<script src="/js/jquery.min.js?1.1.79.0"></script>
+<script src="/js/jquery.validate.min.js?1.1.79.0"></script>
+<script src="/js/jquery.validationEngine.min.js?1.1.79.0"></script>
+<script src="/js/jquery.blockUI.min.js?1.1.79.0"></script>
+<script src="/js/jquery-ui.min.js?1.1.79.0"></script>
+<script src="/js/jquery.ui.touch-punch.min.js?1.1.79.0"></script>
+<script src="/js/NTC_UI.js?1.1.79.0"></script>
+<script src="/js/script.js?1.1.79.0"></script>
+<script src="/js/language_selection.js?1.1.79.0"></script>
+<script src="/js/generatedSupportedLanguages.js?1.1.79.0"></script>
+<script src="/js/generatedMenuEntries.js?jtools-menu-v20260322a"></script>
+<script src="/theme/js/genHeader.js?1.1.79.0"></script>
+<script src="/theme/js/genFooter.js?1.1.79.0"></script>
+<script src="/js/quick_overview_core.js?jtools-qo-v20260322a"></script>
+<script src="/js/quick_overview.js?jtools-qo-v20260322a"></script>
+<script>
+var pageData = {
+    title: "Quick Overview",
+    menuPos: ["JtoolServices", "QuickOverview"],
+    pageObjects: [],
+    onReady: function () {
+        if (window.JtoolsQuickOverviewPage) {
+            window.JtoolsQuickOverviewPage.init();
+        }
+    }
+};
+if (pageData.disabled !== true) {
+    if (pageData.pageObjects.length) {
+        requestPageObjects();
+    } else {
+        $(document).ready(function () {
+            if (typeof pageData.onReady === "function") {
+                pageData.onReady();
+            }
+            setVisible("#body", "1");
+        });
+    }
+}
+</script>
+</head>
+<body id="body" style="display: none;">
+<div class="qo-page" id="qoPageRoot">
+    <div class="qo-page-header">
+        <span class="qo-page-title"><span class="qo-status-dot" id="qoStatusDot"></span>Quick Overview</span>
+        <button type="button" class="qo-settings-toggle-btn" id="qoSettingsToggle">Close settings</button>
+    </div>
+
+    <div class="qo-card">
+        <div class="qo-card-title">Signal Grade</div>
+        <div id="qoGradeCard"><div class="qo-no-data">Loading&hellip;</div></div>
+    </div>
+
+    <div class="qo-card">
+        <div class="qo-card-title">Signal Over Time</div>
+        <div class="qo-chart-wrap" id="qoChartWrap">
+            <canvas class="qo-chart-canvas" id="qoChartCanvas"></canvas>
+        </div>
+        <div class="qo-chart-legend">
+            <span><span class="qo-chart-legend-dot" style="background:#8db9ff"></span>RSRP</span>
+            <span><span class="qo-chart-legend-dot" style="background:#00e676"></span>SINR</span>
+        </div>
+    </div>
+
+    <div class="qo-card">
+        <div class="qo-card-title">Band Change History</div>
+        <div class="qo-history-list" id="qoHistoryList"><div class="qo-no-data">No band changes recorded yet</div></div>
+    </div>
+
+    <div class="qo-card">
+        <div class="qo-card-title">Connection Info</div>
+        <div id="qoConnInfo"><div class="qo-no-data">Loading&hellip;</div></div>
+    </div>
+
+    <div class="qo-card">
+        <div class="qo-card-title">Settings</div>
+        <div class="qo-settings is-open" id="qoSettingsWrap">
+            <div class="qo-settings-inner" id="qoSettingsBody"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+{{/loggedIn}}

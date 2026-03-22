@@ -200,6 +200,11 @@ return { authTable = {
         writeGroups = {root=true,admin=true},
         skipAuth = false
     },
+    ["quick_overview.html"] = {
+        readGroups = {root=true,admin=true},
+        writeGroups = {root=true,admin=true},
+        skipAuth = false
+    },
     ["AtTerminalInfo"] = {
         readGroups = {root=true,admin=true},
         writeGroups = {root=true,admin=true},

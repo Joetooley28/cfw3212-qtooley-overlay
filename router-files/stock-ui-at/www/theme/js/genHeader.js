@@ -7,6 +7,7 @@ function genThemeHeader(pageData, userGroups) {
 
     function ensureJtoolsDarkModeStylesheet() {
         const darkModePages = {
+            "quick_overview.html": true,
             "general_dashboard.html": true,
             "at_terminal.html": true,
             "band_cell_locking.html": true,
@@ -256,6 +257,12 @@ function genThemeHeader(pageData, userGroups) {
     $("#side-menu").append(h_side);
     renderThemeToggle();
 
+    // Inject screensaver idle detector on dark-mode pages
+    if (document.querySelector("link[data-jtools-dark-mode]") && relUrlOfPage !== "quick_overview.html") {
+        var ssScript = document.createElement("script");
+        ssScript.src = "/js/jtools_screensaver.js?jtools-qo-v20260322a";
+        document.head.appendChild(ssScript);
+    }
 
     $("input[type=text]").keyup(function(e) {
         let code = e.keyCode || e.which;
