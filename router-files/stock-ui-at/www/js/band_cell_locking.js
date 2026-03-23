@@ -711,7 +711,7 @@
 
         var panel = document.createElement("div");
         panel.id = "band-lock-panel";
-        panel.className = "body-box form-row";
+        panel.className = "body-box form-row qt-card";
         panel.innerHTML = core.buildPanelHtml();
 
         var htmlGoesHere = document.getElementById("htmlGoesHere");

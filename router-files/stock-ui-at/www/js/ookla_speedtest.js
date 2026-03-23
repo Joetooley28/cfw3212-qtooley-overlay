@@ -253,6 +253,88 @@
         ].join("");
     }
 
+    var flipGaugeMode = "download";
+    var flipTimer = null;
+
+    function startFlipTimer() {
+        stopFlipTimer();
+        flipTimer = setInterval(function () {
+            flipGaugeMode = flipGaugeMode === "download" ? "upload" : "download";
+            renderFlipGauge();
+        }, 4000);
+    }
+
+    function stopFlipTimer() {
+        if (flipTimer) {
+            clearInterval(flipTimer);
+            flipTimer = null;
+        }
+    }
+
+    function manualFlip() {
+        flipGaugeMode = flipGaugeMode === "download" ? "upload" : "download";
+        renderFlipGauge();
+        startFlipTimer();
+    }
+
+    function renderFlipGauge() {
+        var slot = document.getElementById("ookla-flip-gauge-slot");
+        if (!slot) return;
+        var liveGauge = liveGaugeState();
+        var scale = liveGauge.scale;
+        var isDl = flipGaugeMode === "download";
+
+        var value, title, subtitle, accentClass, gaugeKind;
+        if (isDl) {
+            value = liveGauge.downloadValue;
+            title = "Download";
+            accentClass = "is-download";
+            gaugeKind = "download";
+            subtitle = state.running && liveGauge.mode === "download" ? "Live downstream" : "Router-side downstream";
+        } else {
+            value = liveGauge.uploadValue;
+            title = "Upload";
+            accentClass = "is-upload";
+            gaugeKind = "upload";
+            subtitle = state.running && liveGauge.mode === "upload" ? "Live upstream" : "Router-side upstream";
+        }
+
+        var hasData = state.running || state.result;
+        if (hasData) {
+            slot.innerHTML = buildGaugeHtml(title, value, scale, accentClass, subtitle, gaugeKind);
+        } else {
+            slot.innerHTML = buildIdleGaugeHtml(title, accentClass, subtitle);
+        }
+
+        var flipDl = document.getElementById("ookla-flip-dl");
+        var flipUl = document.getElementById("ookla-flip-ul");
+        if (flipDl) flipDl.className = "ookla-flip-tab" + (isDl ? " is-active" : "");
+        if (flipUl) flipUl.className = "ookla-flip-tab" + (!isDl ? " is-active" : "");
+    }
+
+    function buildFlipSummaryHtml() {
+        var dlVal = "--", ulVal = "--";
+        if (state.result) {
+            dlVal = formatNumber(state.result.download_mbps, 2);
+            ulVal = formatNumber(state.result.upload_mbps, 2);
+        } else if (state.live) {
+            dlVal = formatNumber(state.live.download_mbps || 0, 2);
+            ulVal = formatNumber(state.live.upload_mbps || 0, 2);
+        }
+        return [
+            "<div class='ookla-flip-summary'>",
+            "<div class='ookla-flip-stat'>",
+            "<span class='ookla-flip-stat-label'>Down</span>",
+            "<span class='ookla-flip-stat-value is-download'>", escapeHtml(dlVal), " <small>Mbps</small></span>",
+            "</div>",
+            "<div class='ookla-flip-stat'>",
+            "<span class='ookla-flip-stat-label'>Up</span>",
+            "<span class='ookla-flip-stat-value is-upload'>", escapeHtml(ulVal), " <small>Mbps</small></span>",
+            "</div>",
+            "</div>"
+        ].join("");
+    }
+
     function buildServerOptions() {
         var html = ["<option value=''>Automatic (recommended)</option>"];
         state.servers.forEach(function (server) {
@@ -320,21 +402,32 @@
 
         var panel = document.createElement("div");
         panel.id = "ookla-speedtest-panel";
-        panel.className = "body-box form-row";
+        panel.className = "body-box form-row qt-card";
         panel.innerHTML = [
             "<div class='ookla-page'>",
-            "<div class='ookla-hero'>",
-            "<div class='ookla-hero-copy'>",
-            "<div class='ookla-eyebrow'>Jtools speed lab</div>",
-            "<h2 class='ookla-title'>Ookla Speedtest</h2>",
+            "<h3 class='qt-card-header'>Ookla Speedtest</h3>",
+            "<div class='ookla-eyebrow'>Qtooley speed lab</div>",
             "<p class='ookla-subtitle'>Run official speed tests from the router itself, keep nearby servers handy, and jump straight to the shareable result page.</p>",
-            "</div>",
-            "</div>",
             "<div id='ookla-speedtest-banner' class='ookla-banner'></div>",
             "<div class='ookla-banner-actions'>",
-            "<button id='ookla-recover' class='at-primary-button ookla-recover-button' type='button'>Restart speedtest backend</button>",
+            "<button id='ookla-recover' class='qt-btn qt-btn-secondary ookla-recover-button' type='button'>Restart speedtest backend</button>",
             "</div>",
-            "<div class='ookla-toolbar'>",
+
+            "<div class='ookla-above-fold'>",
+
+            "<div class='ookla-fold-left'>",
+            "<div id='ookla-ca-bands' class='ookla-ca-slot'></div>",
+            "<div id='ookla-flip-gauge-slot' class='ookla-flip-gauge-slot'></div>",
+            "<div class='ookla-flip-tabs'>",
+            "<button type='button' id='ookla-flip-dl' class='ookla-flip-tab is-active'>Download</button>",
+            "<button type='button' id='ookla-flip-ul' class='ookla-flip-tab'>Upload</button>",
+            "</div>",
+            "<div id='ookla-flip-summary-slot'></div>",
+            "<div id='ookla-live-strip-slot'></div>",
+            "</div>",
+
+            "<div class='ookla-fold-right'>",
+            "<div class='ookla-toolbar-stacked'>",
             "<div class='ookla-field'>",
             "<label for='ookla-server-select'>Server</label>",
             "<select id='ookla-server-select' class='ookla-select'></select>",
@@ -348,17 +441,16 @@
             "<div id='ookla-phase-label' class='ookla-static'>Idle</div>",
             "</div>",
             "</div>",
-            "<div class='ookla-grid ookla-grid-top'>",
-            "<div class='ookla-stage-column'>",
-            "<div id='ookla-ca-bands' class='ookla-ca-slot'></div>",
-            "<div id='ookla-gauges' class='ookla-gauges'></div>",
             "<div class='ookla-stage-actions'>",
-            "<button id='ookla-start' class='at-primary-button ookla-run-button' type='button'>Run speed test</button>",
-            "<button id='ookla-refresh-servers' class='at-primary-button ookla-secondary-button' type='button'>Refresh servers</button>",
-            "</div>",
-            "<div id='ookla-live-strip-slot'></div>",
+            "<button id='ookla-start' class='qt-btn qt-btn-danger ookla-run-button' type='button'>Run speed test</button>",
+            "<button id='ookla-refresh-servers' class='qt-btn qt-btn-primary ookla-secondary-button' type='button'>Refresh servers</button>",
             "</div>",
             "</div>",
+
+            "</div>",
+
+            "<div id='ookla-gauges' class='ookla-gauges' style='display:none'></div>",
+
             "<div class='ookla-grid ookla-grid-lower'>",
             "<div class='ookla-card'>",
             "<div class='ookla-card-title'>See results online</div>",
@@ -374,8 +466,8 @@
             "</div>",
             "</div>",
             "<div class='ookla-card ookla-card-bottom'>",
-            "<details id='ookla-run-details' class='ookla-details'>",
-            "<summary class='ookla-details-summary'>Run details</summary>",
+            "<details id='ookla-run-details' class='ookla-details qt-details'>",
+            "<summary class='ookla-details-summary qt-details-summary'><span class='qt-details-arrow'></span> Run details</summary>",
             "<div id='ookla-result-meta' class='ookla-meta-grid'></div>",
             "</details>",
             "</div>",
@@ -398,6 +490,9 @@
         document.getElementById("ookla-run-details").addEventListener("toggle", function (event) {
             state.details_open = !!event.target.open;
         });
+        document.getElementById("ookla-flip-dl").addEventListener("click", manualFlip);
+        document.getElementById("ookla-flip-ul").addEventListener("click", manualFlip);
+        startFlipTimer();
     }
 
     function render() {
@@ -429,24 +524,16 @@
             recoverButton.disabled = !!state.running;
         }
 
-        var gauges = document.getElementById("ookla-gauges");
-            if (gauges) {
-            if (state.running) {
-                var liveGauge = liveGaugeState();
-                gauges.innerHTML =
-                    buildGaugeHtml("Download", liveGauge.downloadValue, liveGauge.scale, "is-download", liveGauge.mode === "download" ? "Live router-side downstream throughput" : "Waiting for live download samples", "download") +
-                    buildGaugeHtml("Upload", liveGauge.uploadValue, liveGauge.scale, "is-upload", liveGauge.mode === "upload" ? "Live router-side upstream throughput" : "Upload phase will climb when it starts", "upload");
-            } else if (state.result) {
-                var scale = resultScale();
-                gauges.innerHTML =
-                    buildGaugeHtml("Download", state.result.download_mbps, scale, "is-download", "Router-side downstream throughput", "download") +
-                    buildGaugeHtml("Upload", state.result.upload_mbps, scale, "is-upload", "Router-side upstream throughput", "upload");
-            } else {
-                gauges.innerHTML =
-                    buildIdleGaugeHtml("Download", "is-download", state.running ? "Test in progress on the router" : "Router-side downstream throughput") +
-                    buildIdleGaugeHtml("Upload", "is-upload", state.running ? "Waiting for upload results" : "Router-side upstream throughput");
-            }
-            gauges.className = "ookla-gauges" + (state.running ? " is-running" : "");
+        renderFlipGauge();
+
+        var flipSummary = document.getElementById("ookla-flip-summary-slot");
+        if (flipSummary) {
+            flipSummary.innerHTML = buildFlipSummaryHtml();
+        }
+
+        var flipSlot = document.getElementById("ookla-flip-gauge-slot");
+        if (flipSlot) {
+            flipSlot.className = "ookla-flip-gauge-slot" + (state.running ? " is-running" : "");
         }
 
         var caBands = document.getElementById("ookla-ca-bands");

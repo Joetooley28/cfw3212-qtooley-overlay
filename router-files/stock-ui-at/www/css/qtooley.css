@@ -1,0 +1,476 @@
+/* ================================================================
+   Qtooley — Shared Design Tokens & Component Classes
+   Dark-first design system for Qtooley custom pages.
+   Light mode defaults below; dark overrides live in jtools_dark_mode.css.
+   ================================================================ */
+
+/* ── Design Tokens (light mode defaults) ── */
+:root {
+    /* Surfaces */
+    --qt-bg-page: #f5f7fa;
+    --qt-bg-card: #ffffff;
+    --qt-bg-card-alt: #f0f3f7;
+    --qt-bg-inset: #f5f7fa;
+    --qt-bg-hover: #edf0f4;
+
+    /* Borders */
+    --qt-border: #d8d8d8;
+    --qt-border-subtle: #e8ecf0;
+    --qt-border-strong: #bfc7cf;
+
+    /* Text */
+    --qt-text: #1d313f;
+    --qt-text-dim: #6a7f95;
+    --qt-text-bright: #0d1b2a;
+    --qt-text-label: #355070;
+
+    /* Accents */
+    --qt-accent-blue: #0f6b95;
+    --qt-accent-orange: #e06c10;
+    --qt-accent-green: #25813d;
+    --qt-accent-red: #a63434;
+    --qt-accent-cyan: #00838f;
+    --qt-accent-purple: #7b1fa2;
+
+    /* Signal quality — consistent everywhere */
+    --qt-sig-excellent: #00e676;
+    --qt-sig-good: #4caf50;
+    --qt-sig-fair: #ff8a00;
+    --qt-sig-poor: #d16969;
+    --qt-sig-vpoor: #ff1744;
+    --qt-sig-na: #8a8f98;
+
+    /* Carrier colors */
+    --qt-carrier-tmobile: #e20074;
+    --qt-carrier-att: #009fdb;
+    --qt-carrier-verizon: #cd040b;
+
+    /* Temperature (4-step scale) */
+    --qt-temp-green: #4caf50;
+    --qt-temp-yellow: #f9a825;
+    --qt-temp-orange: #ff8a00;
+    --qt-temp-red: #ff1744;
+
+    /* Buttons */
+    --qt-btn-primary-bg: #0f6b95;
+    --qt-btn-primary-hover: #167cab;
+    --qt-btn-danger-bg: #a63434;
+    --qt-btn-danger-hover: #872727;
+    --qt-btn-secondary-bg: #4b5560;
+    --qt-btn-secondary-hover: #5a6470;
+    --qt-btn-text: #ffffff;
+
+    /* Typography */
+    --qt-font-mono: Consolas, "Courier New", monospace;
+    --qt-font-sans: "Segoe UI", "Open Sans Regular", sans-serif;
+
+    /* Spacing & Radii */
+    --qt-radius: 12px;
+    --qt-radius-sm: 6px;
+    --qt-radius-btn: 10px;
+    --qt-radius-pill: 999px;
+    --qt-spacing: 16px;
+    --qt-spacing-sm: 10px;
+    --qt-spacing-lg: 20px;
+
+    /* Shadows */
+    --qt-shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --qt-shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.10);
+}
+
+/* ================================================================
+   SIGNAL QUALITY CLASSES
+   Apply to any element showing RSRP, RSRQ, or SINR values.
+   ================================================================ */
+.qt-sig-excellent { color: var(--qt-sig-excellent) !important; }
+.qt-sig-good      { color: var(--qt-sig-good) !important; }
+.qt-sig-fair      { color: var(--qt-sig-fair) !important; }
+.qt-sig-poor      { color: var(--qt-sig-poor) !important; }
+.qt-sig-vpoor     { color: var(--qt-sig-vpoor) !important; }
+.qt-sig-na        { color: var(--qt-sig-na) !important; }
+
+/* ================================================================
+   CARRIER COLOR CLASSES
+   ================================================================ */
+.qt-carrier-tmobile { color: var(--qt-carrier-tmobile) !important; }
+.qt-carrier-att     { color: var(--qt-carrier-att) !important; }
+.qt-carrier-verizon { color: var(--qt-carrier-verizon) !important; }
+
+/* ================================================================
+   TEMPERATURE CLASSES (4-step scale)
+   green < 40°C | yellow 40-47°C | orange 48-54°C | red 55°C+
+   ================================================================ */
+.qt-temp-green  { color: var(--qt-temp-green) !important; }
+.qt-temp-yellow { color: var(--qt-temp-yellow) !important; }
+.qt-temp-orange { color: var(--qt-temp-orange) !important; }
+.qt-temp-red    { color: var(--qt-temp-red) !important; }
+
+/* ================================================================
+   CARDS
+   Dark surface with border, radius, shadow.
+   ================================================================ */
+.qt-card {
+    background: var(--qt-bg-card);
+    border: 1px solid var(--qt-border);
+    border-radius: var(--qt-radius);
+    box-shadow: var(--qt-shadow-card);
+    padding: var(--qt-spacing);
+}
+.qt-card + .qt-card {
+    margin-top: var(--qt-spacing);
+}
+
+/* ── Card Header ── */
+.qt-card-header {
+    color: var(--qt-text-label);
+    font-family: var(--qt-font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 14px 0;
+}
+
+/* ── Card with inset/terminal look ── */
+.qt-card-inset {
+    background: var(--qt-bg-inset);
+    border: 1px solid var(--qt-border);
+    border-radius: var(--qt-radius-sm);
+}
+
+/* ================================================================
+   SECTION TITLES
+   ================================================================ */
+.qt-section-title {
+    color: var(--qt-accent-blue);
+    font-family: var(--qt-font-sans);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin: 0 0 12px 0;
+    text-transform: uppercase;
+}
+
+/* ================================================================
+   METRIC ROWS
+   Label + value pairs used in dashboards.
+   ================================================================ */
+.qt-metric {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+    padding: 6px 0;
+}
+.qt-metric-label {
+    color: var(--qt-text-dim);
+    font-family: var(--qt-font-sans);
+    font-size: 13px;
+    min-width: 120px;
+}
+.qt-metric-value {
+    color: var(--qt-text);
+    font-family: var(--qt-font-mono);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* ================================================================
+   STATUS PILLS
+   ================================================================ */
+.qt-pill {
+    border-radius: var(--qt-radius-pill);
+    display: inline-block;
+    font-family: var(--qt-font-sans);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    min-width: 64px;
+    padding: 6px 12px;
+    text-align: center;
+}
+.qt-pill-ok {
+    background: rgba(76, 175, 80, 0.12);
+    color: var(--qt-sig-good);
+}
+.qt-pill-warn {
+    background: rgba(255, 138, 0, 0.12);
+    color: var(--qt-sig-fair);
+}
+.qt-pill-error {
+    background: rgba(209, 105, 105, 0.12);
+    color: var(--qt-sig-poor);
+}
+.qt-pill-info {
+    background: rgba(141, 185, 255, 0.12);
+    color: var(--qt-accent-blue);
+}
+.qt-pill-na {
+    background: rgba(138, 143, 152, 0.10);
+    color: var(--qt-sig-na);
+}
+
+/* ================================================================
+   BANNERS / ALERTS
+   ================================================================ */
+.qt-banner {
+    border-radius: var(--qt-radius-sm);
+    font-family: var(--qt-font-sans);
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 14px;
+    padding: 10px 14px;
+}
+.qt-banner-ok {
+    background: rgba(76, 175, 80, 0.10);
+    border: 1px solid rgba(76, 175, 80, 0.30);
+    color: var(--qt-sig-good);
+}
+.qt-banner-error {
+    background: rgba(224, 108, 79, 0.10);
+    border: 1px solid rgba(224, 108, 79, 0.30);
+    color: var(--qt-accent-red);
+}
+.qt-banner-warn {
+    background: rgba(249, 168, 37, 0.10);
+    border: 1px solid rgba(249, 168, 37, 0.30);
+    color: var(--qt-temp-yellow);
+}
+.qt-banner-info {
+    background: rgba(141, 185, 255, 0.10);
+    border: 1px solid rgba(141, 185, 255, 0.25);
+    color: var(--qt-accent-blue);
+}
+.qt-banner-hidden {
+    display: none;
+}
+
+/* ================================================================
+   BUTTONS
+   ================================================================ */
+.qt-btn {
+    border: none;
+    border-radius: var(--qt-radius-btn);
+    color: var(--qt-btn-text);
+    cursor: pointer;
+    font-family: var(--qt-font-sans);
+    font-size: 14px;
+    font-weight: 600;
+    min-height: 40px;
+    padding: 8px 18px;
+    transition: background 0.15s;
+    user-select: none;
+}
+.qt-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+.qt-btn-primary {
+    background: var(--qt-btn-primary-bg);
+}
+.qt-btn-primary:hover:not(:disabled),
+.qt-btn-primary:focus:not(:disabled) {
+    background: var(--qt-btn-primary-hover);
+}
+.qt-btn-danger {
+    background: var(--qt-btn-danger-bg);
+}
+.qt-btn-danger:hover:not(:disabled),
+.qt-btn-danger:focus:not(:disabled) {
+    background: var(--qt-btn-danger-hover);
+}
+.qt-btn-secondary {
+    background: var(--qt-btn-secondary-bg);
+}
+.qt-btn-secondary:hover:not(:disabled),
+.qt-btn-secondary:focus:not(:disabled) {
+    background: var(--qt-btn-secondary-hover);
+}
+
+/* ================================================================
+   TERMINAL / RAW PANELS
+   Monospace, dark inset, preformatted text areas.
+   ================================================================ */
+.qt-terminal {
+    background: var(--qt-bg-inset);
+    border: 1px solid var(--qt-border);
+    border-radius: var(--qt-radius-sm);
+    color: var(--qt-text);
+    font-family: var(--qt-font-mono);
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 0;
+    max-height: 400px;
+    overflow: auto;
+    padding: 12px;
+    white-space: pre;
+}
+
+/* ================================================================
+   PROGRESS BAR
+   ================================================================ */
+.qt-progress {
+    background: var(--qt-bg-inset);
+    border-radius: var(--qt-radius-pill);
+    height: 6px;
+    overflow: hidden;
+    width: 100%;
+}
+.qt-progress-fill {
+    background: var(--qt-accent-blue);
+    border-radius: var(--qt-radius-pill);
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+/* ================================================================
+   RAT BADGE (glowing pill — reusable)
+   ================================================================ */
+.qt-rat-badge {
+    border-radius: 20px;
+    display: inline-block;
+    font-family: var(--qt-font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    padding: 4px 16px;
+    text-transform: uppercase;
+}
+.qt-rat-lte {
+    background: rgba(33, 150, 243, 0.15);
+    border: 1px solid rgba(33, 150, 243, 0.30);
+    color: #64b5f6;
+    box-shadow: 0 0 12px rgba(33, 150, 243, 0.2);
+}
+.qt-rat-nr {
+    background: rgba(179, 136, 255, 0.15);
+    border: 1px solid rgba(179, 136, 255, 0.30);
+    color: #ce93d8;
+    box-shadow: 0 0 12px rgba(179, 136, 255, 0.2);
+}
+.qt-rat-nsa {
+    background: rgba(0, 229, 255, 0.12);
+    border: 1px solid rgba(0, 229, 255, 0.25);
+    color: #00e5ff;
+    box-shadow: 0 0 14px rgba(0, 229, 255, 0.2);
+}
+
+/* ================================================================
+   BAND PILLS
+   ================================================================ */
+.qt-band-pill {
+    background: rgba(141, 185, 255, 0.10);
+    border: 1px solid rgba(141, 185, 255, 0.20);
+    border-radius: var(--qt-radius-sm);
+    color: var(--qt-accent-blue);
+    display: inline-block;
+    font-family: var(--qt-font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 3px 10px;
+    text-transform: uppercase;
+}
+
+/* ================================================================
+   COLLAPSIBLE DETAILS
+   ================================================================ */
+.qt-details {
+    background: var(--qt-bg-card);
+    border: 1px solid var(--qt-border);
+    border-radius: var(--qt-radius);
+}
+.qt-details-summary {
+    align-items: center;
+    color: var(--qt-text-label);
+    cursor: pointer;
+    display: flex;
+    font-family: var(--qt-font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    list-style: none;
+    padding: 14px var(--qt-spacing);
+    user-select: none;
+}
+.qt-details-summary::-webkit-details-marker {
+    display: none;
+}
+.qt-details-arrow {
+    border: solid var(--qt-text-label);
+    border-width: 0 2.5px 2.5px 0;
+    display: inline-block;
+    flex-shrink: 0;
+    height: 8px;
+    margin-right: 10px;
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+    width: 8px;
+}
+.qt-details[open] > .qt-details-summary .qt-details-arrow {
+    transform: rotate(-135deg);
+}
+.qt-details-body {
+    border-top: 1px solid var(--qt-border);
+    padding: 14px var(--qt-spacing);
+}
+
+/* ================================================================
+   DEVICE / MODULE IMAGE CARD
+   Decorative image card for FCC-sourced module/device images.
+   ================================================================ */
+.qt-device-card {
+    align-items: center;
+    background: var(--qt-bg-card);
+    border: 1px solid var(--qt-border);
+    border-radius: var(--qt-radius);
+    display: flex;
+    gap: var(--qt-spacing);
+    padding: var(--qt-spacing);
+}
+.qt-device-img {
+    border-radius: var(--qt-radius-sm);
+    flex-shrink: 0;
+    height: auto;
+    max-width: 160px;
+    object-fit: contain;
+}
+.qt-device-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.qt-device-model {
+    color: var(--qt-text-bright);
+    font-family: var(--qt-font-sans);
+    font-size: 18px;
+    font-weight: 700;
+}
+.qt-device-detail {
+    color: var(--qt-text-dim);
+    font-family: var(--qt-font-sans);
+    font-size: 13px;
+}
+
+/* ================================================================
+   UTILITY CLASSES
+   ================================================================ */
+.qt-mono { font-family: var(--qt-font-mono); }
+.qt-sans { font-family: var(--qt-font-sans); }
+.qt-dim  { color: var(--qt-text-dim); }
+.qt-gap  { gap: var(--qt-spacing); }
+.qt-gap-sm { gap: var(--qt-spacing-sm); }
+.qt-flex { display: flex; }
+.qt-flex-col { display: flex; flex-direction: column; }
+.qt-flex-center { align-items: center; }
+.qt-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--qt-spacing); }
+.qt-hidden { display: none; }
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 900px) {
+    .qt-grid-2 {
+        grid-template-columns: 1fr;
+    }
+    .qt-device-card {
+        flex-direction: column;
+        text-align: center;
+    }
+}

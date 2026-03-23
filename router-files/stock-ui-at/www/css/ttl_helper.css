@@ -9,21 +9,23 @@
 }
 
 .ttl-status-card {
-    background: #fff;
-    border: 1px solid #d8d8d8;
+    background: var(--qt-bg-card, #fff);
+    border: 1px solid var(--qt-border, #d8d8d8);
+    border-radius: var(--qt-radius, 10px);
     flex: 1;
     padding: 18px;
 }
 
 .ttl-info-card {
-    background: #fff;
-    border: 1px solid #d8d8d8;
+    background: var(--qt-bg-card, #fff);
+    border: 1px solid var(--qt-border, #d8d8d8);
+    border-radius: var(--qt-radius, 10px);
     flex: 1;
     padding: 18px;
 }
 
 .ttl-status-card h3 {
-    color: #355070;
+    color: var(--qt-text-label, #355070);
     font-size: 15px;
     margin: 0 0 14px 0;
 }
@@ -36,7 +38,7 @@
 }
 
 .ttl-status-label {
-    color: #6a7f95;
+    color: var(--qt-text-dim, #6a7f95);
     font-size: 13px;
     min-width: 120px;
 }
@@ -63,19 +65,20 @@
 }
 
 .ttl-pill-inactive {
-    background: #f5f7fa;
-    color: #6a7f95;
+    background: var(--qt-bg-card-alt, #f5f7fa);
+    color: var(--qt-text-dim, #6a7f95);
 }
 
 .ttl-controls-card {
-    background: #fff;
-    border: 1px solid #d8d8d8;
+    background: var(--qt-bg-card, #fff);
+    border: 1px solid var(--qt-border, #d8d8d8);
+    border-radius: var(--qt-radius, 10px);
     margin-bottom: 18px;
     padding: 18px;
 }
 
 .ttl-controls-card h3 {
-    color: #355070;
+    color: var(--qt-text-label, #355070);
     font-size: 15px;
     margin: 0 0 14px 0;
 }
@@ -89,7 +92,7 @@
 .ttl-preset-button {
     background: #0f5f83;
     border: none;
-    border-radius: 10px;
+    border-radius: var(--qt-radius-sm, 6px);
     color: #fff;
     cursor: pointer;
     font-size: 14px;
@@ -111,12 +114,17 @@
     margin-bottom: 16px;
 }
 
+.ttl-custom-row label {
+    color: var(--qt-text-label, #355070);
+    font-size: 13px;
+}
+
 .ttl-custom-input {
-    background: #e8ecf0;
-    border: 1px solid #bfc7cf;
-    border-radius: 6px;
+    background: var(--qt-bg-card-alt, #e8ecf0);
+    border: 1px solid var(--qt-border, #bfc7cf);
+    border-radius: var(--qt-radius-sm, 6px);
     box-sizing: border-box;
-    font-family: monospace;
+    font-family: var(--qt-font-mono, monospace);
     font-size: 16px;
     padding: 12px 14px;
     width: 120px;
@@ -130,6 +138,7 @@
 }
 
 .ttl-toggle-label {
+    color: var(--qt-text, inherit);
     font-size: 14px;
     font-weight: 600;
 }
@@ -137,7 +146,7 @@
 .ttl-update-button {
     background: #a63434;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--qt-radius-sm, 6px);
     color: #fff;
     cursor: pointer;
     font-size: 13px;
@@ -152,20 +161,20 @@
 }
 
 .ttl-info-card h3 {
-    color: #355070;
+    color: var(--qt-text-label, #355070);
     font-size: 15px;
     margin: 0 0 10px 0;
 }
 
 .ttl-info-card p {
-    color: #6a7f95;
+    color: var(--qt-text-dim, #6a7f95);
     font-size: 13px;
     line-height: 1.6;
     margin: 0 0 8px 0;
 }
 
 .ttl-banner {
-    border-radius: 4px;
+    border-radius: var(--qt-radius-sm, 6px);
     font-size: 13px;
     margin-bottom: 14px;
     padding: 10px 14px;
@@ -194,8 +203,9 @@
 }
 
 .ttl-rules-card {
-    background: #fff;
-    border: 1px solid #d8d8d8;
+    background: var(--qt-bg-card, #fff);
+    border: 1px solid var(--qt-border, #d8d8d8);
+    border-radius: var(--qt-radius, 10px);
     margin-bottom: 18px;
 }
 
@@ -209,14 +219,14 @@
 }
 
 .ttl-rules-header h3 {
-    color: #355070;
+    color: var(--qt-text-label, #355070);
     flex: 1;
     font-size: 15px;
     margin: 0;
 }
 
 .ttl-rules-arrow {
-    color: #6a7f95;
+    color: var(--qt-text-dim, #6a7f95);
     font-size: 12px;
     width: 16px;
 }
@@ -224,7 +234,7 @@
 .ttl-rules-refresh {
     background: #0f5f83;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--qt-radius-sm, 6px);
     color: #fff;
     cursor: pointer;
     font-size: 12px;
@@ -236,7 +246,7 @@
 }
 
 .ttl-rules-body {
-    border-top: 1px solid #d8d8d8;
+    border-top: 1px solid var(--qt-border, #d8d8d8);
     padding: 14px 18px;
 }
 
@@ -249,7 +259,7 @@
 }
 
 .ttl-rules-label {
-    color: #6a7f95;
+    color: var(--qt-text-dim, #6a7f95);
     display: block;
     font-size: 12px;
     font-weight: 600;
@@ -257,11 +267,11 @@
 }
 
 .ttl-rules-pre {
-    background: #f5f7fa;
-    border: 1px solid #d8d8d8;
-    border-radius: 4px;
-    color: #333;
-    font-family: monospace;
+    background: var(--qt-bg-inset, #f5f7fa);
+    border: 1px solid var(--qt-border, #d8d8d8);
+    border-radius: var(--qt-radius-sm, 6px);
+    color: var(--qt-text, #333);
+    font-family: var(--qt-font-mono, monospace);
     font-size: 12px;
     line-height: 1.5;
     margin: 0;
@@ -269,4 +279,10 @@
     overflow: auto;
     padding: 12px;
     white-space: pre;
+}
+
+@media (max-width: 700px) {
+    .ttl-top-row {
+        flex-direction: column;
+    }
 }

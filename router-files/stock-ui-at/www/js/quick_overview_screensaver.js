@@ -18,11 +18,8 @@
     }
 
     function getCarrierColorClass(provider) {
-        var p = String(provider || "").toLowerCase();
-        if (p.indexOf("t-mobile") !== -1 || p.indexOf("tmobile") !== -1) { return "qo-carrier-tmo"; }
-        if (p.indexOf("at&t") !== -1 || p.indexOf("att") !== -1) { return "qo-carrier-att"; }
-        if (p.indexOf("verizon") !== -1) { return "qo-carrier-vzw"; }
-        return "qo-carrier-other";
+        var cls = QO.getCarrierClass(provider);
+        return cls || "qo-carrier-other";
     }
 
     function renderScreensaver(data) {
@@ -63,11 +60,11 @@
             "    </div>",
             "    <div class='qo-ss-metric-item'>",
             "      <span class='qo-ss-metric-label'>RSRQ</span>",
-            "      <span class='qo-ss-metric-value'>" + QO.escapeHtml(data.rsrqText) + "</span>",
+            "      <span class='qo-ss-metric-value " + data.rsrqClass + "'>" + QO.escapeHtml(data.rsrqText) + "</span>",
             "    </div>",
             "    <div class='qo-ss-metric-item'>",
             "      <span class='qo-ss-metric-label'>SINR</span>",
-            "      <span class='qo-ss-metric-value'>" + QO.escapeHtml(data.sinrText) + "</span>",
+            "      <span class='qo-ss-metric-value " + data.sinrClass + "'>" + QO.escapeHtml(data.sinrText) + "</span>",
             "    </div>",
             "  </div>",
             "  " + QO.buildGradientBar(data.grade),

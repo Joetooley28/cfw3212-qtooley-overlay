@@ -123,11 +123,8 @@
     // ── Active Band Card ──
 
     function getCarrierColorClass(provider) {
-        var p = String(provider || "").toLowerCase();
-        if (p.indexOf("t-mobile") !== -1 || p.indexOf("tmobile") !== -1) { return "qo-carrier-tmo"; }
-        if (p.indexOf("at&t") !== -1 || p.indexOf("att") !== -1) { return "qo-carrier-att"; }
-        if (p.indexOf("verizon") !== -1) { return "qo-carrier-vzw"; }
-        return "qo-carrier-other";
+        var cls = QO.getCarrierClass ? QO.getCarrierClass(provider) : "";
+        return cls || "qo-carrier-other";
     }
 
     function renderActiveBand(data) {

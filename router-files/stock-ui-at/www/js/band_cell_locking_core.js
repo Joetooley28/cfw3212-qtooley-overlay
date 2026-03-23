@@ -143,9 +143,9 @@
 
     function buildSectionDetails(title, bodyHtml, extraClass) {
         return [
-            "<details class='band-lock-section band-lock-section-top ", extraClass || "", "'>",
-            "<summary>", escapeHtml(title), "</summary>",
-            "<div class='band-lock-section-body'>",
+            "<details class='band-lock-section band-lock-section-top qt-details ", extraClass || "", "'>",
+            "<summary class='qt-details-summary'><span class='qt-details-arrow'></span> ", escapeHtml(title), "</summary>",
+            "<div class='band-lock-section-body qt-details-body'>",
             bodyHtml,
             "</div>",
             "</details>"
@@ -166,21 +166,21 @@
 
     function buildRatSectionHtml() {
         return [
-            "<details class='band-lock-section rat-section' id='rat-section'>",
-            "<summary>RAT Control</summary>",
-            "<div class='band-lock-section-body'>",
+            "<details class='band-lock-section rat-section qt-details' id='rat-section'>",
+            "<summary class='qt-details-summary'><span class='qt-details-arrow'></span> RAT Control</summary>",
+            "<div class='band-lock-section-body qt-details-body'>",
 
             "<div class='rat-control-row'>",
             "<label for='rat-mode-select'>Mode preference</label>",
             "<select id='rat-mode-select'>", buildModeOptions(), "</select>",
-            "<button id='rat-mode-apply' class='band-lock-apply-button' type='button'>Apply</button>",
+            "<button id='rat-mode-apply' class='band-lock-apply-button qt-btn qt-btn-danger' type='button'>Apply</button>",
             "<span id='band-lock-rat-indicator' class='band-lock-indicator band-lock-indicator-idle'></span>",
             "</div>",
 
             "<div class='rat-control-row'>",
             "<label for='rat-acq-order-select'>Acquisition order</label>",
             "<select id='rat-acq-order-select'>", buildAcqOrderOptions(), "</select>",
-            "<button id='rat-acq-order-apply' class='band-lock-apply-button' type='button'>Apply</button>",
+            "<button id='rat-acq-order-apply' class='band-lock-apply-button qt-btn qt-btn-danger' type='button'>Apply</button>",
             "<span id='rat-acq-order-indicator' class='band-lock-indicator band-lock-indicator-idle'></span>",
             "</div>",
 
@@ -190,7 +190,7 @@
             "<option value='0'>Enabled</option>",
             "<option value='1'>Disabled</option>",
             "</select>",
-            "<button id='rat-nr5g-disable-apply' class='band-lock-apply-button' type='button'>Apply</button>",
+            "<button id='rat-nr5g-disable-apply' class='band-lock-apply-button qt-btn qt-btn-danger' type='button'>Apply</button>",
             "<span id='rat-nr5g-disable-indicator' class='band-lock-indicator band-lock-indicator-idle'></span>",
             "</div>",
 
@@ -201,11 +201,11 @@
 
     function buildBandLockSectionHtml() {
         return [
-            "<details class='band-lock-section band-lock-wrapper-section' id='band-lock-section'>",
-            "<summary>Band Locking</summary>",
-            "<div class='band-lock-section-body'>",
+            "<details class='band-lock-section band-lock-wrapper-section qt-details' id='band-lock-section'>",
+            "<summary class='qt-details-summary'><span class='qt-details-arrow'></span> Band Locking</summary>",
+            "<div class='band-lock-section-body qt-details-body'>",
             "<div class='band-lock-reset-row'>",
-            "<button id='band-lock-reset' type='button' class='secondary' title='Reset wiring will be enabled after restore_band handling is verified on this build.'>Reset to defaults</button>",
+            "<button id='band-lock-reset' type='button' class='qt-btn qt-btn-secondary' title='Reset wiring will be enabled after restore_band handling is verified on this build.'>Reset to defaults</button>",
             "</div>",
             buildCheckboxes("lte", []),
             buildCheckboxes("nsa", []),
@@ -218,10 +218,11 @@
     function buildPanelHtml() {
         return [
             "<div class='at-panel-content'>",
+            "<h3 class='qt-card-header'>Band &amp; Cell Locking</h3>",
             "<p class='at-panel-note'>Reads and writes preferences through QNWPREFCFG and QNWLOCK. Refresh is manual on purpose so this page does not constantly compete with the stock status UI for modem queries.</p>",
             "<div id='band-lock-status' class='band-lock-status band-lock-status-info'>Ready.</div>",
             "<div class='band-lock-top-actions'>",
-            "<button id='band-lock-refresh' type='button'>Refresh</button>",
+            "<button id='band-lock-refresh' class='qt-btn qt-btn-primary' type='button'>Refresh</button>",
             "</div>",
             buildSectionDetails("Current modem state", [
                 "<div class='band-lock-current-grid'>",
@@ -262,9 +263,9 @@
         }
 
         return [
-            "<details class='band-lock-section cell-lock-section' id='cell-lock-panel'>",
-            "<summary>Cell Locking</summary>",
-            "<div class='band-lock-section-body'>",
+            "<details class='band-lock-section cell-lock-section qt-details' id='cell-lock-panel'>",
+            "<summary class='qt-details-summary'><span class='qt-details-arrow'></span> Cell Locking</summary>",
+            "<div class='band-lock-section-body qt-details-body'>",
 
             "<div class='cell-lock-status-row'>",
             "<span class='cell-lock-status-label'>LTE:</span>",
@@ -278,7 +279,7 @@
 
             "<div class='cell-lock-scan-section'>",
             "<div class='cell-lock-scan-actions'>",
-            "<button type='button' id='cell-lock-scan-btn' class='band-lock-apply-button'>Scan Neighbor Cells</button>",
+            "<button type='button' id='cell-lock-scan-btn' class='band-lock-apply-button qt-btn qt-btn-primary'>Scan Neighbor Cells</button>",
             "<span id='cell-lock-scan-indicator' class='band-lock-indicator band-lock-indicator-idle'></span>",
             "</div>",
             "<div id='cell-lock-scan-results' style='display:none'>",
@@ -339,7 +340,7 @@
             "</label>",
             "</div>",
             "<div class='cell-lock-form-row'>",
-            "<button type='button' id='cell-lock-execute' class='band-lock-apply-button'>Execute</button>",
+            "<button type='button' id='cell-lock-execute' class='band-lock-apply-button qt-btn qt-btn-danger'>Execute</button>",
             "<span id='cell-lock-execute-indicator' class='band-lock-indicator band-lock-indicator-idle'></span>",
             "</div>",
             "</div>",

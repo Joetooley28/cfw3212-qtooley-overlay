@@ -414,13 +414,56 @@
         }).join("");
     }
 
-    function createMetric(label, value) {
+    function createMetric(label, value, extraClass) {
         return [
             "<div class='jgd-metric'>",
             "<div class='jgd-metric-label'>", escapeHtml(label), "</div>",
-            "<div class='jgd-metric-value'>", escapeHtml(value), "</div>",
+            "<div class='jgd-metric-value", extraClass ? " " + extraClass : "", "'>", escapeHtml(value), "</div>",
             "</div>"
         ].join("");
+    }
+
+    function getSignalClassForDb(dbValue, metric) {
+        var v = asInt(dbValue);
+        if (v == null) { return "qt-sig-na"; }
+        if (metric === "rsrq") {
+            if (v > -8) { return "qt-sig-excellent"; }
+            if (v > -11) { return "qt-sig-good"; }
+            if (v > -15) { return "qt-sig-fair"; }
+            if (v > -18) { return "qt-sig-poor"; }
+            return "qt-sig-vpoor";
+        }
+        if (metric === "sinr") {
+            if (v > 20) { return "qt-sig-excellent"; }
+            if (v > 13) { return "qt-sig-good"; }
+            if (v > 5) { return "qt-sig-fair"; }
+            if (v > 0) { return "qt-sig-poor"; }
+            return "qt-sig-vpoor";
+        }
+        // rsrp default
+        if (v > -80) { return "qt-sig-excellent"; }
+        if (v > -90) { return "qt-sig-good"; }
+        if (v > -100) { return "qt-sig-fair"; }
+        if (v > -110) { return "qt-sig-poor"; }
+        return "qt-sig-vpoor";
+    }
+
+    function getTempColorClass(tempText) {
+        var match = String(tempText || "").match(/(\d+)/);
+        if (!match) { return ""; }
+        var val = parseInt(match[1], 10);
+        if (val >= 55) { return "qt-temp-red"; }
+        if (val >= 48) { return "qt-temp-orange"; }
+        if (val >= 40) { return "qt-temp-yellow"; }
+        return "qt-temp-green";
+    }
+
+    function getCarrierColorClass(provider) {
+        var p = String(provider || "").toLowerCase();
+        if (p.indexOf("t-mobile") !== -1 || p.indexOf("tmobile") !== -1) { return "qt-carrier-tmobile"; }
+        if (p.indexOf("at&t") !== -1 || p.indexOf("att") !== -1) { return "qt-carrier-att"; }
+        if (p.indexOf("verizon") !== -1) { return "qt-carrier-verizon"; }
+        return "";
     }
 
     function renderCarrierList(carriers) {
@@ -450,10 +493,11 @@
             return "<div class='jgd-muted'>Temperature sensors unavailable right now.</div>";
         }
         return temps.map(function (temp) {
+            var tempCls = getTempColorClass(temp.value_text);
             return [
                 "<div class='jgd-temp'>",
                 "<span class='jgd-temp-name'>", escapeHtml(temp.name), "</span>",
-                "<span class='jgd-temp-value'>", escapeHtml(temp.value_text), "</span>",
+                "<span class='jgd-temp-value ", tempCls, "'>", escapeHtml(temp.value_text), "</span>",
                 "</div>"
             ].join("");
         }).join("");
@@ -563,7 +607,7 @@
             "<div class='jgd-page'>",
             "<div class='jgd-hero'>",
             "<div class='jgd-hero-top'>",
-            "<h2 class='jgd-title'>Jtool General Dashboard</h2>",
+            "<h2 class='jgd-title'>Qtooley General Info</h2>",
             "</div>",
             "<div class='jgd-hero-main'>",
             "<div class='jgd-kicker'>", escapeHtml(deviceName), "</div>",
@@ -573,8 +617,19 @@
             "</div>",
             "</div>",
             "<div class='jgd-hero-spacer'></div>",
+            "<div class='jgd-module-strip'>",
+            "<div class='qt-device-card'>",
+            "<img class='qt-device-img' src='/img/rg520n-na-module.png' alt='RG520N-NA module' onerror='this.style.display=\"none\"'>",
+            "<div class='qt-device-info'>",
+            "<div class='qt-device-model'>", escapeHtml(modemName), "</div>",
+            "<div class='qt-device-detail'>FCC ID: XIA2023RG520NNA</div>",
+            "<div class='qt-device-detail'>FW: ", escapeHtml(asText(system.moduleFirmwareVersion, "N/A")), "</div>",
+            "<div class='qt-device-detail'>IMEI: ", escapeHtml(asText(system.imei, "N/A")), "</div>",
+            "</div>",
+            "</div>",
             "<div class='jgd-hero-side'>",
             "<div id='jgd-live-time' class='jgd-clock'></div>",
+            "</div>",
             "</div>",
             "</div>",
             "<div class='jgd-status-strip'>",
@@ -582,7 +637,7 @@
             "<span class='jgd-status-light'></span>",
             escapeHtml(connected ? "Connected" : (cellular.noSim ? "No SIM / not connected" : "Not connected")),
             "</div>",
-            "<div class='jgd-status-meta'>Carrier ", escapeHtml(provider), "</div>",
+            "<div class='jgd-status-meta'>Carrier <span class='", getCarrierColorClass(provider), "'>", escapeHtml(provider), "</span></div>",
             "<div class='jgd-status-meta'>RAT ", escapeHtml(rat), "</div>",
             "<div class='jgd-status-meta'>", escapeHtml(bandLabel), "</div>",
             "<div class='jgd-status-meta'>Session ", escapeHtml(sessionLabel), "</div>",
@@ -596,9 +651,9 @@
             "<div class='jgd-signal-value'>", escapeHtml(signalText), "</div>",
             "</div>",
             "<div class='jgd-metrics-grid'>",
-            createMetric("Primary RSRP", formatDb(primaryRsrp, " dBm")),
-            createMetric("Primary RSRQ", formatDb(primaryRsrq, " dB")),
-            createMetric("Primary SINR", formatDb(primarySinr, " dB")),
+            createMetric("Primary RSRP", formatDb(primaryRsrp, " dBm"), getSignalClassForDb(primaryRsrp, "rsrp")),
+            createMetric("Primary RSRQ", formatDb(primaryRsrq, " dB"), getSignalClassForDb(primaryRsrq, "rsrq")),
+            createMetric("Primary SINR", formatDb(primarySinr, " dB"), getSignalClassForDb(primarySinr, "sinr")),
             createMetric("Primary CQI", primaryCqi),
             renderSignalDetailBlock(primaryRsrp, primaryRsrq, primarySinr, primaryCqi, adv, rat),
             "</div>",
@@ -613,7 +668,7 @@
             createMetric("Roaming", asText(cellular.roaming)),
             createMetric("Packet service", asText(adv.packetService)),
             createMetric("System uptime", systemUptime),
-            createMetric("Modem temp", primaryTemp),
+            createMetric("Modem temp", primaryTemp, getTempColorClass(primaryTemp)),
             "</div>",
             "</section>",
             "</div>",

@@ -279,19 +279,20 @@
 
         var panel = document.createElement("div");
         panel.id = "at-terminal-panel";
-        panel.className = "body-box form-row";
+        panel.className = "body-box form-row qt-card";
         panel.innerHTML = [
             "<div class='at-panel-content'>",
+            "<h3 class='qt-card-header'>AT Terminal</h3>",
             "<div class='at-split'>",
             "<div class='at-split-left'>",
-            "<p class='at-panel-note'>Authenticated Jtools stock UI terminal. AT access stays serialized through the shared modem lock, so only one client can talk to the modem at a time.</p>",
+            "<p class='at-panel-note'>Authenticated Qtooley terminal. AT access stays serialized through the shared modem lock, so only one client can talk to the modem at a time.</p>",
             "<div class='at-input-row'>",
             "<input id='at-command-input' class='at-command-input' type='text' maxlength='128' autocomplete='off' spellcheck='false' placeholder='Enter a single AT command'>",
             "</div>",
             "<div class='at-left-actions'>",
-            "<button id='at-command-send' class='at-primary-button at-send-button' type='button'>Send</button>",
-            "<button id='at-command-copy' class='at-primary-button' type='button'>Copy all</button>",
-            "<button id='at-command-clear' class='at-primary-button' type='button'>Clear history</button>",
+            "<button id='at-command-send' class='qt-btn qt-btn-danger at-send-button' type='button'>Send</button>",
+            "<button id='at-command-copy' class='qt-btn qt-btn-primary' type='button'>Copy all</button>",
+            "<button id='at-command-clear' class='qt-btn qt-btn-primary' type='button'>Clear history</button>",
             "</div>",
             "</div>",
             "<div class='at-split-right'>",
@@ -308,11 +309,11 @@
 
         var refCard = document.createElement("div");
         refCard.id = "at-ref-panel";
-        refCard.className = "body-box form-row";
+        refCard.className = "body-box form-row qt-card";
         refCard.innerHTML = [
             "<div class='at-ref-card'>",
-            "<details id='at-ref-details' class='at-ref-details' open>",
-            "<summary class='at-ref-summary'><span class='at-ref-arrow'></span> AT Command Reference — Quectel RG520N-NA</summary>",
+            "<details id='at-ref-details' class='at-ref-details qt-details' open>",
+            "<summary class='at-ref-summary qt-details-summary'><span class='at-ref-arrow qt-details-arrow'></span> AT Command Reference — Quectel RG520N-NA</summary>",
             "<div class='at-ref-body'>",
             "<p class='at-ref-note'>Read-only queries and safe operational commands for the RG520N-NA. Use Load to populate the terminal input, or Copy to clipboard.</p>",
             "<div class='at-ref-table-wrap'>",

@@ -215,7 +215,9 @@
 
         var panel = document.createElement("div");
         panel.id = "ttl-panel";
+        panel.className = "qt-card";
         panel.innerHTML = [
+            '<h3 class="qt-card-header">TTL Helper</h3>',
             '<div id="ttl-banner" class="ttl-banner ttl-banner-hidden"></div>',
 
             '<div class="ttl-top-row">',
@@ -242,16 +244,16 @@
             '    <h3>What is TTL override?</h3>',
             '    <p>TTL (Time-To-Live) and HL (Hop Limit) override modifies outgoing packet headers on the modem\'s rmnet interfaces using iptables mangle rules.</p>',
             '    <p>Common uses include setting TTL to 65 or 128 to prevent carrier detection of tethered traffic.</p>',
-            '    <p>The configured value is saved and reapplied automatically after each reboot via the Jtools overlay.</p>',
+            '    <p>The configured value is saved and reapplied automatically after each reboot via the Qtooley overlay.</p>',
             '  </div>',
             '</div>',
 
             '<div class="ttl-controls-card">',
             '  <h3>Set TTL value</h3>',
             '  <div class="ttl-preset-row">',
-            '    <button type="button" class="ttl-preset-button" onclick="JtoolsTtlHelper.preset(64)">64</button>',
-            '    <button type="button" class="ttl-preset-button" onclick="JtoolsTtlHelper.preset(65)">65</button>',
-            '    <button type="button" class="ttl-preset-button" onclick="JtoolsTtlHelper.preset(128)">128</button>',
+            '    <button type="button" class="ttl-preset-button qt-btn qt-btn-primary" onclick="JtoolsTtlHelper.preset(64)">64</button>',
+            '    <button type="button" class="ttl-preset-button qt-btn qt-btn-primary" onclick="JtoolsTtlHelper.preset(65)">65</button>',
+            '    <button type="button" class="ttl-preset-button qt-btn qt-btn-primary" onclick="JtoolsTtlHelper.preset(128)">128</button>',
             '  </div>',
             '  <div class="ttl-custom-row">',
             '    <label for="ttl-custom-input">Custom value (1-255):</label>',
@@ -268,7 +270,7 @@
             '        <label for="ttl_toggle_1" class="off">off</label>',
             '      </div>',
             '    </div>',
-            '    <button type="button" id="ttl-update-btn" class="ttl-update-button" onclick="JtoolsTtlHelper.update()" style="display:none">Apply</button>',
+            '    <button type="button" id="ttl-update-btn" class="ttl-update-button qt-btn qt-btn-danger" onclick="JtoolsTtlHelper.update()" style="display:none">Apply</button>',
             '  </div>',
             '</div>',
 
@@ -276,7 +278,7 @@
             '  <div class="ttl-rules-header" onclick="JtoolsTtlHelper.toggleRules()">',
             '    <span id="ttl-rules-arrow" class="ttl-rules-arrow">&#9654;</span>',
             '    <h3>iptables mangle rules</h3>',
-            '    <button type="button" class="ttl-rules-refresh" onclick="event.stopPropagation(); JtoolsTtlHelper.refreshRules()">Refresh</button>',
+            '    <button type="button" class="ttl-rules-refresh qt-btn qt-btn-secondary" onclick="event.stopPropagation(); JtoolsTtlHelper.refreshRules()">Refresh</button>',
             '  </div>',
             '  <div id="ttl-rules-body" class="ttl-rules-body" style="display:none">',
             '    <div class="ttl-rules-section">',

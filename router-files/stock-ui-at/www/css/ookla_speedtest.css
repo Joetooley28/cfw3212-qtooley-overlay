@@ -3,20 +3,17 @@
 }
 
 .ookla-page {
-    background: linear-gradient(180deg, #f7f9fc 0%, #eef3f9 100%);
-    border: 1px solid #dbe4ef;
+    background: var(--qt-bg-card, linear-gradient(180deg, #f7f9fc 0%, #eef3f9 100%));
+    border: 1px solid var(--qt-border, #dbe4ef);
+    border-radius: var(--qt-radius, 10px);
     box-sizing: border-box;
     max-width: 100%;
     overflow: hidden;
     padding: 22px;
 }
 
-.ookla-hero-copy {
-    max-width: 720px;
-}
-
 .ookla-eyebrow {
-    color: #496d97;
+    color: var(--qt-text-dim, #496d97);
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.14em;
@@ -24,43 +21,27 @@
     text-transform: uppercase;
 }
 
-.ookla-title {
-    background: transparent !important;
-    color: #0f2b46 !important;
-    font-size: 38px;
-    font-weight: 800;
-    line-height: 1.02;
-    margin: 0 0 10px 0;
-    padding: 0;
-}
-
 .ookla-subtitle {
-    color: #395471;
-    font-size: 16px;
+    color: var(--qt-text-dim, #395471);
+    font-size: 15px;
     line-height: 1.5;
-    margin: 0;
+    margin: 0 0 18px 0;
     max-width: 680px;
 }
 
 .ookla-run-button {
-    background: linear-gradient(180deg, #c54242 0%, #992b2b 100%);
     min-width: 170px;
 }
 
-.ookla-run-button:hover,
-.ookla-run-button:focus {
-    background: linear-gradient(180deg, #d25454 0%, #ad3636 100%);
-}
-
 .ookla-secondary-button {
-    background: linear-gradient(180deg, #2b6f99 0%, #124d70 100%);
     min-width: 160px;
 }
 
 .ookla-banner {
-    background: #edf4fb;
-    border: 1px solid #d3dfec;
-    color: #294867;
+    background: var(--qt-bg-card-alt, #edf4fb);
+    border: 1px solid var(--qt-border, #d3dfec);
+    border-radius: var(--qt-radius-sm, 6px);
+    color: var(--qt-text-label, #294867);
     margin-bottom: 16px;
     min-height: 18px;
     padding: 12px 14px;
@@ -97,28 +78,47 @@
 }
 
 .ookla-recover-button {
-    background: linear-gradient(180deg, #2b6f99 0%, #124d70 100%);
     min-width: 230px;
 }
 
-.ookla-toolbar {
+/* ── Above-fold two-column layout ─────────────────── */
+
+.ookla-above-fold {
     display: grid;
+    gap: 24px;
+    grid-template-columns: 1fr 320px;
+    margin-bottom: 24px;
+}
+
+.ookla-fold-left {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ookla-fold-right {
+    display: flex;
+    flex-direction: column;
     gap: 14px;
-    grid-template-columns: 1.4fr 0.8fr 0.7fr;
-    margin-bottom: 18px;
-    min-width: 0;
+}
+
+.ookla-toolbar-stacked {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .ookla-field {
-    background: #ffffff;
-    border: 1px solid #d8e0ea;
+    background: var(--qt-bg-card, #ffffff);
+    border: 1px solid var(--qt-border, #d8e0ea);
+    border-radius: var(--qt-radius-sm, 6px);
     min-width: 0;
     overflow: hidden;
     padding: 12px;
 }
 
 .ookla-field label {
-    color: #4d6988;
+    color: var(--qt-text-dim, #4d6988);
     display: block;
     font-size: 12px;
     font-weight: 700;
@@ -132,9 +132,10 @@
 
 .ookla-select,
 .ookla-static {
-    border: 1px solid #c8d4e0;
+    border: 1px solid var(--qt-border, #c8d4e0);
+    border-radius: var(--qt-radius-sm, 6px);
     box-sizing: border-box;
-    color: #17324d;
+    color: var(--qt-text, #17324d);
     font-size: 14px;
     min-height: 44px;
     overflow: hidden;
@@ -145,38 +146,107 @@
 }
 
 .ookla-select {
-    background: #ffffff;
+    background: var(--qt-bg-card, #ffffff);
 }
 
 .ookla-static {
-    background: #f5f8fb;
-}
-
-.ookla-grid {
-    display: grid;
-    gap: 18px;
-    grid-template-columns: minmax(0, 1.55fr) minmax(280px, 0.75fr);
-    margin-bottom: 18px;
-}
-
-.ookla-grid-top {
-    grid-template-columns: 1fr;
+    background: var(--qt-bg-card-alt, #f5f8fb);
 }
 
 .ookla-grid-lower {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    margin-bottom: 0;
-}
-
-.ookla-stage-column {
     display: grid;
     gap: 18px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-bottom: 18px;
+}
+
+/* ── Flip gauge ───────────────────────────────────── */
+
+.ookla-flip-gauge-slot {
+    display: flex;
+    justify-content: center;
+}
+
+.ookla-flip-gauge-slot .ookla-gauge-card {
+    max-width: 340px;
+    width: 100%;
+}
+
+.ookla-flip-gauge-slot.is-running .ookla-gauge {
+    animation: ooklaPulse 1.8s ease-in-out infinite;
+}
+
+.ookla-flip-tabs {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.ookla-flip-tab {
+    background: var(--qt-bg-card-alt, #edf1f5);
+    border: 1px solid var(--qt-border, #d8e0ea);
+    border-radius: var(--qt-radius-sm, 6px);
+    color: var(--qt-text-dim, #5a7594);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    min-width: 100px;
+    padding: 8px 18px;
+    text-transform: uppercase;
+    transition: background 0.15s, color 0.15s;
+}
+
+.ookla-flip-tab.is-active {
+    background: var(--qt-accent-blue, #0f5f83);
+    border-color: var(--qt-accent-blue, #0f5f83);
+    color: #fff;
+}
+
+.ookla-flip-summary {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+}
+
+.ookla-flip-stat {
+    text-align: center;
+}
+
+.ookla-flip-stat-label {
+    color: var(--qt-text-dim, #5a7594);
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.ookla-flip-stat-value {
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.ookla-flip-stat-value.is-download {
+    color: #d94f4f;
+}
+
+.ookla-flip-stat-value.is-upload {
+    color: #2a8bb9;
+}
+
+.ookla-flip-stat-value small {
+    font-size: 12px;
+    font-weight: 600;
 }
 
 .ookla-ca-card {
     align-items: center;
-    background: #ffffff;
-    border: 1px solid #d8e0ea;
+    background: var(--qt-bg-card, #ffffff);
+    border: 1px solid var(--qt-border, #d8e0ea);
+    border-radius: var(--qt-radius-sm, 6px);
     display: flex;
     gap: 18px;
     justify-content: space-between;
@@ -261,26 +331,23 @@
 }
 
 .ookla-stage-actions {
-    display: grid;
+    display: flex;
     gap: 12px;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.ookla-stage-actions .at-primary-button {
-    justify-self: center;
+.ookla-stage-actions .qt-btn {
+    flex: 1;
 }
 
 .ookla-gauges {
-    display: grid;
-    gap: 18px;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-items: stretch;
+    display: none;
 }
 
 .ookla-card,
 .ookla-gauge-card {
-    background: #ffffff;
-    border: 1px solid #d8e0ea;
+    background: var(--qt-bg-card, #ffffff);
+    border: 1px solid var(--qt-border, #d8e0ea);
+    border-radius: var(--qt-radius-sm, 6px);
     padding: 18px;
 }
 
@@ -299,7 +366,7 @@
 }
 
 .ookla-card-title {
-    color: #b86118;
+    color: var(--qt-accent-orange, #b86118);
     font-size: 18px;
     font-weight: 700;
     margin-bottom: 14px;
@@ -365,7 +432,7 @@
 }
 
 .ookla-gauge::after {
-    background: #ffffff;
+    background: var(--qt-bg-card, #ffffff);
     border-radius: 50%;
     content: "";
     height: 184px;
@@ -380,7 +447,7 @@
 }
 
 .ookla-gauge-value {
-    color: #0f2b46;
+    color: var(--qt-text, #0f2b46);
     font-size: 42px;
     font-weight: 800;
     line-height: 1;
@@ -389,7 +456,7 @@
 .ookla-gauge-unit,
 .ookla-gauge-scale,
 .ookla-gauge-subtitle {
-    color: #5a7594;
+    color: var(--qt-text-dim, #5a7594);
 }
 
 .ookla-gauge-unit {
@@ -415,10 +482,6 @@
     text-align: center;
 }
 
-.ookla-gauges.is-running .ookla-gauge {
-    animation: ooklaPulse 1.8s ease-in-out infinite;
-}
-
 @keyframes ooklaPulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.02); }
@@ -431,13 +494,14 @@
 }
 
 .ookla-meta-item {
-    background: #f7fafc;
-    border: 1px solid #dce4ee;
+    background: var(--qt-bg-card-alt, #f7fafc);
+    border: 1px solid var(--qt-border-subtle, #dce4ee);
+    border-radius: var(--qt-radius-sm, 6px);
     padding: 12px;
 }
 
 .ookla-meta-label {
-    color: #597492;
+    color: var(--qt-text-dim, #597492);
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -446,8 +510,8 @@
 }
 
 .ookla-meta-value {
-    color: #18324d;
-    font-family: Consolas, "Courier New", monospace;
+    color: var(--qt-text, #18324d);
+    font-family: var(--qt-font-mono, Consolas, "Courier New", monospace);
     font-size: 13px;
     line-height: 1.4;
     word-break: break-word;
@@ -460,8 +524,9 @@
 }
 
 .ookla-live-strip {
-    background: linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%);
-    border: 1px solid #d8e0ea;
+    background: var(--qt-bg-card-alt, linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%));
+    border: 1px solid var(--qt-border, #d8e0ea);
+    border-radius: var(--qt-radius-sm, 6px);
     padding: 16px 18px;
 }
 
@@ -531,7 +596,7 @@
 .ookla-link-button {
     align-items: center;
     background: #153b5c;
-    border-radius: 10px;
+    border-radius: var(--qt-radius-sm, 6px);
     border: 1px solid #153b5c;
     color: #ffffff;
     display: inline-flex;
@@ -552,9 +617,9 @@
 }
 
 .ookla-link-button[disabled] {
-    background: #edf1f5;
-    border-color: #d8e0ea;
-    color: #8a98a6;
+    background: var(--qt-bg-card-alt, #edf1f5);
+    border-color: var(--qt-border, #d8e0ea);
+    color: var(--qt-text-dim, #8a98a6);
 }
 
 .ookla-summary {
@@ -574,8 +639,9 @@
 }
 
 .ookla-history-item {
-    background: #f7fafc;
-    border: 1px solid #dce4ee;
+    background: var(--qt-bg-card-alt, #f7fafc);
+    border: 1px solid var(--qt-border-subtle, #dce4ee);
+    border-radius: var(--qt-radius-sm, 6px);
     padding: 12px;
 }
 
@@ -612,9 +678,10 @@
 }
 
 .ookla-empty {
-    background: #f7fafc;
-    border: 1px dashed #ced9e4;
-    color: #5f7692;
+    background: var(--qt-bg-card-alt, #f7fafc);
+    border: 1px dashed var(--qt-border, #ced9e4);
+    border-radius: var(--qt-radius-sm, 6px);
+    color: var(--qt-text-dim, #5f7692);
     line-height: 1.5;
     padding: 16px;
 }
@@ -660,22 +727,18 @@
     }
 }
 
-@media (max-width: 1180px) {
-    .ookla-grid-lower {
+@media (max-width: 900px) {
+    .ookla-above-fold {
         grid-template-columns: 1fr;
     }
-}
 
-@media (max-width: 900px) {
-    .ookla-toolbar,
-    .ookla-gauges,
     .ookla-live-metrics {
         grid-template-columns: 1fr;
     }
 
     .ookla-action-grid,
     .ookla-stage-actions {
-        grid-template-columns: 1fr;
+        flex-direction: column;
     }
 
     .ookla-ca-card {
@@ -688,5 +751,9 @@
 
     .ookla-ca-pills {
         justify-content: flex-start;
+    }
+
+    .ookla-grid-lower {
+        grid-template-columns: 1fr;
     }
 }

@@ -255,6 +255,34 @@
         return "qo-sig-vpoor";
     }
 
+    function getRsrqClass(rsrq) {
+        var v = asInt(rsrq);
+        if (v == null) { return "qt-sig-na"; }
+        if (v > -8)  { return "qt-sig-excellent"; }
+        if (v > -11) { return "qt-sig-good"; }
+        if (v > -15) { return "qt-sig-fair"; }
+        if (v > -18) { return "qt-sig-poor"; }
+        return "qt-sig-vpoor";
+    }
+
+    function getSinrClass(sinr) {
+        var v = asInt(sinr);
+        if (v == null) { return "qt-sig-na"; }
+        if (v > 20)  { return "qt-sig-excellent"; }
+        if (v > 13)  { return "qt-sig-good"; }
+        if (v > 5)   { return "qt-sig-fair"; }
+        if (v > 0)   { return "qt-sig-poor"; }
+        return "qt-sig-vpoor";
+    }
+
+    function getCarrierClass(provider) {
+        var p = String(provider || "").toLowerCase();
+        if (p.indexOf("t-mobile") !== -1 || p.indexOf("tmobile") !== -1) { return "qt-carrier-tmobile"; }
+        if (p.indexOf("at&t") !== -1 || p.indexOf("att") !== -1) { return "qt-carrier-att"; }
+        if (p.indexOf("verizon") !== -1) { return "qt-carrier-verizon"; }
+        return "";
+    }
+
     function getRatClass(rat) {
         var r = String(rat || "").toUpperCase();
         if (r.indexOf("NSA") !== -1 || r === "5GNSA") { return "qo-rat-nsa"; }
@@ -441,9 +469,10 @@
         var match = String(tempText || "").match(/(\d+)/);
         if (!match) { return ""; }
         var val = parseInt(match[1], 10);
-        if (val >= 55) { return "qo-temp-hot"; }
-        if (val >= 45) { return "qo-temp-warm"; }
-        return "qo-temp-ok";
+        if (val >= 55) { return "qt-temp-red"; }
+        if (val >= 48) { return "qt-temp-orange"; }
+        if (val >= 40) { return "qt-temp-yellow"; }
+        return "qt-temp-green";
     }
 
     // ── Data Fetch ──
@@ -515,6 +544,9 @@
             rsrqText: formatDb(rsrq, " dB"),
             sinrText: formatDb(sinr, " dB"),
             signalClass: getSignalClass(rsrp),
+            rsrqClass: getRsrqClass(rsrq),
+            sinrClass: getSinrClass(sinr),
+            carrierClass: getCarrierClass(provider),
             grade: grade,
             gradeClass: getGradeClass(grade),
             gradeText: grade != null ? grade + "%" : "N/A",
@@ -579,6 +611,9 @@
         calcSignalGrade: calcSignalGrade,
         normalizeMetric: normalizeMetric,
         getSignalClass: getSignalClass,
+        getRsrqClass: getRsrqClass,
+        getSinrClass: getSinrClass,
+        getCarrierClass: getCarrierClass,
         getGradeClass: getGradeClass,
         getRatClass: getRatClass,
         buildPhoneBars: buildPhoneBars,
