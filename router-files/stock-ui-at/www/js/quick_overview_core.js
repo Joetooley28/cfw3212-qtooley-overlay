@@ -184,6 +184,7 @@
         return {
             enabled:       s.enabled !== false,
             timeout:       asInt(s.timeout) || 10000,
+            dismissMode:   s.dismissMode || "movement",
             weightRsrp:    asInt(s.weightRsrp) != null ? asInt(s.weightRsrp) : DEFAULTS.weightRsrp,
             weightSinr:    asInt(s.weightSinr) != null ? asInt(s.weightSinr) : DEFAULTS.weightSinr,
             weightRsrq:    asInt(s.weightRsrq) != null ? asInt(s.weightRsrq) : DEFAULTS.weightRsrq
@@ -447,9 +448,18 @@
 
     // ── Data Fetch ──
 
+    var _pollCount = 0;
+    var CROSSCHECK_EVERY = 5; // run extra signal commands every Nth poll
+    var _lastCrosscheck = null; // cache between polls
+
     function fetchData(callback) {
+        _pollCount++;
+        var url = "/jtools_general_api/state";
+        if (_pollCount % CROSSCHECK_EVERY === 1) {
+            url += "?crosscheck=1";
+        }
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", "/jtools_general_api/state", true);
+        xhr.open("GET", url, true);
         xhr.onreadystatechange = function () {
             if (xhr.readyState !== 4) { return; }
             if (xhr.status !== 200) {
@@ -471,6 +481,7 @@
     }
 
     function processResponse(resp) {
+        if (resp.signal_crosscheck) { _lastCrosscheck = resp.signal_crosscheck; }
         var qnwinfo = parseQnwinfo(resp.qnwinfo_summary || "");
         var qspn = parseQspn(resp.qspn_summary || "");
         var cops = parseCops(resp.cops_summary || "");
@@ -513,6 +524,7 @@
             tempClass: getTempClass(temp),
             qnwinfo: qnwinfo,
             servingcell: servingcell,
+            signalCrosscheck: _lastCrosscheck,
             raw: resp
         };
     }

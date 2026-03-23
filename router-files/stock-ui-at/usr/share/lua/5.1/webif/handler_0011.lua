@@ -654,6 +654,24 @@ local function parse_qcainfo(summary)
                         break
                     end
                 end
+                -- Extract per-carrier RSRP/RSRQ: always at band_index+3 and band_index+4
+                local carrier_rsrp = nil
+                local carrier_rsrq = nil
+                local carrier_sinr = nil
+                if tokens[band_index + 3] then
+                    local v = tonumber(tokens[band_index + 3])
+                    if v and v < 0 then carrier_rsrp = v end
+                end
+                if tokens[band_index + 4] then
+                    local v = tonumber(tokens[band_index + 4])
+                    if v and v < 0 then carrier_rsrq = v end
+                end
+                -- SINR: NR5G at band_index+5, LTE at band_index+6 (RSSI in between)
+                local sinr_idx = (rat == "NR5G") and (band_index + 5) or (band_index + 6)
+                if tokens[sinr_idx] then
+                    local v = tonumber(tokens[sinr_idx])
+                    if v then carrier_sinr = v end
+                end
                 table.insert(carriers, {
                     role = role,
                     rat = rat or "",
@@ -662,6 +680,9 @@ local function parse_qcainfo(summary)
                     channel = channel or "",
                     bandwidth_mhz = bandwidth_mhz or "",
                     bandwidth_text = bandwidth_mhz and ("Bandwidth " .. bandwidth_mhz .. " MHz") or "Bandwidth unavailable",
+                    rsrp = carrier_rsrp,
+                    rsrq = carrier_rsrq,
+                    sinr = carrier_sinr,
                     raw = line
                 })
             end
@@ -731,6 +752,42 @@ local function parse_qeng_servingcell(summary)
         end
     end
     return ""
+end
+
+-- Parse AT+QRSRP/QRSRQ/QSINR: per-antenna values + sys_mode
+-- Format: +QRSRP: <v0>,<v1>,<v2>,<v3>,<sys_mode>
+local function parse_qsignal(summary, prefix)
+    local escaped = prefix:gsub("(%W)", "%%%1")
+    for line in (summary or ""):gmatch("([^\n]+)") do
+        if line:find(escaped) then
+            local body = line:gsub("^" .. escaped .. ":%s*", "")
+            local values = {}
+            local sys_mode = nil
+            for token in body:gmatch("([^,]+)") do
+                local trimmed = token:gsub("^%s+", ""):gsub("%s+$", "")
+                local num = tonumber(trimmed)
+                if num then
+                    -- Skip -32768 (unavailable sentinel)
+                    if num > -32768 then
+                        table.insert(values, num)
+                    end
+                else
+                    sys_mode = trimmed
+                end
+            end
+            -- Return best (highest) value as primary, plus all valid values
+            local best = nil
+            for _, v in ipairs(values) do
+                if not best or v > best then best = v end
+            end
+            return {
+                values = values,
+                best = best,
+                sys_mode = sys_mode or ""
+            }
+        end
+    end
+    return nil
 end
 
 local function build_ca_band_label(carrier)
@@ -1391,6 +1448,9 @@ function JtoolGeneralApiHandler:get(url, action)
         return
     end
 
+    -- Only run extra signal crosscheck commands when requested (adds ~3 AT cmds)
+    local want_crosscheck = (self:get_argument("crosscheck", "") == "1")
+
     local payload, err = run_locked_transaction(config, function()
         local qcainfo_raw, qcainfo_err = soft_run_command(config, 'AT+QCAINFO')
         local qeng_raw, qeng_err = soft_run_command(config, 'AT+QENG="servingcell"')
@@ -1399,6 +1459,14 @@ function JtoolGeneralApiHandler:get(url, action)
         local qspn_raw, qspn_err = soft_run_command(config, 'AT+QSPN')
         local cops_raw, cops_err = soft_run_command(config, 'AT+COPS?')
 
+        -- Multi-source signal confirmation (opt-in to keep normal polling fast)
+        local qrsrp_raw, qrsrq_raw, qsinr_raw
+        if want_crosscheck then
+            qrsrp_raw = soft_run_command(config, 'AT+QRSRP')
+            qrsrq_raw = soft_run_command(config, 'AT+QRSRQ')
+            qsinr_raw = soft_run_command(config, 'AT+QSINR')
+        end
+
         local qcainfo_summary = qcainfo_raw and summarize_response("AT+QCAINFO", qcainfo_raw) or ("unavailable: " .. tostring(qcainfo_err))
         local qeng_summary = qeng_raw and summarize_response('AT+QENG="servingcell"', qeng_raw) or ("unavailable: " .. tostring(qeng_err))
         local qtemp_summary = qtemp_raw and summarize_response("AT+QTEMP", qtemp_raw) or ("unavailable: " .. tostring(qtemp_err))
@@ -1406,6 +1474,18 @@ function JtoolGeneralApiHandler:get(url, action)
         local qspn_summary = qspn_raw and summarize_response("AT+QSPN", qspn_raw) or ("unavailable: " .. tostring(qspn_err))
         local cops_summary = cops_raw and summarize_response("AT+COPS?", cops_raw) or ("unavailable: " .. tostring(cops_err))
         local temperatures, primary_temperature_text = parse_qtemp(qtemp_summary)
+
+        local crosscheck_data = nil
+        if want_crosscheck then
+            local qrsrp_summary = qrsrp_raw and summarize_response("AT+QRSRP", qrsrp_raw) or nil
+            local qrsrq_summary = qrsrq_raw and summarize_response("AT+QRSRQ", qrsrq_raw) or nil
+            local qsinr_summary = qsinr_raw and summarize_response("AT+QSINR", qsinr_raw) or nil
+            crosscheck_data = {
+                qrsrp = parse_qsignal(qrsrp_summary, "+QRSRP"),
+                qrsrq = parse_qsignal(qrsrq_summary, "+QRSRQ"),
+                qsinr = parse_qsignal(qsinr_summary, "+QSINR")
+            }
+        end
 
         return {
             ok = true,
@@ -1419,7 +1499,8 @@ function JtoolGeneralApiHandler:get(url, action)
             carriers = parse_qcainfo(qcainfo_summary),
             servingcell_line = parse_qeng_servingcell(qeng_summary),
             temperatures = temperatures,
-            primary_temperature_text = primary_temperature_text
+            primary_temperature_text = primary_temperature_text,
+            signal_crosscheck = crosscheck_data
         }
     end)
 

@@ -94,38 +94,77 @@ function genThemeHeader(pageData, userGroups) {
         }
 
         const prefersDark = !(window.localStorage && window.localStorage.getItem(themeStorageKey) === "light");
-        const toggle = document.createElement("button");
-        toggle.id = "jtoolsThemeToggle";
-        toggle.type = "button";
-        toggle.textContent = prefersDark ? "Light mode" : "Dark mode";
-        toggle.setAttribute("aria-label", "Toggle dark mode");
-        toggle.style.background = "#3a3f46";
-        toggle.style.border = "1px solid #59606a";
-        toggle.style.borderRadius = "5px";
-        toggle.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.18)";
-        toggle.style.color = "#d7dde4";
-        toggle.style.cursor = "pointer";
-        toggle.style.display = "inline-flex";
-        toggle.style.alignItems = "center";
-        toggle.style.fontFamily = "\"Open Sans Regular\", \"Segoe UI\", sans-serif";
-        toggle.style.fontSize = "12px";
-        toggle.style.height = "32px";
-        toggle.style.padding = "0 12px";
-        toggle.style.position = "absolute";
-        toggle.style.right = "20px";
-        toggle.style.top = "92px";
-        toggle.style.zIndex = "40";
-        toggle.style.whiteSpace = "nowrap";
-        toggle.onclick = function () {
+
+        // Inject toggle switch CSS once
+        const styleEl = document.createElement("style");
+        styleEl.textContent =
+            ".jt-toggle-row{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}" +
+            ".jt-toggle-label{font-family:'Open Sans Regular','Segoe UI',sans-serif;font-size:11px;color:#8a919a;white-space:nowrap;}" +
+            ".jt-toggle-track{position:relative;width:36px;height:20px;border-radius:10px;background:#3a3f46;border:1px solid #59606a;transition:background 0.2s,border-color 0.2s;flex-shrink:0;}" +
+            ".jt-toggle-track.is-on{background:#4a7cdb;border-color:#5a8ae6;}" +
+            ".jt-toggle-knob{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#d7dde4;transition:transform 0.2s;}" +
+            ".jt-toggle-track.is-on .jt-toggle-knob{transform:translateX(16px);}";
+        document.head.appendChild(styleEl);
+
+        function makeToggleRow(id, label, isOn, onChange) {
+            const row = document.createElement("label");
+            row.className = "jt-toggle-row";
+            row.setAttribute("for", id);
+
+            const track = document.createElement("div");
+            track.className = "jt-toggle-track" + (isOn ? " is-on" : "");
+            const knob = document.createElement("div");
+            knob.className = "jt-toggle-knob";
+            track.appendChild(knob);
+
+            const lbl = document.createElement("span");
+            lbl.className = "jt-toggle-label";
+            lbl.id = id + "Label";
+            lbl.textContent = label;
+
+            row.appendChild(track);
+            row.appendChild(lbl);
+
+            row.addEventListener("click", function (e) {
+                e.preventDefault();
+                const on = track.classList.toggle("is-on");
+                onChange(on, lbl);
+            });
+            return row;
+        }
+
+        // Container — stacked vertically, positioned outside the Casa container's right edge
+        const wrap = document.createElement("div");
+        wrap.id = "jtoolsHeaderBtns";
+        wrap.setAttribute("style",
+            "position:absolute;right:-216px;top:80px;z-index:99999;" +
+            "display:flex;flex-direction:column;gap:6px;align-items:flex-start;");
+
+        // Dark mode toggle (on = dark, off = light)
+        const darkRow = makeToggleRow("jtoolsThemeToggle", "Dark mode", prefersDark, function (on) {
             if (window.localStorage) {
-                window.localStorage.setItem(themeStorageKey, prefersDark ? "light" : "dark");
+                window.localStorage.setItem(themeStorageKey, on ? "dark" : "light");
             }
             window.location.reload();
-        };
+        });
+
+        // Screensaver toggle (on = active, off = paused)
+        window._jtoolsSsPaused = false;
+        const ssRow = makeToggleRow("jtoolsSsPause", "Screensaver", true, function (on, lbl) {
+            window._jtoolsSsPaused = !on;
+            lbl.textContent = on ? "Screensaver" : "Screensaver paused";
+            lbl.style.color = on ? "" : "#e06c4f";
+        });
+
+        wrap.appendChild(darkRow);
+        wrap.appendChild(ssRow);
 
         const host = document.querySelector(".container");
         if (host) {
-            host.appendChild(toggle);
+            if (!host.style.position || host.style.position === "static") {
+                host.style.position = "relative";
+            }
+            host.appendChild(wrap);
         }
     }
 

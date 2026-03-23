@@ -12,16 +12,24 @@
     var isVisible = false;
     var canDismiss = false;
 
-    function getTimeout() {
+    function getSettings() {
         try {
             var raw = window.localStorage.getItem("jtoolsQoSettings");
-            if (raw) {
-                var s = JSON.parse(raw);
-                if (s.enabled === false) { return 0; }
-                if (s.timeout && parseInt(s.timeout, 10) > 0) { return parseInt(s.timeout, 10); }
-            }
+            if (raw) { return JSON.parse(raw); }
         } catch (e) { /* ignore */ }
+        return {};
+    }
+
+    function getTimeout() {
+        var s = getSettings();
+        if (s.enabled === false) { return 0; }
+        if (s.timeout && parseInt(s.timeout, 10) > 0) { return parseInt(s.timeout, 10); }
         return 15000;
+    }
+
+    function getDismissMode() {
+        var s = getSettings();
+        return s.dismissMode || "movement";
     }
 
     function resetIdleTimer() {
@@ -94,6 +102,7 @@
 
     function activateScreensaver() {
         if (isVisible) { return; }
+        if (window._jtoolsSsPaused) { resetIdleTimer(); return; }
         ensureResources(function () {
             if (!window.JtoolsQuickOverview || !window.JtoolsScreensaverRenderer) { return; }
             isVisible = true;
@@ -117,7 +126,15 @@
             // Grace period — ignore events from cursor already on overlay
             graceTimer = setTimeout(function () {
                 canDismiss = true;
-                if (overlay) {
+                if (!overlay) { return; }
+                if (getDismissMode() === "button") {
+                    var btn = document.createElement("div");
+                    btn.className = "qo-ss-dismiss";
+                    btn.textContent = "Tap to dismiss";
+                    btn.addEventListener("click", dismissScreensaver);
+                    btn.addEventListener("touchstart", dismissScreensaver);
+                    overlay.appendChild(btn);
+                } else {
                     overlay.addEventListener("mousemove", dismissScreensaver);
                     overlay.addEventListener("touchstart", dismissScreensaver);
                     overlay.addEventListener("click", dismissScreensaver);
@@ -132,7 +149,10 @@
         canDismiss = false;
         if (graceTimer) { clearTimeout(graceTimer); graceTimer = null; }
         if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
-        if (window.JtoolsScreensaverRenderer) { window.JtoolsScreensaverRenderer.stopClock(); }
+        if (window.JtoolsScreensaverRenderer) {
+            window.JtoolsScreensaverRenderer.stopClock();
+            window.JtoolsScreensaverRenderer.clearBandHistory();
+        }
 
         if (overlay) {
             overlay.classList.remove("is-visible");
@@ -151,6 +171,7 @@
         window.JtoolsQuickOverview.fetchData(function (data, err) {
             if (!isVisible || !overlay) { return; }
             if (err || !data) { return; }
+            window.JtoolsScreensaverRenderer.trackBandSignals(data);
             overlay.innerHTML = window.JtoolsScreensaverRenderer.renderScreensaver(data);
             window.JtoolsScreensaverRenderer.checkForBandChange(data);
         });
