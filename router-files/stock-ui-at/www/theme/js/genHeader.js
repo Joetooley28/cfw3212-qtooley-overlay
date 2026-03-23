@@ -258,7 +258,7 @@ function genThemeHeader(pageData, userGroups) {
     renderThemeToggle();
 
     // Inject screensaver idle detector on dark-mode pages
-    if (document.querySelector("link[data-jtools-dark-mode]") && relUrlOfPage !== "quick_overview.html") {
+    if (document.querySelector("link[data-jtools-dark-mode]")) {
         var ssScript = document.createElement("script");
         ssScript.src = "/js/jtools_screensaver.js?jtools-qo-v20260322a";
         document.head.appendChild(ssScript);

@@ -1,11 +1,6 @@
 (function () {
     "use strict";
 
-    // Don't activate on the Quick Overview page itself
-    if (window.location.pathname.indexOf("quick_overview.html") !== -1) {
-        return;
-    }
-
     var POLL_INTERVAL = 6500;
     var GRACE_MS = 800;
     var overlay = null;
@@ -26,7 +21,7 @@
                 if (s.timeout && parseInt(s.timeout, 10) > 0) { return parseInt(s.timeout, 10); }
             }
         } catch (e) { /* ignore */ }
-        return 10000;
+        return 15000;
     }
 
     function resetIdleTimer() {

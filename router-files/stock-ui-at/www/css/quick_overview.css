@@ -121,6 +121,15 @@
     line-height: 1;
     margin-bottom: 4px;
 }
+.qo-ss-ampm {
+    font-family: var(--qo-font-mono);
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--qo-text-dim);
+    letter-spacing: 3px;
+    margin-top: -2px;
+    margin-bottom: 4px;
+}
 .qo-ss-device {
     font-size: 14px;
     color: var(--qo-text-dim);
@@ -247,9 +256,11 @@
     border-color: rgba(179,136,255,0.3);
     color: #ce93d8;
 }
-.qo-band-pill.is-pcc {
-    border-color: rgba(0,229,255,0.25);
-    color: #80deea;
+.qo-band-pill.is-pcc,
+.qo-band-pill.is-nr.is-pcc {
+    border-color: rgba(0,229,255,0.35);
+    color: #00e5ff;
+    background: rgba(0,229,255,0.08);
 }
 
 /* ── Bottom detail line ── */
@@ -319,20 +330,25 @@
     color: var(--qo-text-bright);
     letter-spacing: 0.5px;
 }
-.qo-settings-toggle-btn {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 8px;
-    color: var(--qo-text-dim);
+/* ── Collapsible card ── */
+.qo-card-toggle {
     cursor: pointer;
-    font-size: 13px;
-    padding: 6px 14px;
-    transition: background 0.2s, color 0.2s;
-    font-family: var(--qo-font-sans);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+    -webkit-user-select: none;
 }
-.qo-settings-toggle-btn:hover {
-    background: rgba(255,255,255,0.1);
+.qo-card-toggle:hover {
     color: var(--qo-text);
+}
+.qo-card-arrow {
+    font-size: 10px;
+    transition: transform 0.3s ease;
+    color: var(--qo-text-dim);
+}
+.qo-card-arrow.is-open {
+    transform: rotate(180deg);
 }
 
 /* ── Card (glassmorphism) ── */
@@ -354,6 +370,49 @@
     margin-bottom: 14px;
     padding-bottom: 8px;
     border-bottom: 1px solid var(--qo-border);
+}
+
+/* ── Carrier Brand Colors ── */
+.qo-carrier-tmo   { color: #e20074; }
+.qo-carrier-att   { color: #009fdb; }
+.qo-carrier-vzw   { color: #cd040b; }
+.qo-carrier-other { color: var(--qo-text); }
+
+/* ── Active Band Card ── */
+.qo-ab-combo {
+    font-family: var(--qo-font-mono);
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    line-height: 1.3;
+}
+.qo-ab-pcc {
+    color: #00e5ff;
+}
+.qo-ab-nr {
+    color: #ce93d8;
+}
+.qo-ab-lte {
+    color: #00e676;
+}
+.qo-ab-plus {
+    color: var(--qo-text-dim);
+    margin: 0 4px;
+    font-weight: 400;
+}
+.qo-ab-none {
+    color: var(--qo-text-dim);
+    font-size: 16px;
+}
+.qo-ab-sub {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+.qo-ab-provider {
+    font-size: 13px;
+    color: var(--qo-text-dim);
 }
 
 /* ── Signal Grade Card ── */

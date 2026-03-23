@@ -17,9 +17,62 @@
 
     function $(id) { return document.getElementById(id); }
 
+    // ── Build page DOM into #htmlGoesHere ──
+
+    function buildPage() {
+        var host = document.getElementById("htmlGoesHere");
+        if (!host) { return; }
+
+        var page = document.createElement("div");
+        page.className = "qo-page";
+        page.id = "qoPageRoot";
+        page.innerHTML = [
+            "<div class='qo-page-header'>",
+            "  <span class='qo-page-title'><span class='qo-status-dot' id='qoStatusDot'></span>Quick Overview</span>",
+            "</div>",
+            "<div class='qo-card'>",
+            "  <div class='qo-card-title'>Active Band</div>",
+            "  <div id='qoActiveBand'><div class='qo-no-data'>Loading\u2026</div></div>",
+            "</div>",
+            "<div class='qo-card'>",
+            "  <div class='qo-card-title'>Signal Grade</div>",
+            "  <div id='qoGradeCard'><div class='qo-no-data'>Loading\u2026</div></div>",
+            "</div>",
+            "<div class='qo-card'>",
+            "  <div class='qo-card-title'>Signal Over Time</div>",
+            "  <div class='qo-chart-wrap' id='qoChartWrap'>",
+            "    <canvas class='qo-chart-canvas' id='qoChartCanvas'></canvas>",
+            "  </div>",
+            "  <div class='qo-chart-legend'>",
+            "    <span><span class='qo-chart-legend-dot' style='background:#8db9ff'></span>RSRP</span>",
+            "    <span><span class='qo-chart-legend-dot' style='background:#00e676'></span>SINR</span>",
+            "  </div>",
+            "</div>",
+            "<div class='qo-card'>",
+            "  <div class='qo-card-title'>Band Change History</div>",
+            "  <div class='qo-history-list' id='qoHistoryList'><div class='qo-no-data'>No band changes recorded yet</div></div>",
+            "</div>",
+            "<div class='qo-card'>",
+            "  <div class='qo-card-title'>Connection Info</div>",
+            "  <div id='qoConnInfo'><div class='qo-no-data'>Loading\u2026</div></div>",
+            "</div>",
+            "<div class='qo-card qo-card-collapsible' id='qoSettingsCard'>",
+            "  <div class='qo-card-title qo-card-toggle' id='qoSettingsToggle'>Screensaver Settings <span class='qo-card-arrow' id='qoSettingsArrow'>\u25BC</span></div>",
+            "  <div class='qo-settings' id='qoSettingsWrap'>",
+            "    <div class='qo-settings-inner' id='qoSettingsBody'></div>",
+            "  </div>",
+            "</div>"
+        ].join("\n");
+
+        host.appendChild(page);
+    }
+
     // ── Init ──
 
     function init() {
+        buildPage();
+
+        els.activeBand    = $("qoActiveBand");
         els.gradeCard     = $("qoGradeCard");
         els.chartWrap     = $("qoChartWrap");
         els.historyList   = $("qoHistoryList");
@@ -50,6 +103,7 @@
             }
             if (els.statusDot) { els.statusDot.className = "qo-status-dot"; }
 
+            renderActiveBand(data);
             renderSignalGrade(data);
             updateChartData(data);
             renderSparkline();
@@ -57,6 +111,48 @@
             renderBandHistory();
             renderConnectionInfo(data);
         });
+    }
+
+    // ── Active Band Card ──
+
+    function getCarrierColorClass(provider) {
+        var p = String(provider || "").toLowerCase();
+        if (p.indexOf("t-mobile") !== -1 || p.indexOf("tmobile") !== -1) { return "qo-carrier-tmo"; }
+        if (p.indexOf("at&t") !== -1 || p.indexOf("att") !== -1) { return "qo-carrier-att"; }
+        if (p.indexOf("verizon") !== -1) { return "qo-carrier-vzw"; }
+        return "qo-carrier-other";
+    }
+
+    function renderActiveBand(data) {
+        if (!els.activeBand) { return; }
+
+        var parts = [];
+        if (data.carriers && data.carriers.length) {
+            data.carriers.forEach(function (c) {
+                var num = String(c.band || "").replace(/[^0-9]/g, "");
+                var rat = String(c.rat || "").toUpperCase();
+                var prefix = rat === "NR5G" ? "N" : "B";
+                var cls = c.role === "PCC" ? "qo-ab-pcc" : (rat === "NR5G" ? "qo-ab-nr" : "qo-ab-lte");
+                parts.push("<span class='" + cls + "'>" + QO.escapeHtml(prefix + num) + "</span>");
+            });
+        }
+
+        var combo = parts.length ? parts.join("<span class='qo-ab-plus'>+</span>") : "<span class='qo-ab-none'>No carriers</span>";
+
+        var providerLabel = QO.escapeHtml(data.provider || "");
+        var carrierCls = getCarrierColorClass(data.provider);
+        var techLabel = QO.escapeHtml(data.rat || "");
+
+        els.activeBand.innerHTML = [
+            "<div class='qo-ab-combo'>",
+            "  <span class='" + carrierCls + "'>" + providerLabel + "</span>",
+            "  <span class='qo-ab-plus'></span>",
+            "  " + combo,
+            "</div>",
+            "<div class='qo-ab-sub'>",
+            "  <span class='qo-rat-badge " + data.ratClass + "' style='font-size:10px;padding:2px 8px'>" + techLabel + "</span>",
+            "</div>"
+        ].join("");
     }
 
     // ── Signal Grade Card ──
@@ -102,9 +198,7 @@
 
     function updateChartData(data) {
         var now = new Date();
-        var timeLabel = String(now.getHours()).replace(/^(\d)$/, "0$1") + ":" +
-                        String(now.getMinutes()).replace(/^(\d)$/, "0$1") + ":" +
-                        String(now.getSeconds()).replace(/^(\d)$/, "0$1");
+        var timeLabel = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
         chartData.push({
             time: timeLabel,
             rsrp: QO.asInt(data.rsrp),
@@ -372,13 +466,14 @@
             }
         });
 
-        // Settings toggle
+        // Settings toggle (collapsible card)
         var toggleBtn = document.getElementById("qoSettingsToggle");
         var settingsWrap = document.getElementById("qoSettingsWrap");
+        var arrow = document.getElementById("qoSettingsArrow");
         if (toggleBtn && settingsWrap) {
             toggleBtn.addEventListener("click", function () {
                 settingsWrap.classList.toggle("is-open");
-                toggleBtn.textContent = settingsWrap.classList.contains("is-open") ? "Close settings" : "Settings";
+                if (arrow) { arrow.classList.toggle("is-open"); }
             });
         }
     }

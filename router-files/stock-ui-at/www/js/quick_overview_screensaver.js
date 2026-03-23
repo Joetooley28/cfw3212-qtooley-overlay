@@ -8,10 +8,25 @@
 
     // ── Build screensaver HTML ──
 
+    function formatClock(date) {
+        var h = date.getHours();
+        var ampm = h >= 12 ? "PM" : "AM";
+        h = h % 12;
+        if (h === 0) { h = 12; }
+        var mm = String(date.getMinutes()).replace(/^(\d)$/, "0$1");
+        return { h: String(h), mm: mm, ampm: ampm };
+    }
+
+    function getCarrierColorClass(provider) {
+        var p = String(provider || "").toLowerCase();
+        if (p.indexOf("t-mobile") !== -1 || p.indexOf("tmobile") !== -1) { return "qo-carrier-tmo"; }
+        if (p.indexOf("at&t") !== -1 || p.indexOf("att") !== -1) { return "qo-carrier-att"; }
+        if (p.indexOf("verizon") !== -1) { return "qo-carrier-vzw"; }
+        return "qo-carrier-other";
+    }
+
     function renderScreensaver(data) {
-        var now = new Date();
-        var hh = String(now.getHours()).replace(/^(\d)$/, "0$1");
-        var mm = String(now.getMinutes()).replace(/^(\d)$/, "0$1");
+        var clk = formatClock(new Date());
 
         var bandPills = "";
         if (data.carriers && data.carriers.length) {
@@ -35,9 +50,10 @@
             "  <span class='qo-ss-grade-label " + data.gradeClass + "'>" + QO.escapeHtml(data.gradeText) + "</span>",
             "</div>",
             "<div class='qo-ss-center'>",
-            "  <div class='qo-ss-clock' id='qoSsClock'>" + hh + ":" + mm + "</div>",
+            "  <div class='qo-ss-clock' id='qoSsClock'>" + clk.h + ":" + clk.mm + "</div>",
+            "  <div class='qo-ss-ampm' id='qoSsAmpm'>" + clk.ampm + "</div>",
             "  <div class='qo-ss-device'>CFW-3212 / RG520N-NA</div>",
-            "  <div class='qo-ss-provider'>" + QO.escapeHtml(data.provider) + "</div>",
+            "  <div class='qo-ss-provider " + getCarrierColorClass(data.provider) + "'>" + QO.escapeHtml(data.provider) + "</div>",
             "  <span class='qo-rat-badge " + data.ratClass + "'>" + QO.escapeHtml(data.rat) + "</span>",
             "  <div class='qo-ss-temp " + data.tempClass + "'>" + QO.escapeHtml(data.temp) + "</div>",
             "  <div class='qo-ss-metrics'>",
@@ -73,10 +89,10 @@
         clockTimer = setInterval(function () {
             var el = document.getElementById("qoSsClock");
             if (!el) { return; }
-            var now = new Date();
-            var hh = String(now.getHours()).replace(/^(\d)$/, "0$1");
-            var mm = String(now.getMinutes()).replace(/^(\d)$/, "0$1");
-            el.textContent = hh + ":" + mm;
+            var clk = formatClock(new Date());
+            el.textContent = clk.h + ":" + clk.mm;
+            var ampmEl = document.getElementById("qoSsAmpm");
+            if (ampmEl) { ampmEl.textContent = clk.ampm; }
         }, 5000);
     }
 

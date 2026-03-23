@@ -178,13 +178,26 @@
             item.mnc = asText(parts[5], "");
             item.cellId = asText(parts[6], "");
             item.pci = asText(parts[7], "");
-            item.tac = asText(parts[8], "");
-            item.arfcn = asText(parts[9], "");
-            item.band = hasValue(parts[10]) ? "NR5G BAND " + parts[10] : "";
-            item.nrDlBw = asText(parts[11], "");
-            item.rsrp = asText(parts[12], "");
-            item.rsrq = asText(parts[13], "");
-            item.sinr = asText(parts[14], "");
+
+            var radio = String(item.radio).toUpperCase();
+            if (radio.indexOf("LTE") !== -1) {
+                // LTE: ...,cellID,PCI,EARFCN,band,UL_BW,DL_BW,TAC,RSRP,RSRQ,RSSI,SINR,...
+                item.arfcn = asText(parts[8], "");
+                item.band = hasValue(parts[9]) ? "LTE BAND " + parts[9] : "";
+                item.tac = asText(parts[12], "");
+                item.rsrp = asText(parts[13], "");
+                item.rsrq = asText(parts[14], "");
+                item.sinr = parts.length > 16 ? asText(parts[16], "") : "";
+            } else {
+                // NR5G-SA: ...,cellID,PCI,TAC,ARFCN,band,DL_BW,RSRP,RSRQ,SINR
+                item.tac = asText(parts[8], "");
+                item.arfcn = asText(parts[9], "");
+                item.band = hasValue(parts[10]) ? "NR5G BAND " + parts[10] : "";
+                item.nrDlBw = asText(parts[11], "");
+                item.rsrp = asText(parts[12], "");
+                item.rsrq = asText(parts[13], "");
+                item.sinr = asText(parts[14], "");
+            }
         }
         return item;
     }
