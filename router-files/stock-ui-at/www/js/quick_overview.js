@@ -30,6 +30,7 @@
             "<div class='qo-page-header'>",
             "  <span class='qo-page-title'><span class='qo-status-dot' id='qoStatusDot'></span>Quick Overview</span>",
             "</div>",
+            "<div id='qoErrorBanner' style='display:none;padding:10px 14px;margin:0 0 10px;border-radius:6px;background:rgba(224,108,79,0.15);border:1px solid rgba(224,108,79,0.4);color:#e06c4f;font-size:12px;font-family:\"Segoe UI\",sans-serif;'></div>",
             "<div class='qo-card'>",
             "  <div class='qo-card-title'>Active Band</div>",
             "  <div id='qoActiveBand'><div class='qo-no-data'>Loading\u2026</div></div>",
@@ -79,6 +80,7 @@
         els.connInfo      = $("qoConnInfo");
         els.settingsBody  = $("qoSettingsBody");
         els.statusDot     = $("qoStatusDot");
+        els.errorBanner   = $("qoErrorBanner");
         chartCanvas       = $("qoChartCanvas");
 
         if (chartCanvas) {
@@ -99,9 +101,14 @@
         QO.fetchData(function (data, err) {
             if (err || !data) {
                 if (els.statusDot) { els.statusDot.className = "qo-status-dot is-error"; }
+                if (els.errorBanner) {
+                    els.errorBanner.textContent = QO.friendlyError(err);
+                    els.errorBanner.style.display = "block";
+                }
                 return;
             }
             if (els.statusDot) { els.statusDot.className = "qo-status-dot"; }
+            if (els.errorBanner) { els.errorBanner.style.display = "none"; }
 
             renderActiveBand(data);
             renderSignalGrade(data);
@@ -375,6 +382,7 @@
             "    <span class='qo-conn-value'>" + QO.escapeHtml(data.arfcn) + "</span>",
             "  </div>",
             bandPills ? "  <div class='qo-conn-bands-row'><span class='qo-conn-label'>Band Combo</span><div style='margin-top:6px;display:flex;flex-wrap:wrap;gap:6px'>" + bandPills + "</div></div>" : "",
+            data.firmwareVersion ? "  <div class='qo-conn-item'><span class='qo-conn-label'>Firmware</span><span class='qo-conn-value' style='font-size:11px'>" + QO.escapeHtml(data.firmwareVersion) + "</span></div>" : "",
             "</div>"
         ].join("\n");
     }

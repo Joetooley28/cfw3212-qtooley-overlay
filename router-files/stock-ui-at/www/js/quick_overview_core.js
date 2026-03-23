@@ -460,6 +460,10 @@
         }
         var xhr = new XMLHttpRequest();
         xhr.open("GET", url, true);
+        xhr.timeout = 8000;
+        xhr.ontimeout = function () {
+            callback(null, "timeout");
+        };
         xhr.onreadystatechange = function () {
             if (xhr.readyState !== 4) { return; }
             if (xhr.status !== 200) {
@@ -498,6 +502,7 @@
         var bandLabel = chooseFirst(qnwinfo.bandLabel, servingcell.band);
         var grade = calcSignalGrade(rsrp, rsrq, sinr);
         var temp = resp.primary_temperature_text || "N/A";
+        var fwVersion = resp.firmware_version || null;
 
         return {
             provider: provider,
@@ -524,6 +529,7 @@
             tempClass: getTempClass(temp),
             qnwinfo: qnwinfo,
             servingcell: servingcell,
+            firmwareVersion: fwVersion,
             signalCrosscheck: _lastCrosscheck,
             raw: resp
         };
@@ -532,6 +538,38 @@
     // ── Init ──
 
     loadBandHistory();
+
+    // ── Friendly Error Messages ──
+
+    var ERROR_MESSAGES = {
+        "at_channel_busy": "AT port is busy. Another command or page is using the modem right now. Try again in a few seconds.",
+        "timeout": "The modem did not respond in time. It may be busy or temporarily unavailable. Try again shortly.",
+        "backend_internal_error": "An internal error occurred communicating with the modem. Try again or check the AT terminal for diagnostics.",
+        "request_failed": "The request to the modem failed. Check that the router is reachable and try again.",
+        "config_read_failed": "Could not read the AT backend configuration file.",
+        "backend_bad_result": "The modem returned an unexpected result. Try again.",
+        "response_too_large": "The modem response was too large to process.",
+        "API error": "The API returned an error. The modem may be busy or restarting."
+    };
+
+    function friendlyError(rawError) {
+        if (!rawError) { return "An unknown error occurred."; }
+        var raw = String(rawError);
+        // Check for exact match first
+        if (ERROR_MESSAGES[raw]) { return ERROR_MESSAGES[raw]; }
+        // Check for prefix match (e.g. "backend_internal_error:details")
+        var prefix = raw.split(":")[0];
+        if (ERROR_MESSAGES[prefix]) { return ERROR_MESSAGES[prefix]; }
+        // CME/CMS errors
+        if (raw.indexOf("CME_ERROR") === 0 || raw.indexOf("CMS_ERROR") === 0) {
+            return "The modem returned an error: " + raw.replace(/_/g, " ") + ".";
+        }
+        // HTTP errors
+        if (raw.indexOf("HTTP ") === 0) {
+            return "Server returned " + raw + ". The router may be busy or restarting.";
+        }
+        return raw;
+    }
 
     // ── Public API ──
 
@@ -560,6 +598,7 @@
         hasValue: hasValue,
         asInt: asInt,
         formatDb: formatDb,
+        friendlyError: friendlyError,
         DEFAULTS: DEFAULTS
     };
 

@@ -58,6 +58,29 @@
         ]}
     ];
 
+    var FRIENDLY_ERRORS = {
+        "at_channel_busy": "AT port is busy. Another command or page is using the modem right now. Try again in a few seconds.",
+        "timeout": "The modem did not respond in time. It may be busy or temporarily unavailable. Try again shortly.",
+        "backend_internal_error": "An internal error occurred communicating with the modem. Try again or check the AT terminal for diagnostics.",
+        "request_failed": "The request to the modem failed. Check that the router is reachable and try again.",
+        "config_read_failed": "Could not read the AT backend configuration file.",
+        "backend_bad_result": "The modem returned an unexpected result. Try again.",
+        "response_too_large": "The modem response was too large to process.",
+        "API error": "The API returned an error. The modem may be busy or restarting."
+    };
+
+    function friendlyError(raw) {
+        if (!raw) { return "An unknown error occurred."; }
+        var s = String(raw);
+        if (FRIENDLY_ERRORS[s]) { return FRIENDLY_ERRORS[s]; }
+        var prefix = s.split(":")[0];
+        if (FRIENDLY_ERRORS[prefix]) { return FRIENDLY_ERRORS[prefix]; }
+        if (s.indexOf("CME_ERROR") === 0 || s.indexOf("CMS_ERROR") === 0) {
+            return "The modem returned an error: " + s.replace(/_/g, " ") + ".";
+        }
+        return s;
+    }
+
     function escapeHtml(value) {
         return String(value)
             .replace(/&/g, "&amp;")
@@ -223,16 +246,26 @@
             if (response && response.ok) {
                 appendHistory("response", "Response", response.response || "");
             } else if (response) {
-                var errText = response.error || "request_failed";
+                var rawErr = response.error || "request_failed";
                 var details = response.response || "";
-                appendHistory("error", "Error", errText + (details ? "\n\n" + details : ""));
+                appendHistory("error", "Error", friendlyError(rawErr) + (details ? "\n\n" + details : ""));
             } else {
                 appendHistory("error", "Error", "Empty response from server.");
             }
         }).fail(function (xhr) {
-            var text = xhr && xhr.responseText ? xhr.responseText : "Request failed.";
             appendHistory("command", "Command", command);
-            appendHistory("error", "Error", text);
+            var errMsg = "Request failed.";
+            if (xhr && xhr.responseText) {
+                try {
+                    var body = JSON.parse(xhr.responseText);
+                    if (body && body.error) {
+                        errMsg = friendlyError(body.error);
+                    }
+                } catch (e) {
+                    errMsg = friendlyError("request_failed");
+                }
+            }
+            appendHistory("error", "Error", errMsg);
         }).always(function () {
             setBusy(false);
             clearCommand();

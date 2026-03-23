@@ -3,13 +3,48 @@
 
     var core = window.JtoolsBandLockingCore;
 
+    var FRIENDLY_ERRORS = {
+        "at_channel_busy": "AT port is busy. Another command or page is using the modem right now. Try again in a few seconds.",
+        "timeout": "The modem did not respond in time. It may be busy or temporarily unavailable. Try again shortly.",
+        "backend_internal_error": "An internal error occurred communicating with the modem. Try again or check the AT terminal for diagnostics.",
+        "request_failed": "The request to the modem failed. Check that the router is reachable and try again.",
+        "config_read_failed": "Could not read the AT backend configuration file.",
+        "backend_bad_result": "The modem returned an unexpected result. Try again.",
+        "response_too_large": "The modem response was too large to process.",
+        "API error": "The API returned an error. The modem may be busy or restarting."
+    };
+
+    function friendlyError(raw) {
+        if (!raw) { return "An unknown error occurred."; }
+        var s = String(raw);
+        if (FRIENDLY_ERRORS[s]) { return FRIENDLY_ERRORS[s]; }
+        var prefix = s.split(":")[0];
+        if (FRIENDLY_ERRORS[prefix]) { return FRIENDLY_ERRORS[prefix]; }
+        if (s.indexOf("CME_ERROR") === 0 || s.indexOf("CMS_ERROR") === 0) {
+            return "The modem returned an error: " + s.replace(/_/g, " ") + ".";
+        }
+        return s;
+    }
+
+    function extractXhrError(xhr, fallback) {
+        if (xhr && xhr.responseText) {
+            try {
+                var body = JSON.parse(xhr.responseText);
+                if (body && body.error) { return body.error; }
+            } catch (e) { /* not JSON */ }
+        }
+        return fallback || "request_failed";
+    }
+
     function setStatus(kind, text) {
         var node = document.getElementById("band-lock-status");
         if (!node) {
             return;
         }
         node.className = "band-lock-status band-lock-status-" + kind;
-        node.textContent = text || "";
+        var display = text || "";
+        if (kind === "error") { display = friendlyError(display); }
+        node.textContent = display;
     }
 
     function setBusy(busy) {
@@ -130,8 +165,7 @@
                 setStatus("ok", options.successText || core.buildStateSummary(response));
             }
         }).fail(function (xhr) {
-            var text = xhr && xhr.responseText ? xhr.responseText : "State request failed.";
-            setStatus("error", text);
+            setStatus("error", extractXhrError(xhr, "State request failed."));
         }).always(function () {
             setBusy(false);
             if (typeof options.onComplete === "function") {
@@ -175,8 +209,7 @@
                 setBusy(false);
             }
         }).fail(function (xhr) {
-            var text = xhr && xhr.responseText ? xhr.responseText : "Mode apply failed.";
-            setStatus("error", text);
+            setStatus("error", extractXhrError(xhr, "Mode apply failed."));
             setIndicator("band-lock-rat-indicator", "error", "Error");
             setBusy(false);
         });
@@ -217,8 +250,7 @@
                 setBusy(false);
             }
         }).fail(function (xhr) {
-            var text = xhr && xhr.responseText ? xhr.responseText : "Acquisition order apply failed.";
-            setStatus("error", text);
+            setStatus("error", extractXhrError(xhr, "Acquisition order apply failed."));
             setIndicator("rat-acq-order-indicator", "error", "Error");
             setBusy(false);
         });
@@ -257,8 +289,7 @@
                 setBusy(false);
             }
         }).fail(function (xhr) {
-            var text = xhr && xhr.responseText ? xhr.responseText : "5G disable mode apply failed.";
-            setStatus("error", text);
+            setStatus("error", extractXhrError(xhr, "5G disable mode apply failed."));
             setIndicator("rat-nr5g-disable-indicator", "error", "Error");
             setBusy(false);
         });
@@ -303,8 +334,7 @@
                 setBusy(false);
             }
         }).fail(function (xhr) {
-            var text = xhr && xhr.responseText ? xhr.responseText : "Band apply failed.";
-            setStatus("error", text);
+            setStatus("error", extractXhrError(xhr, "Band apply failed."));
             setIndicator(indicatorId, "error", "Error");
             setBusy(false);
         });
@@ -378,9 +408,11 @@
         if (!node) {
             return;
         }
-        node.style.display = msg ? "block" : "none";
+        var display = msg || "";
+        if (kind === "error" && display) { display = friendlyError(display); }
+        node.style.display = display ? "block" : "none";
         node.className = "band-lock-status band-lock-status-" + (kind || "info");
-        node.textContent = msg || "";
+        node.textContent = display;
     }
 
     function setCellBusy(busy) {

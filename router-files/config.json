@@ -25,19 +25,5 @@
   "read_timeout_ms": 1500,
   "hard_timeout_ms": 5000,
   "poll_interval_ms": 50,
-  "log_level": "info",
-  "allowed_commands": [
-    "AT",
-    "ATI",
-    "AT+CGMI",
-    "AT+CGMM",
-    "AT+CGMR",
-    "AT+QGMR",
-    "AT+CIMI",
-    "AT+ICCID",
-    "AT+CSQ",
-    "AT+QNWINFO",
-    "AT+QCAINFO",
-    "AT+QENG=\"servingcell\""
-  ]
+  "log_level": "info"
 }

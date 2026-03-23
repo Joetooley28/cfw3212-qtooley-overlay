@@ -151,7 +151,6 @@
         if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
         if (window.JtoolsScreensaverRenderer) {
             window.JtoolsScreensaverRenderer.stopClock();
-            window.JtoolsScreensaverRenderer.clearBandHistory();
         }
 
         if (overlay) {
@@ -171,7 +170,6 @@
         window.JtoolsQuickOverview.fetchData(function (data, err) {
             if (!isVisible || !overlay) { return; }
             if (err || !data) { return; }
-            window.JtoolsScreensaverRenderer.trackBandSignals(data);
             overlay.innerHTML = window.JtoolsScreensaverRenderer.renderScreensaver(data);
             window.JtoolsScreensaverRenderer.checkForBandChange(data);
         });

@@ -12,6 +12,9 @@ local speedtest = require("ookla_speedtest")
 local ttl_helper = require("ttl_helper")
 local JSON = require("JSON")
 
+-- Cached firmware version (AT+QGMR) — fetched once per process lifetime
+local _cached_firmware_version = nil
+
 local MODE_VALUES = {
     AUTO = true,
     WCDMA = true,
@@ -1459,6 +1462,17 @@ function JtoolGeneralApiHandler:get(url, action)
         local qspn_raw, qspn_err = soft_run_command(config, 'AT+QSPN')
         local cops_raw, cops_err = soft_run_command(config, 'AT+COPS?')
 
+        -- Firmware version: fetch once and cache for process lifetime
+        if not _cached_firmware_version then
+            local qgmr_raw = soft_run_command(config, 'AT+QGMR')
+            if qgmr_raw then
+                local fw = summarize_response("AT+QGMR", qgmr_raw)
+                if fw and fw ~= "" and not fw:find("^unavailable") then
+                    _cached_firmware_version = fw:gsub("^%s+", ""):gsub("%s+$", "")
+                end
+            end
+        end
+
         -- Multi-source signal confirmation (opt-in to keep normal polling fast)
         local qrsrp_raw, qrsrq_raw, qsinr_raw
         if want_crosscheck then
@@ -1500,6 +1514,7 @@ function JtoolGeneralApiHandler:get(url, action)
             servingcell_line = parse_qeng_servingcell(qeng_summary),
             temperatures = temperatures,
             primary_temperature_text = primary_temperature_text,
+            firmware_version = _cached_firmware_version,
             signal_crosscheck = crosscheck_data
         }
     end)

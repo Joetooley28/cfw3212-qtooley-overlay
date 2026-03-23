@@ -2,6 +2,12 @@
 
 set -eu
 
+# --- Disable Jtools overlay reapply-on-boot ---
+systemctl disable --now jtools-stock-ui.timer 2>/dev/null || true
+systemctl disable jtools-stock-ui.service 2>/dev/null || true
+systemctl stop jtools-stock-ui.service 2>/dev/null || true
+echo "Jtools systemd units disabled"
+
 # --- TTL: remove override rules if present ---
 TTL_CONFIG="/usrdata/at-stock-ui/ttl_config.json"
 if [ -f "$TTL_CONFIG" ]; then
@@ -18,8 +24,16 @@ fi
 rm -f /tmp/ookla-speedtest-state.json /tmp/ookla-speedtest-state.json.tmp
 rm -f /tmp/ookla-speedtest.pid
 
-umount /usr/share/lua/5.1/webif 2>/dev/null || true
-umount /www 2>/dev/null || true
+# --- Detach overlay bind mounts (robust, matching apply script) ---
+detach_mount_if_needed() {
+    target="$1"
+    if grep -q " $target " /proc/self/mountinfo 2>/dev/null; then
+        umount "$target" 2>/dev/null || umount -l "$target" 2>/dev/null || true
+    fi
+}
+
+detach_mount_if_needed "/usr/share/lua/5.1/webif"
+detach_mount_if_needed "/www"
 
 systemctl restart turbontc.service
 
