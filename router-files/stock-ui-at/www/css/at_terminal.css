@@ -53,6 +53,12 @@
     gap: 10px;
 }
 
+.at-left-actions .qt-btn {
+    min-width: 150px;
+    text-align: center;
+    white-space: nowrap;
+}
+
 .at-primary-button {
     background: #0f5f83;
     border-radius: 10px;
