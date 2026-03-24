@@ -724,19 +724,32 @@ form .title-box,
     border-color: var(--qt-border, #3c3c3c);
 }
 
-.ookla-ca-pill {
-    background: linear-gradient(180deg, #403222 0%, #342719 100%);
-    border-color: #805c33;
-    color: #f4c993;
+.qt-band-pill {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.10);
+    color: var(--qt-text, #d7dde4);
 }
 
-.ookla-ca-pill.is-primary {
-    background: linear-gradient(180deg, #5c4a12 0%, #4b3a0e 100%);
-    border-color: #be9523;
-    color: #ffe48d;
+.qt-band-pill.is-lte {
+    background: rgba(0, 230, 118, 0.08);
+    border-color: rgba(0, 230, 118, 0.24);
+    color: #7dffbb;
 }
 
-.ookla-ca-pill.is-muted {
+.qt-band-pill.is-nr {
+    background: rgba(179, 136, 255, 0.08);
+    border-color: rgba(179, 136, 255, 0.24);
+    color: #d8b3ff;
+}
+
+.qt-band-pill.is-pcc,
+.qt-band-pill.is-nr.is-pcc {
+    background: rgba(0, 229, 255, 0.10);
+    border-color: rgba(0, 229, 255, 0.30);
+    color: #7df4ff;
+}
+
+.qt-band-pill.is-muted {
     background: linear-gradient(180deg, #30343a 0%, #26292e 100%);
     border-color: #4a5058;
     color: #9ba7b4;

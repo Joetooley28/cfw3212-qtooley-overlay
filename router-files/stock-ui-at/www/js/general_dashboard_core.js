@@ -424,7 +424,12 @@
     }
 
     function getSignalClassForDb(dbValue, metric) {
-        var v = asInt(dbValue);
+        if (window.JtoolsQuickOverview) {
+            if (metric === "rsrq" && typeof window.JtoolsQuickOverview.getRsrqClass === "function") { return window.JtoolsQuickOverview.getRsrqClass(dbValue); }
+            if (metric === "sinr" && typeof window.JtoolsQuickOverview.getSinrClass === "function") { return window.JtoolsQuickOverview.getSinrClass(dbValue); }
+            if ((!metric || metric === "rsrp") && typeof window.JtoolsQuickOverview.getSignalClass === "function") { return window.JtoolsQuickOverview.getSignalClass(dbValue); }
+        }
+        var v = asInt(dbValue);
         if (v == null) { return "qt-sig-na"; }
         if (metric === "rsrq") {
             if (v > -8) { return "qt-sig-excellent"; }
@@ -466,7 +471,150 @@
         return "";
     }
 
-    function renderCarrierList(carriers) {
+    function getRatBadgeClass(rat) {
+
+
+        if (window.JtoolsQuickOverview && typeof window.JtoolsQuickOverview.getRatClass === "function") { return window.JtoolsQuickOverview.getRatClass(rat) || "qt-rat-lte"; }
+        var r = String(rat || "").toUpperCase();
+
+
+        if (r.indexOf("NSA") !== -1 || r === "5GNSA") { return "qt-rat-nsa"; }
+
+
+        if (r.indexOf("SA") !== -1 || r === "5GSA") { return "qt-rat-sa"; }
+
+
+        if (r.indexOf("NR") !== -1 || r.indexOf("5G") !== -1) { return "qt-rat-sa"; }
+
+
+        return "qt-rat-lte";
+
+
+    }
+
+
+
+
+
+    function getBandToneClass(carrier) {
+
+
+        if (window.JtoolsQuickOverview && typeof window.JtoolsQuickOverview.getBandToneClass === "function") { return window.JtoolsQuickOverview.getBandToneClass(carrier) || ""; }
+        var c = carrier || {};
+
+
+        var rat = String(c.rat || "").toUpperCase();
+
+
+        var band = String(c.band || c.band_label || "").toLowerCase().replace(/[^0-9]/g, "");
+
+
+        if (!band) { return ""; }
+
+
+        if (rat === "NR5G") { return "qt-band-n" + band; }
+
+
+        if (rat === "LTE") { return "qt-band-b" + band; }
+
+
+        return "";
+
+
+    }
+
+
+
+
+
+    function getBandPillClass(carrier) {
+
+
+        var c = carrier || {};
+
+
+        var rat = String(c.rat || "").toUpperCase();
+
+
+        var role = String(c.role || "").toUpperCase();
+
+
+        var classes = ["qt-band-pill"];
+
+
+        if (rat === "NR5G") {
+
+
+            classes.push("is-nr");
+
+
+        } else if (rat === "LTE") {
+
+
+            classes.push("is-lte");
+
+
+        }
+
+
+        if (role === "PCC") {
+
+
+            classes.push("is-pcc");
+
+
+        }
+
+
+        var tone = getBandToneClass(c);
+
+
+        if (tone) {
+
+
+            classes.push(tone);
+
+
+        }
+
+
+        return classes.join(" ");
+
+
+    }
+
+
+
+
+    function renderStatusBandChip(carrier, fallbackLabel) {
+
+
+        var label = asText(fallbackLabel, "N/A");
+
+
+        if (!carrier || (!carrier.band && !carrier.band_label && !carrier.rat)) {
+
+
+            return escapeHtml(label);
+
+
+        }
+
+
+        return [
+            "<span class='", getBandPillClass(carrier), "'>",
+            escapeHtml(label),
+            "</span>"
+        ].join("");
+
+
+    }
+
+
+
+
+
+    function renderCarrierList(carriers) {
         if (!carriers || !carriers.length) {
             return "<div class='jgd-muted'>No active carrier details from QCAINFO right now.</div>";
         }
@@ -480,7 +628,7 @@
             }
             return [
                 "<div class='jgd-carrier'>",
-                "<div class='jgd-carrier-band'>", escapeHtml(carrier.band_label || carrier.band || "Carrier"), "</div>",
+                "<div class='jgd-carrier-band'><span class='", getBandPillClass(carrier), "'>", escapeHtml(carrier.band_label || carrier.band || "Carrier"), "</span></div>",
                 "<div class='jgd-carrier-meta'>", escapeHtml(meta.join(" | ")), "</div>",
                 "<div class='jgd-carrier-bw'>", escapeHtml(carrier.bandwidth_text || "Bandwidth unavailable"), "</div>",
                 "</div>"
@@ -546,9 +694,9 @@
 
         if (hasNrSignals && (ssDistinct || !isNr)) {
             return [
-                createMetric("SS-RSRP", formatDb(adv.nrRsrp, " dBm")),
-                createMetric("SS-RSRQ", formatDb(adv.nrRsrq, " dB")),
-                createMetric("SS-SINR", formatDb(adv.nrSnr, " dB")),
+                createMetric("SS-RSRP", formatDb(adv.nrRsrp, " dBm"), getSignalClassForDb(adv.nrRsrp, "rsrp")),
+                createMetric("SS-RSRQ", formatDb(adv.nrRsrq, " dB"), getSignalClassForDb(adv.nrRsrq, "rsrq")),
+                createMetric("SS-SINR", formatDb(adv.nrSnr, " dB"), getSignalClassForDb(adv.nrSnr, "sinr")),
                 createMetric("NR CQI", asText(adv.nrCqi))
             ].join("");
         }
@@ -586,7 +734,13 @@
         var deviceName = asText(system.identityTitle, "Casa Systems USC-CFW3212");
         var provider = chooseFirst(cellular.provider, qspn.displayName, cops.operatorName);
         var rat = asText(cellular.ratLabel, "N/A");
-        var currentBand = chooseFirst(cellular.currentBand, qnwinfo.bandLabel, servingcell.band);
+        var currentBand = chooseFirst(cellular.currentBand, qnwinfo.bandLabel, servingcell.band);
+        var currentBandCarrier = at.carriers && at.carriers.length ? at.carriers[0] : {
+            rat: rat,
+            band: currentBand,
+            band_label: currentBand,
+            role: "PCC"
+        };
         var uptime = formatUptime(wwan.connUptime);
         var systemUptime = formatUptime(system.uptime);
         var signalDbm = chooseDb(cellular.signalDbm, adv.rsrp, adv.nrRsrp, servingcell.rsrp);
@@ -637,9 +791,9 @@
             "<span class='jgd-status-light'></span>",
             escapeHtml(connected ? "Connected" : (cellular.noSim ? "No SIM / not connected" : "Not connected")),
             "</div>",
-            "<div class='jgd-status-meta'>Carrier <span class='", getCarrierColorClass(provider), "'>", escapeHtml(provider), "</span></div>",
-            "<div class='jgd-status-meta'>RAT ", escapeHtml(rat), "</div>",
-            "<div class='jgd-status-meta'>", escapeHtml(bandLabel), "</div>",
+            "<div class='jgd-status-meta'>Carrier <span class='", (window.JtoolsQuickOverview && typeof window.JtoolsQuickOverview.getCarrierClass === "function" ? window.JtoolsQuickOverview.getCarrierClass(provider) : getCarrierColorClass(provider)), "'>", escapeHtml(provider), "</span></div>",
+            "<div class='jgd-status-meta'>RAT <span class='qt-rat-badge qt-rat-badge-sm ", getRatBadgeClass(rat), "'>", escapeHtml(rat), "</span></div>",
+            "<div class='jgd-status-meta'>Band ", renderStatusBandChip(currentBandCarrier, chooseFirst(currentBandCarrier.band_label, currentBandCarrier.band, currentBand)), "</div>",
             "<div class='jgd-status-meta'>Session ", escapeHtml(sessionLabel), "</div>",
             "</div>",
             "<div id='jgd-api-status' class='jgd-banner'>", escapeHtml(bannerText), "</div>",
@@ -661,7 +815,7 @@
             "<section class='jgd-card'>",
             "<div class='jgd-card-title'>General info</div>",
             "<div class='jgd-metrics-grid'>",
-            createMetric("Carrier", provider),
+            createMetric("Carrier", provider, (window.JtoolsQuickOverview && typeof window.JtoolsQuickOverview.getCarrierClass === "function" ? window.JtoolsQuickOverview.getCarrierClass(provider) : getCarrierColorClass(provider))),
             createMetric("Operator mode", asText(cellular.operationMode)),
             createMetric("Coverage", asText(cellular.coverage)),
             createMetric("SIM status", asText(cellular.simStatus)),

@@ -154,7 +154,7 @@
             "  " + combo,
             "</div>",
             "<div class='qo-ab-sub'>",
-            "  <span class='qo-rat-badge " + data.ratClass + "' style='font-size:10px;padding:2px 8px'>" + techLabel + "</span>",
+            "  <span class='qt-rat-badge qt-rat-badge-sm " + data.ratClass + "'>" + techLabel + "</span>",
             "</div>"
         ].join("");
     }
@@ -339,15 +339,18 @@
         if (!els.connInfo) { return; }
 
         var bandPills = "";
+        var carrierCls = getCarrierColorClass(data.provider);
         if (data.carriers && data.carriers.length) {
             data.carriers.forEach(function (c) {
                 var label = QO.escapeHtml(c.band_label || c.band || "?");
                 var bw = c.bandwidth_mhz ? " " + c.bandwidth_mhz + "MHz" : "";
                 var role = c.role ? " (" + c.role + ")" : "";
                 var rat = String(c.rat || "").toUpperCase();
-                var cls = "qo-band-pill";
+                var cls = "qt-band-pill";
+                var toneCls = QO.getBandToneClass ? QO.getBandToneClass(c) : "";
                 if (rat === "NR5G") { cls += " is-nr"; }
                 if (c.role === "PCC") { cls += " is-pcc"; }
+                if (toneCls) { cls += " " + toneCls; }
                 bandPills += "<span class='" + cls + "'>" + label + bw + role + "</span>";
             });
         }
@@ -356,11 +359,11 @@
             "<div class='qo-conn-grid'>",
             "  <div class='qo-conn-item'>",
             "    <span class='qo-conn-label'>RAT</span>",
-            "    <span class='qo-conn-value'><span class='qo-rat-badge " + data.ratClass + "' style='font-size:11px;padding:2px 10px'>" + QO.escapeHtml(data.rat) + "</span></span>",
+            "    <span class='qo-conn-value'><span class='qt-rat-badge qt-rat-badge-sm " + data.ratClass + "'>" + QO.escapeHtml(data.rat) + "</span></span>",
             "  </div>",
             "  <div class='qo-conn-item'>",
             "    <span class='qo-conn-label'>Provider</span>",
-            "    <span class='qo-conn-value'>" + QO.escapeHtml(data.provider) + "</span>",
+            "    <span class='qo-conn-value " + carrierCls + "'>" + QO.escapeHtml(data.provider) + "</span>",
             "  </div>",
             "  <div class='qo-conn-item'>",
             "    <span class='qo-conn-label'>Temperature</span>",

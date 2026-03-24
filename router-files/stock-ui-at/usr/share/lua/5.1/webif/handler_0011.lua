@@ -38,11 +38,7 @@ local RAT_ACQ_ORDER_VALUES = {
     ["LTE:WCDMA"] = true,
     ["WCDMA:LTE"] = true,
     ["NR5G:WCDMA"] = true,
-    ["WCDMA:NR5G"] = true,
-    ["NR5G-NSA:NR5G:LTE"] = true,
-    ["NR5G-NSA:LTE:NR5G"] = true,
-    ["LTE:NR5G-NSA:NR5G"] = true,
-    ["NR5G:NR5G-NSA:LTE"] = true
+    ["WCDMA:NR5G"] = true
 }
 
 local NR5G_DISABLE_MODE_VALUES = {
@@ -111,6 +107,7 @@ local function parse_pref_value(group, raw)
         return nil
     end
     value = value:gsub("^%s+", ""):gsub("%s+$", "")
+    value = value:gsub('^"(.*)"$', "%1")
     return value
 end
 

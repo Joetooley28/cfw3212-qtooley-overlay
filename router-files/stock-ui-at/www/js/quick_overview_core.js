@@ -286,8 +286,19 @@
     function getRatClass(rat) {
         var r = String(rat || "").toUpperCase();
         if (r.indexOf("NSA") !== -1 || r === "5GNSA") { return "qo-rat-nsa"; }
+        if (r.indexOf("SA") !== -1 || r === "5GSA") { return "qt-rat-sa"; }
         if (r.indexOf("NR") !== -1 || r.indexOf("5G") !== -1) { return "qo-rat-nr"; }
         return "qo-rat-lte";
+    }
+
+    function getBandToneClass(carrier) {
+        var c = carrier || {};
+        var rat = String(c.rat || "").toUpperCase();
+        var band = String(c.band || c.band_label || "").toLowerCase().replace(/[^0-9]/g, "");
+        if (!band) { return ""; }
+        if (rat === "NR5G") { return "qt-band-n" + band; }
+        if (rat === "LTE") { return "qt-band-b" + band; }
+        return "";
     }
 
     function getRatLabel(qnwinfo, servingcell) {
@@ -616,6 +627,7 @@
         getCarrierClass: getCarrierClass,
         getGradeClass: getGradeClass,
         getRatClass: getRatClass,
+        getBandToneClass: getBandToneClass,
         buildPhoneBars: buildPhoneBars,
         buildGradientBar: buildGradientBar,
         buildFillBar: buildFillBar,

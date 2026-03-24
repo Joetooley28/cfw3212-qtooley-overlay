@@ -60,8 +60,10 @@
 }
 
 .at-primary-button {
-    background: #0f5f83;
-    border-radius: 10px;
+    background: linear-gradient(180deg, #2a86b0 0%, #0f5f83 100%);
+    border: 1px solid rgba(141, 185, 255, 0.28);
+    border-radius: 14px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 12px 24px rgba(15, 95, 131, 0.18);
     color: #fff;
     flex: 0 0 auto;
     min-height: 44px;
@@ -71,19 +73,20 @@
 
 .at-primary-button:hover,
 .at-primary-button:focus {
-    background: #0a4c69;
+    background: linear-gradient(180deg, #3696c2 0%, #0a4c69 100%);
 }
 
 .at-send-button,
 .band-lock-apply-button {
-    background: #a63434;
+    background: linear-gradient(180deg, #bd4a4a 0%, #a63434 100%);
+    border-color: rgba(255, 160, 160, 0.24);
 }
 
 .at-send-button:hover,
 .at-send-button:focus,
 .band-lock-apply-button:hover,
 .band-lock-apply-button:focus {
-    background: #872727;
+    background: linear-gradient(180deg, #cf5656 0%, #872727 100%);
 }
 
 .at-history {
@@ -358,6 +361,13 @@
     margin: 4px 0 18px 0;
 }
 
+.band-lock-reset-row .qt-btn {
+    min-height: 52px;
+    min-width: 220px;
+    padding: 12px 22px;
+    white-space: nowrap;
+}
+
 .band-lock-rat-row label {
     color: var(--qt-text-label, #355070);
     font-weight: 600;
@@ -366,10 +376,11 @@
 
 .band-lock-rat-row select {
     border: 1px solid var(--qt-border, #bfc7cf);
-    border-radius: var(--qt-radius-sm, 6px);
-    font-size: 14px;
+    border-radius: 14px;
+    font-size: 15px;
+    min-height: 46px;
     min-width: 220px;
-    padding: 10px 12px;
+    padding: 10px 42px 10px 14px;
 }
 
 .band-lock-toggle-button,
@@ -539,8 +550,59 @@
     text-align: right;
 }
 
+.rat-control-row select,
+.cell-lock-form-row select,
+#cell-lock-action {
+    appearance: none;
+    background-color: rgba(255, 255, 255, 0.05);
+    background-image:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 18 18'%3E%3Cpath fill='none' stroke='%23d7e8f4' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.8' d='M4.5 6.75 9 11.25l4.5-4.5'/%3E%3C/svg%3E");
+    background-position: 0 0, right 14px center;
+    background-repeat: no-repeat, no-repeat;
+    background-size: auto, 18px 18px;
+    border: 1px solid rgba(141, 185, 255, 0.22);
+    border-radius: 14px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 10px 24px rgba(5, 11, 20, 0.18);
+    color: var(--qt-text, #f1f4f8);
+    font-family: var(--qt-font-sans, "Segoe UI", Tahoma, sans-serif);
+    font-size: 15px;
+    line-height: 1.3;
+    min-height: 48px;
+    padding: 11px 44px 11px 14px;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
 .rat-control-row select {
-    width: 200px;
+    min-width: 240px;
+    width: 240px;
+}
+
+.cell-lock-form-row select,
+#cell-lock-action {
+    max-width: 360px;
+    min-width: 240px;
+}
+
+.rat-control-row select:hover,
+.cell-lock-form-row select:hover,
+#cell-lock-action:hover {
+    border-color: rgba(141, 185, 255, 0.36);
+}
+
+.rat-control-row select:focus,
+.cell-lock-form-row select:focus,
+#cell-lock-action:focus {
+    border-color: rgba(141, 185, 255, 0.58);
+    box-shadow: 0 0 0 3px rgba(141, 185, 255, 0.12), 0 14px 28px rgba(5, 11, 20, 0.22);
+    outline: none;
+}
+
+.rat-control-row select option,
+.cell-lock-form-row select option,
+#cell-lock-action option {
+    background: #24272d;
+    color: #f1f4f8;
 }
 
 .rat-control-row .band-lock-apply-button {

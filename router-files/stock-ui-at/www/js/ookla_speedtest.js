@@ -376,15 +376,21 @@
                 var carrier = carriers[index] || {};
                 var rat = String(carrier.rat || "").toUpperCase();
                 var role = String(carrier.role || "").toUpperCase();
-                var cls = "ookla-ca-pill";
+                var cls = "qt-band-pill";
+                var toneCls = window.JtoolsQuickOverview && typeof window.JtoolsQuickOverview.getBandToneClass === "function" ? window.JtoolsQuickOverview.getBandToneClass(carrier) : "";
                 if (rat === "NR5G") {
                     cls += " is-nr";
+                } else if (rat === "LTE") {
+                    cls += " is-lte";
                 }
                 if (role === "PCC") {
                     cls += " is-pcc";
                 }
+                if (toneCls) {
+                    cls += " " + toneCls;
+                }
                 return "<span class='" + cls + "'>" + escapeHtml(band) + "</span>";
-            }).join("") : "<span class='ookla-ca-pill is-muted'>No CA</span>"),
+            }).join("") : "<span class='qt-band-pill is-muted'>No CA</span>"),
             "</div>",
             "</div>"
         ].join("");
@@ -422,10 +428,6 @@
             "<div class='ookla-field'>",
             "<label for='ookla-server-select'>Server</label>",
             "<select id='ookla-server-select' class='ookla-select'></select>",
-            "</div>",
-            "<div class='ookla-field ookla-readonly'>",
-            "<label>Interface</label>",
-            "<div id='ookla-interface-label' class='ookla-static'>Detecting...</div>",
             "</div>",
             "<div class='ookla-field ookla-readonly'>",
             "<label>Status</label>",

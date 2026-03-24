@@ -32,13 +32,15 @@
                 var bw = c.bandwidth_mhz ? " " + c.bandwidth_mhz + "MHz" : "";
                 var role = c.role ? " (" + c.role + ")" : "";
                 var rat = String(c.rat || "").toUpperCase();
-                var cls = "qo-band-pill";
+                var cls = "qt-band-pill";
+                var toneCls = QO.getBandToneClass ? QO.getBandToneClass(c) : "";
                 if (rat === "NR5G") { cls += " is-nr"; }
                 if (c.role === "PCC") { cls += " is-pcc"; }
+                if (toneCls) { cls += " " + toneCls; }
                 bandPills += "<span class='" + cls + "'>" + label + bw + role + "</span>";
             });
         } else if (QO.hasValue(data.bandLabel)) {
-            bandPills = "<span class='qo-band-pill'>" + QO.escapeHtml(data.bandLabel) + "</span>";
+            bandPills = "<span class='qt-band-pill'>" + QO.escapeHtml(data.bandLabel) + "</span>";
         }
 
         return [
@@ -51,7 +53,7 @@
             "  <div class='qo-ss-ampm' id='qoSsAmpm'>" + clk.ampm + "</div>",
             "  <div class='qo-ss-device'>CFW-3212 / RG520N-NA</div>",
             "  <div class='qo-ss-provider " + getCarrierColorClass(data.provider) + "'>" + QO.escapeHtml(data.provider) + "</div>",
-            "  <span class='qo-rat-badge " + data.ratClass + "'>" + QO.escapeHtml(data.rat) + "</span>",
+            "  <span class='qt-rat-badge qt-rat-badge-sm " + data.ratClass + "'>" + QO.escapeHtml(data.rat) + "</span>",
             "  <div class='qo-ss-temp " + data.tempClass + "'>" + QO.escapeHtml(data.temp) + "</div>",
             "  <div class='qo-ss-metrics'>",
             "    <div class='qo-ss-metric-item'>",

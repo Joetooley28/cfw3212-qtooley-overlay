@@ -21,11 +21,7 @@
             { value: "LTE:WCDMA", label: "LTE > WCDMA" },
             { value: "WCDMA:LTE", label: "WCDMA > LTE" },
             { value: "NR5G:WCDMA", label: "NR5G > WCDMA" },
-            { value: "WCDMA:NR5G", label: "WCDMA > NR5G" },
-            { value: "NR5G-NSA:NR5G:LTE", label: "NSA > NR5G > LTE" },
-            { value: "NR5G-NSA:LTE:NR5G", label: "NSA > LTE > NR5G" },
-            { value: "LTE:NR5G-NSA:NR5G", label: "LTE > NSA > NR5G" },
-            { value: "NR5G:NR5G-NSA:LTE", label: "NR5G > NSA > LTE" }
+            { value: "WCDMA:NR5G", label: "WCDMA > NR5G" }
         ],
         lte: ["2", "4", "5", "7", "12", "13", "14", "17", "25", "26", "29", "30", "38", "41", "42", "43", "48", "66", "71"],
         nsa: ["2", "5", "7", "12", "13", "14", "25", "26", "29", "30", "38", "41", "48", "66", "70", "71", "77", "78"],
