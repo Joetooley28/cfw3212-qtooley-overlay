@@ -1,193 +1,185 @@
-# CFW-3212 AT Terminal v0.1.0
+# CFW-3212 Qtooley Overlay
 
-Standalone AT terminal for the Casa Systems CFW-3212 / Quectel RG520N-NA.
+Qtooley is a stock UI overlay for the Casa Systems `CFW-3212` with a Quectel `RG520N-NA`.
 
-Tested on:
+This branch is the main project direction: a top-level authenticated Qtooley tab inside the stock Casa Turbo web UI, with custom pages for modem visibility, control, and diagnostics.
 
-- router firmware `USC_1.1.79.0`
-- module firmware `RG520NNADAR03A03M4G`
+It is not a generic web app and it is not a generic USB modem project.
 
-Use at your own risk. This project is meant for people who are comfortable working on rooted carrier hardware and understand that modem settings can affect connectivity, access, and behavior. You are responsible for what you send through the terminal.
+## Contents
 
-![CFW-3212 AT Terminal screenshot](docs/images/at-terminal-screenshot.png)
+- [What This Project Is](#what-this-project-is)
+- [Device Scope](#device-scope)
+- [Main Features](#main-features)
+- [Project Tracks](#project-tracks)
+- [Safety Notes](#safety-notes)
+- [How The Overlay Works](#how-the-overlay-works)
+- [Repo Layout](#repo-layout)
+- [Current Pages](#current-pages)
+- [Important Docs](#important-docs)
+- [Install Model](#install-model)
+- [Current Version](#current-version)
 
-Additional documentation:
+## What This Project Is
 
-- [AT Terminal Notes](docs/at-terminal-notes.md)
-- [General Notes](docs/general-notes.md)
+This repo contains the current Qtooley stock UI overlay work for the `CFW-3212`.
 
-## What This Is
+The overlay adds Qtooley pages into the stock Casa interface while preserving:
 
-This package installs a small standalone Lua AT terminal page and backend on the router.
+- LAN access
+- stock login flow
+- stock page rendering
+- SSH reachability
+- standalone AT access discipline through the shared modem lock
 
-It does **not**:
-- modify Casa Turbo
-- replace stock web services
-- replace stock `port_bridge`
-- expose the service on every interface
+The current preferred direction is the stock UI overlay, not the older standalone-only web terminal.
 
-Current intended browser access:
+## Device Scope
 
-- `http://192.168.1.1:8088/`
+Tested / documented project target:
+
+- router: Casa Systems `CFW-3212`
+- modem: Quectel `RG520N-NA`
+- tested router firmware: `USC_1.1.79.0`
+- tested module firmware seen in notes: `RG520NNADAR03A03M4G`
+
+Important platform truths:
+
+- `/usrdata` is the writable persistent area
+- the proven AT backend path is `/dev/smd7`
+- shared AT lock path is `/tmp/at-http.lock`
+- the stock UI overlay uses live-tree bind mounts onto `/www` and `/usr/share/lua/5.1/webif`
+
+## Main Features
+
+- authenticated Qtooley tab inside the stock Casa UI
+- Quick Overview page with screensaver path
+- General Info dashboard
+- AT terminal page
+- RAT / band / cell locking page
+- Ookla Speedtest page
+- TTL helper page
+- shared Qtooley color-key system across custom pages
+- shared dark/light theming path through stock header integration
+
+## Project Tracks
+
+There are two related tracks in this project history:
+
+1. `main`
+
+This branch is the current Qtooley stock UI overlay and should be treated as the primary project.
+
+2. `standalone-at-terminal`
+
+This will be the legacy standalone LAN AT terminal branch.
 
 Important:
 
-- in the current version, the AT terminal listens on the LAN bridge IP at `192.168.1.1:8088`
-- there is no separate authentication layer in front of the terminal
-- treat it as a trusted-LAN tool, not a hardened public-facing service
+- both tracks share backend assumptions and modem access discipline
+- both rely on the same platform-native AT path model
+- both use the same shared lock concept around modem access
+- do not casually install and run both as if they were isolated products
 
-## How It Works
+If both are kept published, the stock UI overlay should be the recommended path and the standalone branch should be clearly marked as legacy / fallback / reference.
 
-This is **not** a generic host-PC-to-USB-modem design.
+## Safety Notes
 
-On the CFW-3212, the modem/app processor is the platform itself. The backend talks to the modem using the platform-native device path directly.
+Be careful not to break:
 
-Current default backend:
+- LAN access
+- the stock web login page
+- SSH
+- stock Casa Turbo rendering
+- shared page bootstrap files
 
-- `/dev/smd7`
+High-risk areas include:
 
-The backend uses a direct one-shot transaction model against the `smd` device path rather than going through a typical USB serial AT port. That is why the config refers to `smd7_direct`.
+- `handler_0011.lua`
+- `genHeader.js`
+- menu injection
+- auth wiring
+- shared stock JS/CSS includes
+- overlay mount/apply logic
 
-Important:
-- default backend remains `smd7_direct`
-- `at_mdm0_direct` and `smd11_direct` are alternates only
-- `at_usb2_direct` is not the main path and should remain experimental
+Use the smallest safe change.
 
-## Files In This Package
+## How The Overlay Works
 
-Install under `/usrdata/at-http/`:
+Current proven model:
 
-- `config.json`
-- `at_backend.lua`
-- `at_http.lua`
-- `at_lock.lua`
-- `at_validate.lua`
-- `index.html`
-- `app.js`
-- `app.css`
+- keep payload under `/usrdata/at-stock-ui`
+- build live trees under `/usrdata/at-stock-ui/live`
+- bind-mount `live/www` onto `/www`
+- bind-mount `live/usr/share/lua/5.1/webif` onto `/usr/share/lua/5.1/webif`
+- restart `turbontc.service`
+- reapply late after boot with:
+  - `jtools-stock-ui.service`
+  - `jtools-stock-ui.timer`
 
-Install outside that directory:
+Verification note:
 
-- `/usrdata/start-at-http.sh`
-- `/etc/systemd/system/at-http-start.service`
-- `/etc/systemd/system/at-http-start.timer`
+- plain `mount` output is misleading on this device
+- use `/proc/self/mountinfo`
 
-## Router Prerequisites
+## Repo Layout
 
-- rooted Casa Systems CFW-3212
-- Lua working on-box
-- SSH access
+Main stock UI overlay package:
 
-Optional:
-- ADB access
+- [router-files/stock-ui-at](/c:/at_terminal/repo-public/router-files/stock-ui-at)
 
-## Install
+Important areas:
 
-### 1. Copy app files
+- [router-files/stock-ui-at/www](/c:/at_terminal/repo-public/router-files/stock-ui-at/www)
+- [router-files/stock-ui-at/usr/share/lua/5.1/webif](/c:/at_terminal/repo-public/router-files/stock-ui-at/usr/share/lua/5.1/webif)
+- [router-files/stock-ui-at/usrdata/at-stock-ui](/c:/at_terminal/repo-public/router-files/stock-ui-at/usrdata/at-stock-ui)
+- [docs](/c:/at_terminal/repo-public/docs)
 
-Copy these into:
+## Current Pages
 
-- `/usrdata/at-http/`
+- Quick Overview
+- General Info
+- AT terminal
+- RAT / band / cell locking
+- Ookla Speedtest
+- TTL helper
 
-### 2. Copy the autostart files
+## Important Docs
 
-Copy:
+Start here:
 
-- `start-at-http.sh` -> `/usrdata/start-at-http.sh`
-- `at-http-start.service` -> `/etc/systemd/system/at-http-start.service`
-- `at-http-start.timer` -> `/etc/systemd/system/at-http-start.timer`
+- [Master Truth](docs/MASTER_TRUTH.md)
+- [Stock UI Integration Note](/c:/at_terminal/notes/CFW3212_stock_ui_AT_integration_note.txt)
+- [Speedtest Page Plan](/c:/at_terminal/notes/CFW3212_ookla_speedtest_page_plan.txt)
+- [Stock UI Package README](router-files/stock-ui-at/README.md)
 
-### 3. Make the start script executable
+Useful supporting docs:
 
-```sh
-chmod +x /usrdata/start-at-http.sh
-```
+- [adb-and-ssh-persistence.md](docs/adb-and-ssh-persistence.md)
+- [platform-notes.md](docs/platform-notes.md)
+- [validator-policy.md](docs/validator-policy.md)
 
-### 4. Reload systemd and enable the timer
+## Install Model
 
-```sh
-systemctl daemon-reload
-systemctl enable --now at-http-start.timer
-```
+This repo is currently organized around local-first development and router-side overlay deployment.
 
-## Manual Start / Stop
+The current expected flow is:
 
-Manual start:
+- make changes locally
+- verify package structure under `router-files/stock-ui-at`
+- sync only the intended files to the router
+- reapply the overlay
+- verify the live bind mounts and actual in-browser behavior
 
-```sh
-cd /usrdata/at-http
-lua /usrdata/at-http/at_http.lua /usrdata/at-http/config.json
-```
+## Current Version
 
-Manual stop:
+- repo version: `v0.3.0-qtooley-2026-03-24`
+- current local checkpoint branch: `qtooley-current`
 
-```sh
-ps | grep '[l]ua /usrdata/at-http/at_http.lua'
-kill <PID>
-rm -f /tmp/at-http.lock
-```
+## Publish Notes
 
-## What The Timer Does
+Before pushing to GitHub:
 
-The timer fires about 2 minutes after boot and runs:
-
-- `/usrdata/start-at-http.sh`
-
-The script:
-- checks whether the AT terminal is already running
-- starts it if not
-- exits cleanly if it is already running
-
-## Verify
-
-Check the listener:
-
-```sh
-netstat -tulpn 2>/dev/null | grep 8088
-```
-
-Expected:
-
-- `192.168.1.1:8088`
-
-Check the timer/service:
-
-```sh
-systemctl status at-http-start.timer 2>/dev/null | sed -n '1,20p'
-systemctl status at-http-start.service 2>/dev/null | sed -n '1,20p'
-```
-
-Open in browser:
-
-- `http://192.168.1.1:8088/`
-
-## Validator Policy
-
-The validator enforces one command at a time and blocks multiline / shell-junk input, but it does not maintain an explicit AT command denylist in the current release.
-
-## Rollback
-
-Disable timer:
-
-```sh
-systemctl disable --now at-http-start.timer
-```
-
-Kill the running AT terminal if needed:
-
-```sh
-ps | grep '[l]ua /usrdata/at-http/at_http.lua'
-kill <PID>
-rm -f /tmp/at-http.lock
-```
-
-Remove files if desired:
-
-- `/usrdata/at-http/*`
-- `/usrdata/start-at-http.sh`
-- `/etc/systemd/system/at-http-start.service`
-- `/etc/systemd/system/at-http-start.timer`
-
-## Version
-
-- `v0.1.0`
+- keep this branch as the main project landing page
+- create a separate legacy branch for the standalone AT terminal
+- add a branch-specific legacy README there warning users not to blindly install both tracks together
