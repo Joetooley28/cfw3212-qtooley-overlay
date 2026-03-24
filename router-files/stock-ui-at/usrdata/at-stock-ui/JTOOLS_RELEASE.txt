@@ -1,5 +1,7 @@
 Jtools stock UI package
-Release date: 2026-03-20
+Release date: 2026-03-24
+Release label: v0.3.0-qtooley-2026-03-24
+Checkpoint commit: 71863c8
 
 Current proven model
 - Keep payload in /usrdata/at-stock-ui
@@ -10,13 +12,12 @@ Current proven model
 - Reapply late with jtools-stock-ui.timer
 
 Jtools asset tokens
-- generatedMenuEntries.js?jtools-menu-v20260320
-- at_terminal.css?jtools-ui-v20260320
-- general_dashboard_core.js?jtools-general-core-v20260320
-- general_dashboard.js?jtools-general-v20260320
-- at_terminal.js?jtools-at-v20260320
-- band_cell_locking_core.js?jtools-bandlock-core-v20260320
-- band_cell_locking.js?jtools-bandlock-v20260320
+- qtooley.css?qtooley-v20260324a
+- at_terminal.css?jtools-ui-v20260324b
+- quick_overview.js?jtools-qo-v20260324a
+- band_cell_locking_core.js?jtools-bandlock-core-v20260324d
+- band_cell_locking.js?jtools-bandlock-v20260324a
+- ookla_speedtest.css?jtools-speedtest-ui-v20260324c
 
 Important reminders
 - Do not replace the late timer with early boot logic unless a better model is proven.

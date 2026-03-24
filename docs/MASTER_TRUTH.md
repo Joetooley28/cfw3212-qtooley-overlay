@@ -108,7 +108,7 @@ The project’s working LAN-side SSH target is:
 
 - `root@192.168.1.1`
 
-Local Claude config in this workspace already allowed:
+Local workspace config already allowed:
 
 - `ssh root@192.168.1.1:*`
 
@@ -127,6 +127,15 @@ Do not assume plain modern `scp` works without the `-O` flag.
 Top-level working repo:
 
 - [repo-public](/c:/at_terminal/repo-public)
+
+Current local branch for the stock UI overlay work:
+
+- `qtooley-current`
+
+Original pre-Qtooley baseline preserved locally:
+
+- `cfw3212-stock-ui-jtools-overlay`
+- `backup/original-pre-qtooley-20260323`
 
 Standalone AT tool local files:
 
@@ -473,6 +482,15 @@ For stock UI overlay work, use this as the default safe checkpoint pattern.
 Git repo root:
 
 - [repo-public](/c:/at_terminal/repo-public)
+
+Current stock UI overlay branch:
+
+- `qtooley-current`
+
+Original pre-Qtooley baseline preserved locally:
+
+- `cfw3212-stock-ui-jtools-overlay`
+- `backup/original-pre-qtooley-20260323`
 
 Desktop backup folder already in use:
 
