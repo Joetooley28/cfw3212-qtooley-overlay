@@ -252,36 +252,147 @@ button:disabled {
     color: #8693a1;
 }
 
+/* ── Qtooley sidebar nav ── */
 .sidemenu,
-.sidemenu ul,
-.sidemenu li a {
-    background: #1d2126;
-    color: #cfd6de;
+.sidemenu ul {
+    background: linear-gradient(180deg, #12161c 0%, #0e1117 100%);
+    overflow: hidden;
+    padding: 6px 0;
 }
 
-.sidemenu li.open > a,
-.sidemenu li a:hover,
+.sidemenu li {
+    background-color: transparent;
+    border-radius: 0;
+    margin: 0 0 1px 0;
+    overflow: hidden;
+    width: auto;
+}
+
+.sidemenu li a {
+    background: rgba(255, 255, 255, 0.03);
+    background-color: rgba(255, 255, 255, 0.03);
+    background-image: none;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-left: 3px solid transparent;
+    border-radius: 10px;
+    color: #8a95a8;
+    font-family: "Segoe UI", "Open Sans Regular", sans-serif;
+    font-size: 13.5px;
+    font-weight: 500;
+    height: auto;
+    letter-spacing: 0.03em;
+    line-height: 1.4;
+    margin: 0;
+    padding: 9px 14px 9px 14px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidemenu li a:hover {
+    background: rgba(255, 255, 255, 0.07);
+    background-color: rgba(255, 255, 255, 0.07);
+    border-color: rgba(141, 185, 255, 0.15);
+    border-left-color: rgba(141, 185, 255, 0.4);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    color: #e2e8f0;
+}
+
 .sidemenu li a:focus {
-    background: #2a3138;
-    color: #ffffff;
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(141, 185, 255, 0.15);
+    border-left-color: rgba(141, 185, 255, 0.4);
+    color: #e2e8f0;
+}
+
+.sidemenu li a:active {
+    background-color: rgba(255, 255, 255, 0.09);
+}
+
+.sidemenu li.open > a {
+    background: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.05);
+    background-image: none;
+    border-radius: 10px;
+    color: #e2e8f0;
+}
+
+.sidemenu li.open > a:after {
+    border-bottom: none;
 }
 
 .sidemenu li a.active {
-    background: #2d333b;
+    background: linear-gradient(135deg, rgba(255, 138, 0, 0.15) 0%, rgba(255, 100, 0, 0.06) 100%);
+    background-color: transparent;
+    border-color: rgba(255, 138, 0, 0.18);
+    border-left: 3px solid #ff8a00;
+    box-shadow: 0 0 20px rgba(255, 138, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.15), inset 0 0 30px rgba(255, 138, 0, 0.04);
     color: #ff8a00;
+    font-weight: 600;
+    margin-bottom: 0;
 }
 
-.sidemenu li a.inactive,
-.sidemenu li.open > div.submenu,
+
+
+.sidemenu li a.inactive {
+    background: rgba(255, 255, 255, 0.03);
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-left: 3px solid transparent;
+    border-radius: 10px;
+    color: #8a95a8;
+    margin: 0;
+    margin-bottom: 0;
+    padding: 9px 14px 9px 14px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidemenu li.open > div.submenu {
+    background: transparent;
+    background-color: transparent;
+    border-radius: 0;
+    padding: 4px 0 0 0;
+}
+
 .sidemenu li.open > div.submenu > a {
-    background: #2d333b;
-    color: #cfd6de;
+    background: rgba(255, 255, 255, 0.03);
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-left: 3px solid transparent;
+    border-radius: 10px;
+    color: #8a95a8;
+    font-size: 13.5px;
+    height: auto;
+    line-height: 1.4;
+    margin: 0 0 4px 0;
+    padding: 9px 14px 9px 14px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidemenu li.open > div.submenu > a:hover,
+.sidemenu li.open > div.submenu > a:focus {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(141, 185, 255, 0.15);
+    border-left-color: rgba(141, 185, 255, 0.4);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    color: #e2e8f0;
 }
 
 .sidemenu li.open > div.submenu > a.active,
 .sidemenu li.open > div.submenu > a.active:visited {
-    background: #2d333b;
+    background: linear-gradient(135deg, rgba(255, 138, 0, 0.15) 0%, rgba(255, 100, 0, 0.06) 100%);
+    background-color: transparent;
+    border-color: rgba(255, 138, 0, 0.18);
+    border-left: 3px solid #ff8a00;
+    box-shadow: 0 0 20px rgba(255, 138, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.15), inset 0 0 30px rgba(255, 138, 0, 0.04);
     color: #ff8a00;
+    font-weight: 600;
+}
+
+
+
+.sidemenu li > a.expandable {
+    background-image: none;
 }
 
 .jgd-page .jgd-muted,
@@ -683,7 +794,13 @@ form .title-box,
     border-color: var(--qt-border, #343b43);
 }
 
-.ookla-title,
+.ookla-title {
+    color: #c8d6e5 !important;
+    font-size: 26px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.3px !important;
+}
+
 .ookla-card-title,
 .ookla-details-summary {
     color: #ff8a00 !important;

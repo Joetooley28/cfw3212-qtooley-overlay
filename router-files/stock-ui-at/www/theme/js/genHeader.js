@@ -48,7 +48,7 @@ function genThemeHeader(pageData, userGroups) {
             "field_test.html": true,
             "encrypted_debuginfo.html": true
         };
-        const darkModeHref = "/css/jtools_dark_mode.css?jtools-dark-v20260323";
+        const darkModeHref = "/css/jtools_dark_mode.css?jtools-dark-v20260326";
 
         if (!darkModePages[relUrlOfPage]) {
             return false;

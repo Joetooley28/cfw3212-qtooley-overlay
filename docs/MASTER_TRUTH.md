@@ -422,6 +422,7 @@ Preferred design:
 - files live in the overlay package
 - late-start units reapply the overlay
 - uninstall can disable the units, unmount cleanly, restart `turbontc`, and remove payload if desired
+- keep a dated stock snapshot baseline for `/overlay/pivot/www` and `/overlay/pivot/usr/share/lua/5.1/webif`
 
 Avoid feature designs that require manual archaeology to remove.
 
@@ -453,6 +454,22 @@ Current expected uninstaller responsibilities:
 - unmount active live trees if currently bound
 - restart `turbontc.service`
 - remove the payload under `/usrdata/at-stock-ui` if doing a full uninstall
+- if the goal is full rollback, also remove optional runtimes installed by Qtooley such as Tailscale under `/usrdata/tailscale`
+
+### 10. Keep a stock snapshot manifest current
+
+For stock UI overlay work, maintain a local stock snapshot reference so uninstall and rollback work can be verified against something real.
+
+Current policy:
+
+- capture stock snapshots from the router's underlying stock paths, not the live bind-mounted trees:
+  - `/overlay/pivot/www`
+  - `/overlay/pivot/usr/share/lua/5.1/webif`
+- SSH or ADB are both acceptable transport paths for snapshot capture on this router
+- store them under `router-files/stock-ui-at/stock-snapshots/` in dated folders
+- prefer tar archives as the authoritative artifact because stock trees can contain symlinks that do not round-trip cleanly on Windows
+- include a `SNAPSHOT_INFO.md` file with capture time, source paths, hashes, and caveats
+- when Codex or Claude captures, refreshes, or relies on a stock snapshot, update the snapshot manifest and this project truth if the workflow changes
 
 When in doubt, choose the design that makes future packaging simpler.
 

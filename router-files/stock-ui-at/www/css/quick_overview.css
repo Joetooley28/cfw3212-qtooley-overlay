@@ -319,16 +319,16 @@
 .qo-page-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     margin-bottom: 20px;
     padding-bottom: 12px;
     border-bottom: 1px solid var(--qo-border);
 }
 .qo-page-title {
-    font-size: 22px;
+    font-size: 26px;
     font-weight: 600;
-    color: var(--qo-text-bright);
-    letter-spacing: 0.5px;
+    color: #c8d6e5;
+    letter-spacing: 0.3px;
 }
 /* ── Collapsible card ── */
 .qo-card-toggle {
@@ -814,7 +814,7 @@
         padding: 12px;
     }
     .qo-page-title {
-        font-size: 18px;
+        font-size: 22px;
     }
     .qo-card {
         padding: 14px;

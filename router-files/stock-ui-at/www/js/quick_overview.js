@@ -171,7 +171,7 @@
         var html = [
             "<div class='qo-grade-header'>",
             "  <span class='qo-grade-pct " + data.gradeClass + "'>" + QO.escapeHtml(data.gradeText) + "</span>",
-            "  <div class='qo-grade-bars-wrap'>" + QO.buildPhoneBars(data.rsrp) + "</div>",
+            "  <div class='qo-grade-bars-wrap'>" + QO.buildPhoneBars(data.grade) + "</div>",
             "</div>",
             QO.buildGradientBar(data.grade),
 

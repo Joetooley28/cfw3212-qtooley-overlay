@@ -318,15 +318,15 @@
 
     // ── Phone-style Signal Bars ──
 
-    function buildPhoneBars(rsrp) {
-        var v = asInt(rsrp);
+    function buildPhoneBars(grade) {
+        var v = (typeof grade === "number") ? grade : null;
         var level = 0;
         if (v != null) {
-            if (v > -70) { level = 5; }
-            else if (v > -80) { level = 4; }
-            else if (v > -90) { level = 3; }
-            else if (v > -100) { level = 2; }
-            else if (v > -120) { level = 1; }
+            if (v >= 80) { level = 5; }
+            else if (v >= 60) { level = 4; }
+            else if (v >= 40) { level = 3; }
+            else if (v >= 20) { level = 2; }
+            else if (v > 0) { level = 1; }
         }
         var bars = [];
         for (var i = 1; i <= 5; i++) {

@@ -110,11 +110,11 @@
     background: none !important;
     border: 0;
     box-shadow: none;
-    color: var(--qt-text-bright, #0d1b2a);
+    color: #c8d6e5;
     display: block;
-    font-size: 30px;
-    font-weight: 700;
-    letter-spacing: -0.03em;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
     margin: 0 0 8px 0;
     padding: 0;
 }

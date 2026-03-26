@@ -80,14 +80,14 @@
             remaining++;
             // Load core first, then screensaver renderer
             if (!window.JtoolsQuickOverview) {
-                loadScript("/js/quick_overview_core.js?jtools-qo-v20260322a", function () {
-                    loadScript("/js/quick_overview_screensaver.js?jtools-qo-v20260322a", function () {
+                loadScript("/js/quick_overview_core.js?jtools-qo-v20260326", function () {
+                    loadScript("/js/quick_overview_screensaver.js?jtools-qo-v20260326", function () {
                         scriptsLoaded = true;
                         done();
                     });
                 });
             } else if (!window.JtoolsScreensaverRenderer) {
-                loadScript("/js/quick_overview_screensaver.js?jtools-qo-v20260322a", function () {
+                loadScript("/js/quick_overview_screensaver.js?jtools-qo-v20260326", function () {
                     scriptsLoaded = true;
                     done();
                 });

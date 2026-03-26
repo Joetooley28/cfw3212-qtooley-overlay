@@ -45,7 +45,7 @@
 
         return [
             "<div class='qo-ss-corner'>",
-            "  <div class='qo-phone-bars'>", QO.buildPhoneBars(data.rsrp), "</div>",
+            "  <div class='qo-phone-bars'>", QO.buildPhoneBars(data.grade), "</div>",
             "  <span class='qo-ss-grade-label " + data.gradeClass + "'>" + QO.escapeHtml(data.gradeText) + "</span>",
             "</div>",
             "<div class='qo-ss-center'>",
