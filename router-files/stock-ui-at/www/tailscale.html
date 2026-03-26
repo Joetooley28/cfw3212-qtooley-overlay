@@ -9,13 +9,12 @@
 <link rel="stylesheet" href="/css/jquery-ui.css?1.1.79.0">
 <link rel="stylesheet" href="/css/validationEngine.jquery.css?1.1.79.0">
 <link rel="stylesheet" href="/css/qtooley.css?qtooley-v20260324a">
-<link rel="stylesheet" href="/css/at_terminal.css?jtools-ui-v20260323">
-<link rel="stylesheet" href="/css/ttl_helper.css?jtools-ttl-v20260323">
+<link rel="stylesheet" href="/css/tailscale.css?jtools-tailscale-v20260326h">
 <script>
 if (top !== self) top.location = self.location;
 var nas_installed = '<<<system.package.installed.nas>>>';
 var service_pppoe_server_0_enable = '<<<service.pppoe.server.0.enable>>>';
-var relUrlOfPage = 'ttl_helper.html';
+var relUrlOfPage = 'tailscale.html';
 var user = '{{loggedInUser}}';
 var userGroup = '{{loggedInUserGroup}}';
 var userGroups = userGroup.split(',');
@@ -39,15 +38,15 @@ for (const [key, value] of searchParams) { queryParams[key] = value; }
 <script src="/js/generatedMenuEntries.js?jtools-menu-v20260324a"></script>
 <script src="/theme/js/genHeader.js?1.1.79.0"></script>
 <script src="/theme/js/genFooter.js?1.1.79.0"></script>
-<script src="/js/ttl_helper.js?jtools-ttl-v20260321"></script>
+<script src="/js/tailscale.js?jtools-tailscale-v20260326k"></script>
 <script>
 var pageData = {
-    title: "TTL helper",
-    menuPos: ["JtoolServices", "TtlHelper"],
+    title: "Tailscale",
+    menuPos: ["JtoolServices", "Tailscale"],
     pageObjects: [],
     onReady: function () {
-        if (window.JtoolsTtlHelper) {
-            window.JtoolsTtlHelper.init();
+        if (window.JtoolsTailscalePage) {
+            window.JtoolsTailscalePage.init();
         }
     }
 };

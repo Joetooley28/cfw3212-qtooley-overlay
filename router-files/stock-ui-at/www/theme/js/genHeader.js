@@ -13,6 +13,7 @@ function genThemeHeader(pageData, userGroups) {
             "band_cell_locking.html": true,
             "ookla_speedtest.html": true,
             "ttl_helper.html": true,
+            "tailscale.html": true,
             "status.html": true,
             "profile_list.html": true,
             "operator_setting.html": true,

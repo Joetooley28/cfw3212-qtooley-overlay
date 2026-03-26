@@ -205,6 +205,11 @@ return { authTable = {
         writeGroups = {root=true,admin=true},
         skipAuth = false
     },
+    ["tailscale.html"] = {
+        readGroups = {root=true,admin=true},
+        writeGroups = {root=true,admin=true},
+        skipAuth = false
+    },
     ["AtTerminalInfo"] = {
         readGroups = {root=true,admin=true},
         writeGroups = {root=true,admin=true},
@@ -236,6 +241,11 @@ return { authTable = {
         skipAuth = false
     },
     ["TtlHelperApi"] = {
+        readGroups = {root=true,admin=true},
+        writeGroups = {root=true,admin=true},
+        skipAuth = false
+    },
+    ["TailscaleApi"] = {
         readGroups = {root=true,admin=true},
         writeGroups = {root=true,admin=true},
         skipAuth = false

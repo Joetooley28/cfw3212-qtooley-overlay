@@ -9,6 +9,7 @@ local validate = require("at_validate")
 local at_lock = require("at_lock")
 local backend = require("at_backend")
 local speedtest = require("ookla_speedtest")
+local tailscale = require("tailscale")
 local ttl_helper = require("ttl_helper")
 local JSON = require("JSON")
 
@@ -1755,9 +1756,92 @@ function TtlHelperApiHandler:post(url, action)
     self:write({ ok = false, error = "unknown_action" })
 end
 
+local TailscaleApiHandler = class("TailscaleApiHandler", SessionRequestHandler)
+
+function TailscaleApiHandler:getUrl(url, action)
+    return "TailscaleApi"
+end
+
+function TailscaleApiHandler:get(url, action)
+    action = normalize_action("tailscale_api", url, action)
+
+    if action == "state" then
+        local ok, result = pcall(tailscale.get_state)
+        if not ok then
+            self:set_status(500)
+            self:write({ ok = false, error = "tailscale_state_failed" })
+            return
+        end
+        self:write(result)
+        return
+    end
+
+    if action == "raw" then
+        local ok, result = pcall(tailscale.get_raw)
+        if not ok then
+            self:set_status(500)
+            self:write({ ok = false, error = "tailscale_raw_failed" })
+            return
+        end
+        self:write(result)
+        return
+    end
+
+    error(turbo.web.HTTPError(404))
+end
+
+function TailscaleApiHandler:post(url, action)
+    action = normalize_action("tailscale_api", url, action)
+
+    local action_map = {
+        install = tailscale.install,
+        update = tailscale.update,
+        remove = tailscale.remove,
+        start = tailscale.start,
+        stop = tailscale.stop,
+        restart = tailscale.restart,
+        connect = tailscale.connect,
+        connect_ssh = tailscale.connect_ssh,
+        reconnect_no_ssh = tailscale.reconnect_no_ssh,
+        disconnect = tailscale.disconnect,
+        logout = tailscale.logout
+    }
+
+    local fn = action_map[action]
+    if not fn then
+        self:set_status(404)
+        self:write({ ok = false, error = "unknown_action" })
+        return
+    end
+
+    local ok, result = pcall(fn)
+    if not ok then
+        self:set_status(500)
+        self:write({ ok = false, error = "tailscale_action_failed" })
+        return
+    end
+    if result and result.ok == false then
+        self:set_status(400)
+    end
+    self:write(result)
+end
+
 return {
     init = function(handlers)
         table.insert(handlers, 1, {"^/top_menu/JtoolServices$", JtoolTopMenuHandler})
+        table.insert(handlers, 1, {"^/(tailscale_api)/(state)$", TailscaleApiHandler})
+        table.insert(handlers, 1, {"^/(tailscale_api)/(raw)$", TailscaleApiHandler})
+        table.insert(handlers, 1, {"^/(tailscale_api)/(install)$", TailscaleApiHandler})
+        table.insert(handlers, 1, {"^/(tailscale_api)/(update)$", TailscaleApiHandler})
+        table.insert(handlers, 1, {"^/(tailscale_api)/(remove)$", TailscaleApiHandler})
+        table.insert(handlers, 1, {"^/(tailscale_api)/(start)$", TailscaleApiHandler})
+        table.insert(handlers, 1, {"^/(tailscale_api)/(stop)$", TailscaleApiHandler})
+        table.insert(handlers, 1, {"^/(tailscale_api)/(restart)$", TailscaleApiHandler})
+        table.insert(handlers, 1, {"^/(tailscale_api)/(connect)$", TailscaleApiHandler})
+        table.insert(handlers, 1, {"^/(tailscale_api)/(connect_ssh)$", TailscaleApiHandler})
+        table.insert(handlers, 1, {"^/(tailscale_api)/(reconnect_no_ssh)$", TailscaleApiHandler})
+        table.insert(handlers, 1, {"^/(tailscale_api)/(disconnect)$", TailscaleApiHandler})
+        table.insert(handlers, 1, {"^/(tailscale_api)/(logout)$", TailscaleApiHandler})
         table.insert(handlers, 1, {"^/(ookla_speedtest_api)/(state)$", OoklaSpeedtestApiHandler})
         table.insert(handlers, 1, {"^/(ookla_speedtest_api)/(servers)$", OoklaSpeedtestApiHandler})
         table.insert(handlers, 1, {"^/(ookla_speedtest_api)/(start)$", OoklaSpeedtestApiHandler})
