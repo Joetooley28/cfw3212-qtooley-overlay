@@ -11,20 +11,72 @@
     var scriptsLoaded = false;
     var isVisible = false;
     var canDismiss = false;
+    var cachedSettings = readSettingsFromStorage();
 
-    function getSettings() {
+    function normalizeSettings(input) {
+        var s = input || {};
+        return {
+            enabled: s.enabled !== false,
+            timeout: parseInt(s.timeout, 10) > 0 ? parseInt(s.timeout, 10) : 45000,
+            dismissMode: s.dismissMode || "movement"
+        };
+    }
+
+    function readSettingsFromStorage() {
         try {
             var raw = window.localStorage.getItem("jtoolsQoSettings");
-            if (raw) { return JSON.parse(raw); }
+            if (raw) { return normalizeSettings(JSON.parse(raw)); }
         } catch (e) { /* ignore */ }
-        return {};
+        return normalizeSettings({});
+    }
+
+    function writeSettingsToStorage(settings) {
+        try {
+            var merged = {};
+            var raw = window.localStorage.getItem("jtoolsQoSettings");
+            if (raw) { merged = JSON.parse(raw) || {}; }
+            merged.enabled = settings.enabled;
+            merged.timeout = settings.timeout;
+            merged.dismissMode = settings.dismissMode;
+            window.localStorage.setItem("jtoolsQoSettings", JSON.stringify(merged));
+        } catch (e) { /* ignore */ }
+    }
+
+    function getSettings() {
+        if (window.JtoolsQuickOverview && typeof window.JtoolsQuickOverview.getSettings === "function") {
+            return window.JtoolsQuickOverview.getSettings();
+        }
+        return cachedSettings;
+    }
+
+    function refreshSettingsFromServer() {
+        if (!window.XMLHttpRequest) { return; }
+        try {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/quick_overview_api/settings", true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState !== 4) { return; }
+                if (xhr.status !== 200) { return; }
+                try {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response && response.ok && response.settings) {
+                        cachedSettings = normalizeSettings(response.settings);
+                        writeSettingsToStorage(cachedSettings);
+                        resetIdleTimer();
+                    }
+                } catch (e) { /* ignore */ }
+            };
+            xhr.send();
+        } catch (e) { /* ignore */ }
     }
 
     function getTimeout() {
-        var s = getSettings();
-        if (s.enabled === false) { return 0; }
-        if (s.timeout && parseInt(s.timeout, 10) > 0) { return parseInt(s.timeout, 10); }
-        return 15000;
+        try {
+            var s = getSettings();
+            if (s.enabled === false) { return 0; }
+            if (s.timeout && parseInt(s.timeout, 10) > 0) { return parseInt(s.timeout, 10); }
+        } catch (e) { /* ignore */ }
+        return 45000;
     }
 
     function getDismissMode() {
@@ -80,14 +132,14 @@
             remaining++;
             // Load core first, then screensaver renderer
             if (!window.JtoolsQuickOverview) {
-                loadScript("/js/quick_overview_core.js?jtools-qo-v20260326", function () {
-                    loadScript("/js/quick_overview_screensaver.js?jtools-qo-v20260326", function () {
+                loadScript("/js/quick_overview_core.js?jtools-qo-v20260327a", function () {
+                    loadScript("/js/quick_overview_screensaver.js?jtools-qo-v20260327a", function () {
                         scriptsLoaded = true;
                         done();
                     });
                 });
             } else if (!window.JtoolsScreensaverRenderer) {
-                loadScript("/js/quick_overview_screensaver.js?jtools-qo-v20260326", function () {
+                loadScript("/js/quick_overview_screensaver.js?jtools-qo-v20260327a", function () {
                     scriptsLoaded = true;
                     done();
                 });
@@ -188,6 +240,7 @@
     });
 
     // Start the idle timer
+    refreshSettingsFromServer();
     resetIdleTimer();
 
 })();

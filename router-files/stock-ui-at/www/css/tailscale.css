@@ -398,6 +398,49 @@
     margin-bottom: 18px;
 }
 
+.ts-list-header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+}
+
+.ts-list-header .ts-card-title {
+    margin-bottom: 0;
+}
+
+.ts-hide-ip-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.72);
+    cursor: pointer;
+    flex-shrink: 0;
+    font-family: var(--qt-font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 7px 16px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.ts-hide-ip-btn:hover {
+    background: rgba(255, 255, 255, 0.13);
+    border-color: rgba(255, 255, 255, 0.24);
+    color: #fff;
+}
+
+.ts-hide-ip-btn.is-active {
+    background: rgba(255, 138, 0, 0.15);
+    border-color: rgba(255, 138, 0, 0.35);
+    color: #ff8a00;
+}
+
+.ts-hide-ip-btn.is-active:hover {
+    background: rgba(255, 138, 0, 0.22);
+    border-color: rgba(255, 138, 0, 0.45);
+}
+
 .ts-search-shell {
     align-items: center;
     background: var(--qt-bg-inset, #1a1a1d);

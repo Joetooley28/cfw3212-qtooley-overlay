@@ -89,6 +89,9 @@
 
         renderSettings();
         bindSettingsEvents();
+        QO.loadSettings(function () {
+            renderSettings();
+        });
 
         // Initial fetch
         fetchAndRender();
@@ -404,11 +407,10 @@
             "<div class='qo-setting-row'>",
             "  <span class='qo-setting-label'>Idle timeout</span>",
             "  <select class='qo-select' id='qoSettingTimeout'>",
-            "    <option value='5000'" + (s.timeout === 5000 ? " selected" : "") + ">5 seconds</option>",
-            "    <option value='10000'" + (s.timeout === 10000 ? " selected" : "") + ">10 seconds</option>",
-            "    <option value='15000'" + (s.timeout === 15000 ? " selected" : "") + ">15 seconds</option>",
             "    <option value='30000'" + (s.timeout === 30000 ? " selected" : "") + ">30 seconds</option>",
+            "    <option value='45000'" + (s.timeout === 45000 ? " selected" : "") + ">45 seconds</option>",
             "    <option value='60000'" + (s.timeout === 60000 ? " selected" : "") + ">60 seconds</option>",
+            "    <option value='120000'" + (s.timeout === 120000 ? " selected" : "") + ">2 minutes</option>",
             "  </select>",
             "</div>",
             "<div class='qo-setting-row'>",

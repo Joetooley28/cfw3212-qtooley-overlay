@@ -201,7 +201,7 @@
             "<summary class='qt-details-summary'><span class='qt-details-arrow'></span> Band Locking</summary>",
             "<div class='band-lock-section-body qt-details-body'>",
             "<div class='band-lock-reset-row'>",
-            "<button id='band-lock-reset' type='button' class='qt-btn qt-btn-secondary' title='Reset wiring will be enabled after restore_band handling is verified on this build.'>Reset to defaults</button>",
+            "<button id='band-lock-reset' type='button' class='qt-btn qt-btn-secondary' title='Apply and save: mode_pref=AUTO, rat_acq_order=NR5G:LTE, nr5g_disable_mode=0, and all supported LTE/NSA/SA bands. Cell locks are not changed.'>Reset to safe defaults</button>",
             "</div>",
             buildCheckboxes("lte", []),
             buildCheckboxes("nsa", []),
@@ -215,7 +215,7 @@
         return [
             "<div class='at-panel-content'>",
             "<h3 class='qt-card-header'>Band &amp; Cell Locking</h3>",
-            "<p class='at-panel-note'>Reads and writes preferences through QNWPREFCFG and QNWLOCK. Refresh is manual on purpose so this page does not constantly compete with the stock status UI for modem queries.</p>",
+            "<p class='at-panel-note'>Reads and writes preferences through QNWPREFCFG and QNWLOCK. RAT mode, acquisition order, 5G disable, and band masks are saved and reapplied after reboot. Cell locking remains non-persistent. Refresh is manual on purpose so this page does not constantly compete with the stock status UI for modem queries.</p>",
             "<div id='band-lock-status' class='band-lock-status band-lock-status-info'>Ready.</div>",
             "<div class='band-lock-top-actions'>",
             "<button id='band-lock-refresh' class='qt-btn qt-btn-primary' type='button'>Refresh</button>",

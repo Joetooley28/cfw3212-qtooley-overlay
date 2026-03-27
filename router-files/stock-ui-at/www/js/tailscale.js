@@ -24,6 +24,7 @@
         rawOpen: false,
         peerListScrollTop: 0,
         rawScrollTop: 0,
+        hideIPs: false,
         ssh_preference: false,
         sshPreferenceDirty: false,
         showForceReinstallModal: false
@@ -48,6 +49,11 @@
         return document.querySelector("link[data-jtools-dark-mode]")
             ? "/img/qtooley/tailscale-logo-white.svg"
             : "/img/qtooley/tailscale-logo-black.svg";
+    }
+
+    function maskIP(ip) {
+        if (!state.hideIPs || !ip) return escapeHtml(ip || "Unavailable");
+        return ip.replace(/\d/g, "&#x2022;");
     }
 
     function tipAttr(text) {
@@ -102,13 +108,13 @@
                 "<button type='button' class='ts-peer-button' data-peer-toggle='", escapeHtml(key), "'", tipAttr("Show details for " + (peer.name || "this device")), ">",
                 "<span class='ts-peer-dot ", peer.connected ? "is-online" : "is-offline", "'></span>",
                 "<span class='ts-peer-name'>", escapeHtml(peer.name || "Peer"), "</span>",
-                "<span class='ts-peer-ip-inline'>", escapeHtml(peer.tailscale_ip || "Unavailable"), "</span>",
+                "<span class='ts-peer-ip-inline'>", maskIP(peer.tailscale_ip), "</span>",
                 "<span class='ts-peer-chevron'>&rsaquo;</span>",
                 "</button>",
                 "<div class='ts-peer-details'>",
                 "<div class='ts-peer-details-grid'>",
                 "<div class='ts-peer-detail'><div class='ts-peer-detail-label'>Status</div><div class='ts-peer-detail-value'>", escapeHtml(statusText), "</div></div>",
-                "<div class='ts-peer-detail'><div class='ts-peer-detail-label'>Tailscale IP</div><div class='ts-peer-detail-value'>", escapeHtml(peer.tailscale_ip || "Unavailable"), "</div></div>",
+                "<div class='ts-peer-detail'><div class='ts-peer-detail-label'>Tailscale IP</div><div class='ts-peer-detail-value'>", maskIP(peer.tailscale_ip), "</div></div>",
                 "<div class='ts-peer-detail'><div class='ts-peer-detail-label'>Last seen</div><div class='ts-peer-detail-value'>", escapeHtml(peer.last_seen || "Unavailable"), "</div></div>",
                 "</div>",
                 "</div>",
@@ -203,7 +209,7 @@
             "        <div class='ts-node-item'><div class='ts-node-label'>Install state</div><div class='ts-node-value'>", state.installed ? "Installed" : "Not installed", "</div></div>",
             "        <div class='ts-node-item'><div class='ts-node-label'>Service</div><div class='ts-node-value'>", state.service_active ? "Active" : "Stopped", "</div></div>",
             "        <div class='ts-node-item'><div class='ts-node-label'>Hostname</div><div class='ts-node-value'>", escapeHtml(state.hostname || "Unavailable"), "</div></div>",
-            "        <div class='ts-node-item'><div class='ts-node-label'>Tailscale IP</div><div class='ts-node-value'>", escapeHtml(state.tailscale_ip || "Unavailable"), "</div></div>",
+            "        <div class='ts-node-item'><div class='ts-node-label'>Tailscale IP</div><div class='ts-node-value'>", maskIP(state.tailscale_ip), "</div></div>",
             "        <div class='ts-node-item'><div class='ts-node-label'>Logged in</div><div class='ts-node-value'>", state.logged_in ? "Yes" : "No", "</div></div>",
             "        <div class='ts-node-item'><div class='ts-node-label'>SSH over tailnet</div><div class='ts-node-value'>", state.ssh_enabled ? "Enabled" : "Disabled", "</div></div>",
             "      </div>",
@@ -214,7 +220,10 @@
             "    </div>",
             "  </div>",
             "  <div class='ts-card ts-list-card'>",
-            "    <h3 class='ts-card-title'>Tailnet devices</h3>",
+            "    <div class='ts-list-header'>",
+            "      <h3 class='ts-card-title'>Tailnet devices</h3>",
+            "      <button id='ts-hide-ip' class='ts-hide-ip-btn", state.hideIPs ? " is-active" : "", "' type='button'", tipAttr("Toggle visibility of Tailscale IP addresses"), ">", state.hideIPs ? "Show IP" : "Hide IP", "</button>",
+            "    </div>",
             "    <div class='ts-search-shell'>",
             "      <span class='ts-search-icon'>&#128269;</span>",
             "      <input id='ts-search' class='ts-search-input' type='text' placeholder='Search devices...' value='", escapeHtml(state.search), "'" , tipAttr("Filter the tailnet device list by device name or Tailscale IP"), ">",
@@ -387,6 +396,14 @@
         if (search) {
             search.addEventListener("input", function (event) {
                 state.search = event.target.value || "";
+                render();
+            });
+        }
+
+        var hideIpBtn = byId("ts-hide-ip");
+        if (hideIpBtn) {
+            hideIpBtn.addEventListener("click", function () {
+                state.hideIPs = !state.hideIPs;
                 render();
             });
         }

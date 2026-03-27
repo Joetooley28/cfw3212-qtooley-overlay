@@ -80,7 +80,20 @@ if [ -f "$TTL_CONFIG" ]; then
     fi
 fi
 
+# --- RAT/Band settings: reapply persisted safe radio preferences ---
+if [ -f "$BASE/band_locking_config.json" ]; then
+    /usr/bin/lua - <<'LUA' || true
+package.path = package.path .. ";/usrdata/at-stock-ui/?.lua"
+local settings = require("band_locking_settings")
+local ok, err = settings.reapply_saved()
+if ok then
+    print("RAT/band settings reapplied")
+else
+    print("RAT/band reapply skipped: " .. tostring(err))
+end
+LUA
+fi
+
 systemctl restart turbontc.service
 
 echo "stock-ui AT live tree bound"
-

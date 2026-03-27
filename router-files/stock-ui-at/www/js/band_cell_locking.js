@@ -340,6 +340,40 @@
         });
     }
 
+    function resetRadioDefaults() {
+        if (!window.confirm("Reset RAT and band settings to safe defaults and save them for reboot persistence? Cell locks will not be changed.")) {
+            return;
+        }
+
+        clearIndicators();
+        setBusy(true);
+        setStatus("info", "Applying safe default RAT and band settings...");
+
+        $.ajax({
+            url: "/band_locking_api/reset_defaults",
+            type: "POST",
+            dataType: "json",
+            data: {
+                csrfToken: csrfToken
+            }
+        }).done(function (response) {
+            if (response && response.ok) {
+                fetchState({
+                    loadingText: "Safe defaults applied. Reading back live modem state...",
+                    successText: function () {
+                        return "Safe default RAT and band settings applied and saved for reboot persistence.";
+                    }
+                });
+            } else {
+                setStatus("error", (response && response.error) || "Failed to reset radio defaults.");
+                setBusy(false);
+            }
+        }).fail(function (xhr) {
+            setStatus("error", extractXhrError(xhr, "Reset defaults failed."));
+            setBusy(false);
+        });
+    }
+
     function bindEvents() {
         var refreshBtn = document.getElementById("band-lock-refresh");
         if (refreshBtn) {
@@ -375,8 +409,7 @@
 
         var resetBtn = document.getElementById("band-lock-reset");
         if (resetBtn) {
-            resetBtn.setAttribute("data-disabled-static", "true");
-            resetBtn.setAttribute("disabled", "disabled");
+            resetBtn.addEventListener("click", resetRadioDefaults);
         }
 
         Array.prototype.forEach.call(document.querySelectorAll("[data-check-all]"), function (node) {

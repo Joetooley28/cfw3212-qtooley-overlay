@@ -24,6 +24,12 @@ fi
 rm -f /tmp/ookla-speedtest-state.json /tmp/ookla-speedtest-state.json.tmp
 rm -f /tmp/ookla-speedtest.pid
 
+# --- Quick Overview: remove persisted settings ---
+rm -f /usrdata/at-stock-ui/quick_overview_settings.json
+
+# --- RAT/Band: remove persisted settings ---
+rm -f /usrdata/at-stock-ui/band_locking_config.json
+
 # --- Detach overlay bind mounts (robust, matching apply script) ---
 detach_mount_if_needed() {
     target="$1"

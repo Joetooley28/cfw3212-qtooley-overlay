@@ -11,6 +11,8 @@ local backend = require("at_backend")
 local speedtest = require("ookla_speedtest")
 local tailscale = require("tailscale")
 local ttl_helper = require("ttl_helper")
+local quick_overview_settings = require("quick_overview_settings")
+local band_locking_settings = require("band_locking_settings")
 local JSON = require("JSON")
 
 -- Cached firmware version (AT+QGMR) — fetched once per process lifetime
@@ -983,6 +985,7 @@ function BandLockingApiHandler:get(url, action)
             local qnwinfo_raw, qnwinfo_err = soft_run_command(config, 'AT+QNWINFO')
             local qcainfo_raw, qcainfo_err = soft_run_command(config, 'AT+QCAINFO')
             local servingcell_raw, servingcell_err = soft_run_command(config, 'AT+QENG="servingcell"')
+            local saved_settings = band_locking_settings.read_config()
 
             return {
                 ok = true,
@@ -995,6 +998,8 @@ function BandLockingApiHandler:get(url, action)
                 lte_band_list = split_band_string(parse_pref_value("lte_band", lte_raw) or "0"),
                 nsa_nr5g_band_list = split_band_string(parse_pref_value("nsa_nr5g_band", nsa_raw) or "0"),
                 nr5g_band_list = split_band_string(parse_pref_value("nr5g_band", sa_raw) or "0"),
+                saved_settings = saved_settings,
+                has_saved_settings = saved_settings ~= nil,
                 qnwinfo_summary = qnwinfo_raw and summarize_response("AT+QNWINFO", qnwinfo_raw) or ("unavailable: " .. tostring(qnwinfo_err)),
                 qcainfo_summary = qcainfo_raw and summarize_response("AT+QCAINFO", qcainfo_raw) or ("unavailable: " .. tostring(qcainfo_err)),
                 servingcell_summary = servingcell_raw and summarize_response('AT+QENG="servingcell"', servingcell_raw) or ("unavailable: " .. tostring(servingcell_err))
@@ -1009,6 +1014,11 @@ function BandLockingApiHandler:get(url, action)
         end
 
         self:write(payload)
+        return
+    end
+
+    if action == "saved" then
+        self:write(band_locking_settings.get_saved_config())
         return
     end
 
@@ -1139,6 +1149,8 @@ function BandLockingApiHandler:post(url, action)
             return
         end
 
+        band_locking_settings.save_partial({ mode_pref = mode })
+
         self:write(result)
         return
     end
@@ -1170,6 +1182,8 @@ function BandLockingApiHandler:post(url, action)
             return
         end
 
+        band_locking_settings.save_partial({ rat_acq_order = order })
+
         self:write(result)
         return
     end
@@ -1200,6 +1214,8 @@ function BandLockingApiHandler:post(url, action)
             self:write({ ok = false, error = err })
             return
         end
+
+        band_locking_settings.save_partial({ nr5g_disable_mode = val })
 
         self:write(result)
         return
@@ -1239,6 +1255,22 @@ function BandLockingApiHandler:post(url, action)
             local status = err == "at_channel_busy" and 409 or 502
             self:set_status(status)
             self:write({ ok = false, error = err })
+            return
+        end
+
+        band_locking_settings.save_partial({ [group] = bands })
+
+        self:write(result)
+        return
+    end
+
+    if action == "reset_defaults" then
+        local result = band_locking_settings.reset_to_defaults()
+        if not result or not result.ok then
+            local error_text = result and result.error or "request_failed"
+            local status = error_text == "at_channel_busy" and 409 or 502
+            self:set_status(status)
+            self:write({ ok = false, error = error_text })
             return
         end
 
@@ -1756,6 +1788,78 @@ function TtlHelperApiHandler:post(url, action)
     self:write({ ok = false, error = "unknown_action" })
 end
 
+local QuickOverviewApiHandler = class("QuickOverviewApiHandler", SessionRequestHandler)
+
+function QuickOverviewApiHandler:getUrl(url, action)
+    return "QuickOverviewApi"
+end
+
+function QuickOverviewApiHandler:get(url, action)
+    action = normalize_action("quick_overview_api", url, action)
+
+    if action == "settings" then
+        local ok, result = pcall(quick_overview_settings.get_settings)
+        if not ok then
+            self:set_status(500)
+            self:write({ ok = false, error = "quick_overview_settings_read_failed" })
+            return
+        end
+        self:write(result)
+        return
+    end
+
+    error(turbo.web.HTTPError(404))
+end
+
+function QuickOverviewApiHandler:post(url, action)
+    action = normalize_action("quick_overview_api", url, action)
+
+    if action == "settings" then
+        local enabled = self:get_argument("enabled", nil)
+        local timeout = self:get_argument("timeout", nil)
+        local dismiss_mode = self:get_argument("dismissMode", nil)
+        local weight_rsrp = self:get_argument("weightRsrp", nil)
+        local weight_sinr = self:get_argument("weightSinr", nil)
+        local weight_rsrq = self:get_argument("weightRsrq", nil)
+
+        local payload = {}
+
+        if enabled ~= nil then
+            payload.enabled = tostring(enabled) == "true" or tostring(enabled) == "1"
+        end
+        if timeout ~= nil and timeout ~= "" then
+            payload.timeout = tonumber(timeout)
+        end
+        if dismiss_mode ~= nil and dismiss_mode ~= "" then
+            payload.dismissMode = dismiss_mode
+        end
+        if weight_rsrp ~= nil and weight_rsrp ~= "" then
+            payload.weightRsrp = tonumber(weight_rsrp)
+        end
+        if weight_sinr ~= nil and weight_sinr ~= "" then
+            payload.weightSinr = tonumber(weight_sinr)
+        end
+        if weight_rsrq ~= nil and weight_rsrq ~= "" then
+            payload.weightRsrq = tonumber(weight_rsrq)
+        end
+
+        local ok, result = pcall(quick_overview_settings.save_settings, payload)
+        if not ok then
+            self:set_status(500)
+            self:write({ ok = false, error = "quick_overview_settings_write_failed" })
+            return
+        end
+        if result and not result.ok then
+            self:set_status(500)
+        end
+        self:write(result)
+        return
+    end
+
+    self:set_status(404)
+    self:write({ ok = false, error = "unknown_action" })
+end
+
 local TailscaleApiHandler = class("TailscaleApiHandler", SessionRequestHandler)
 
 function TailscaleApiHandler:getUrl(url, action)
@@ -1850,12 +1954,15 @@ return {
         table.insert(handlers, 1, {"^/(ttl_helper_api)/(rules)$", TtlHelperApiHandler})
         table.insert(handlers, 1, {"^/(ttl_helper_api)/(apply)$", TtlHelperApiHandler})
         table.insert(handlers, 1, {"^/(ttl_helper_api)/(remove)$", TtlHelperApiHandler})
+        table.insert(handlers, 1, {"^/(quick_overview_api)/(settings)$", QuickOverviewApiHandler})
         table.insert(handlers, 1, {"^/(jtools_general_api)/(state)$", JtoolGeneralApiHandler})
         table.insert(handlers, 1, {"^/(band_locking_api)/(state)$", BandLockingApiHandler})
         table.insert(handlers, 1, {"^/(band_locking_api)/(mode)$", BandLockingApiHandler})
         table.insert(handlers, 1, {"^/(band_locking_api)/(rat_acq_order)$", BandLockingApiHandler})
         table.insert(handlers, 1, {"^/(band_locking_api)/(nr5g_disable)$", BandLockingApiHandler})
         table.insert(handlers, 1, {"^/(band_locking_api)/(bands)$", BandLockingApiHandler})
+        table.insert(handlers, 1, {"^/(band_locking_api)/(saved)$", BandLockingApiHandler})
+        table.insert(handlers, 1, {"^/(band_locking_api)/(reset_defaults)$", BandLockingApiHandler})
         table.insert(handlers, 1, {"^/(band_locking_api)/(cell_state)$", BandLockingApiHandler})
         table.insert(handlers, 1, {"^/(band_locking_api)/(cell_scan)$", BandLockingApiHandler})
         table.insert(handlers, 1, {"^/(band_locking_api)/(cell_lock)$", BandLockingApiHandler})

@@ -170,36 +170,104 @@
         rsrpMin: -120, rsrpMax: -70,
         rsrqMin: -20,  rsrqMax: -5,
         sinrMin: -5,   sinrMax: 30,
+        timeout: 45000,
         weightRsrp: 50,
         weightSinr: 30,
         weightRsrq: 20
     };
 
-    function getSettings() {
-        var s = {};
-        try {
-            var raw = window.localStorage.getItem("jtoolsQoSettings");
-            if (raw) { s = JSON.parse(raw); }
-        } catch (e) { /* ignore */ }
+    function normalizeSettings(input) {
+        var s = input || {};
+        var weightRsrp = asInt(s.weightRsrp);
+        var weightSinr = asInt(s.weightSinr);
+        var weightRsrq = asInt(s.weightRsrq);
+        var weightsAreValid = weightRsrp != null && weightSinr != null && weightRsrq != null &&
+            weightRsrp >= 0 && weightSinr >= 0 && weightRsrq >= 0 &&
+            weightRsrp <= 100 && weightSinr <= 100 && weightRsrq <= 100 &&
+            (weightRsrp + weightSinr + weightRsrq) === 100;
+
         return {
             enabled:       s.enabled !== false,
-            timeout:       asInt(s.timeout) || 10000,
+            timeout:       asInt(s.timeout) > 0 ? asInt(s.timeout) : DEFAULTS.timeout,
             dismissMode:   s.dismissMode || "movement",
-            weightRsrp:    asInt(s.weightRsrp) != null ? asInt(s.weightRsrp) : DEFAULTS.weightRsrp,
-            weightSinr:    asInt(s.weightSinr) != null ? asInt(s.weightSinr) : DEFAULTS.weightSinr,
-            weightRsrq:    asInt(s.weightRsrq) != null ? asInt(s.weightRsrq) : DEFAULTS.weightRsrq
+            weightRsrp:    weightsAreValid ? weightRsrp : DEFAULTS.weightRsrp,
+            weightSinr:    weightsAreValid ? weightSinr : DEFAULTS.weightSinr,
+            weightRsrq:    weightsAreValid ? weightRsrq : DEFAULTS.weightRsrq
         };
     }
 
-    function saveSettings(obj) {
+    function readSettingsFromStorage() {
         try {
-            var current = getSettings();
-            var merged = {};
-            var key;
-            for (key in current) { merged[key] = current[key]; }
-            for (key in obj) { merged[key] = obj[key]; }
-            window.localStorage.setItem("jtoolsQoSettings", JSON.stringify(merged));
+            var raw = window.localStorage.getItem("jtoolsQoSettings");
+            if (raw) { return normalizeSettings(JSON.parse(raw)); }
         } catch (e) { /* ignore */ }
+        return normalizeSettings({});
+    }
+
+    function writeSettingsToStorage(settings) {
+        try {
+            window.localStorage.setItem("jtoolsQoSettings", JSON.stringify(settings));
+        } catch (e) { /* ignore */ }
+    }
+
+    var cachedSettings = readSettingsFromStorage();
+
+    function getSettings() {
+        return normalizeSettings(cachedSettings);
+    }
+
+    function mergeSettings(obj) {
+        var merged = {};
+        var current = getSettings();
+        var key;
+        for (key in current) { merged[key] = current[key]; }
+        for (key in obj) { merged[key] = obj[key]; }
+        return normalizeSettings(merged);
+    }
+
+    function saveSettings(obj) {
+        cachedSettings = mergeSettings(obj || {});
+        writeSettingsToStorage(cachedSettings);
+
+        if (!window.XMLHttpRequest) { return; }
+        try {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/quick_overview_api/settings", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+            xhr.send(
+                "csrfToken=" + encodeURIComponent(typeof csrfToken !== "undefined" ? csrfToken : "") +
+                "&enabled=" + encodeURIComponent(cachedSettings.enabled ? "true" : "false") +
+                "&timeout=" + encodeURIComponent(String(cachedSettings.timeout)) +
+                "&dismissMode=" + encodeURIComponent(cachedSettings.dismissMode) +
+                "&weightRsrp=" + encodeURIComponent(String(cachedSettings.weightRsrp)) +
+                "&weightSinr=" + encodeURIComponent(String(cachedSettings.weightSinr)) +
+                "&weightRsrq=" + encodeURIComponent(String(cachedSettings.weightRsrq))
+            );
+        } catch (e) { /* ignore */ }
+    }
+
+    function loadSettings(callback) {
+        if (!window.XMLHttpRequest) {
+            if (callback) { callback(getSettings()); }
+            return;
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/quick_overview_api/settings", true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState !== 4) { return; }
+            if (xhr.status === 200) {
+                try {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response && response.ok && response.settings) {
+                        cachedSettings = normalizeSettings(response.settings);
+                        writeSettingsToStorage(cachedSettings);
+                    }
+                } catch (e) { /* ignore */ }
+            }
+            if (callback) { callback(getSettings()); }
+        };
+        xhr.send();
     }
 
     function normalizeMetric(value, min, max) {
@@ -638,6 +706,7 @@
         getBandChangeHistory: getBandChangeHistory,
         formatBandChangeText: formatBandChangeText,
         getTempClass: getTempClass,
+        loadSettings: loadSettings,
         getSettings: getSettings,
         saveSettings: saveSettings,
         escapeHtml: escapeHtml,
