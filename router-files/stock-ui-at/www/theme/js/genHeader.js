@@ -14,6 +14,7 @@ function genThemeHeader(pageData, userGroups) {
             "ookla_speedtest.html": true,
             "ttl_helper.html": true,
             "tailscale.html": true,
+            "sms.html": true,
             "status.html": true,
             "profile_list.html": true,
             "operator_setting.html": true,

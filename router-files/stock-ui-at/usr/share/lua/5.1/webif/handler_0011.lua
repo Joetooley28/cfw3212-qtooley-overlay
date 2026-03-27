@@ -13,6 +13,7 @@ local tailscale = require("tailscale")
 local ttl_helper = require("ttl_helper")
 local quick_overview_settings = require("quick_overview_settings")
 local band_locking_settings = require("band_locking_settings")
+local sms = require("sms_backend")
 local JSON = require("JSON")
 
 -- Cached firmware version (AT+QGMR) — fetched once per process lifetime
@@ -1930,6 +1931,196 @@ function TailscaleApiHandler:post(url, action)
     self:write(result)
 end
 
+local SmsApiHandler = class("SmsApiHandler", SessionRequestHandler)
+
+function SmsApiHandler:getUrl(url, action)
+    return "SmsApi"
+end
+
+function SmsApiHandler:get(url, action)
+    action = normalize_action("sms_api", url, action)
+    local ok, err = xpcall(function()
+        local config, config_err = read_config()
+        if not config then
+            self:set_status(500)
+            self:write({ ok = false, error = config_err or "config_read_failed" })
+            return
+        end
+
+        if action == "list" then
+            local fd, lock_err = at_lock.acquire(config.lock_path)
+            if not fd then
+                self:set_status(409)
+                self:write({ ok = false, error = lock_err })
+                return
+            end
+            local result_ok, result = pcall(sms.list_messages, config)
+            at_lock.release(fd)
+            if not result_ok then
+                self:set_status(502)
+                self:write({ ok = false, error = "sms_list_failed" })
+                return
+            end
+            self:write(result)
+            return
+        end
+
+        if action == "read" then
+            local index = tonumber(self:get_argument("index", ""))
+            if not index then
+                self:set_status(400)
+                self:write({ ok = false, error = "missing_index" })
+                return
+            end
+            local fd, lock_err = at_lock.acquire(config.lock_path)
+            if not fd then
+                self:set_status(409)
+                self:write({ ok = false, error = lock_err })
+                return
+            end
+            local result_ok, result = pcall(sms.read_message, config, index)
+            at_lock.release(fd)
+            if not result_ok then
+                self:set_status(502)
+                self:write({ ok = false, error = "sms_read_failed" })
+                return
+            end
+            self:write(result)
+            return
+        end
+
+        self:set_status(404)
+        self:write({ ok = false, error = "unknown_action" })
+    end, debug.traceback)
+    if not ok then
+        turbo.log.error("SmsApi GET handler exception: " .. tostring(err))
+        self:set_status(500)
+        self:write({ ok = false, error = "internal_handler_error" })
+    end
+end
+
+function SmsApiHandler:post(url, action)
+    action = normalize_action("sms_api", url, action)
+    local ok, err = xpcall(function()
+        local config, config_err = read_config()
+        if not config then
+            self:set_status(500)
+            self:write({ ok = false, error = config_err or "config_read_failed" })
+            return
+        end
+
+        if action == "send" then
+            local phone = self:get_argument("phone", "")
+            local message = self:get_argument("message", "")
+
+            -- Validate phone number (digits, +, spaces, dashes only)
+            if not phone or phone == "" or not phone:match("^[%d%+%-%s%(%)]+$") then
+                self:set_status(400)
+                self:write({ ok = false, error = "invalid_phone_number" })
+                return
+            end
+
+            -- Sanitize phone: keep only digits and leading +
+            local clean_phone = phone:gsub("[^%d%+]", "")
+            if clean_phone == "" then
+                self:set_status(400)
+                self:write({ ok = false, error = "invalid_phone_number" })
+                return
+            end
+
+            if not message or message == "" then
+                self:set_status(400)
+                self:write({ ok = false, error = "empty_message" })
+                return
+            end
+
+            if #message > 1600 then
+                self:set_status(400)
+                self:write({ ok = false, error = "message_too_long" })
+                return
+            end
+
+            -- Reject characters that could break AT command framing
+            if message:match("[%z\1-\8\14-\31]") then
+                self:set_status(400)
+                self:write({ ok = false, error = "invalid_message_characters" })
+                return
+            end
+
+            local fd, lock_err = at_lock.acquire(config.lock_path)
+            if not fd then
+                self:set_status(409)
+                self:write({ ok = false, error = lock_err })
+                return
+            end
+            local result_ok, result = pcall(sms.send_sms, config, clean_phone, message)
+            at_lock.release(fd)
+            if not result_ok then
+                self:set_status(502)
+                self:write({ ok = false, error = "sms_send_failed" })
+                return
+            end
+            if type(result) == "table" and not result.ok then
+                self:set_status(502)
+            end
+            self:write(result)
+            return
+        end
+
+        if action == "delete" then
+            local index = tonumber(self:get_argument("index", ""))
+            local delflag = self:get_argument("delflag", nil)
+            if not index then
+                self:set_status(400)
+                self:write({ ok = false, error = "missing_index" })
+                return
+            end
+            local fd, lock_err = at_lock.acquire(config.lock_path)
+            if not fd then
+                self:set_status(409)
+                self:write({ ok = false, error = lock_err })
+                return
+            end
+            local result_ok, result = pcall(sms.delete_message, config, index, delflag)
+            at_lock.release(fd)
+            if not result_ok then
+                self:set_status(502)
+                self:write({ ok = false, error = "sms_delete_failed" })
+                return
+            end
+            self:write(result)
+            return
+        end
+
+        if action == "delete_all" then
+            local fd, lock_err = at_lock.acquire(config.lock_path)
+            if not fd then
+                self:set_status(409)
+                self:write({ ok = false, error = lock_err })
+                return
+            end
+            -- delflag=4 means delete all messages
+            local result_ok, result = pcall(sms.delete_message, config, 1, 4)
+            at_lock.release(fd)
+            if not result_ok then
+                self:set_status(502)
+                self:write({ ok = false, error = "sms_delete_all_failed" })
+                return
+            end
+            self:write(result)
+            return
+        end
+
+        self:set_status(404)
+        self:write({ ok = false, error = "unknown_action" })
+    end, debug.traceback)
+    if not ok then
+        turbo.log.error("SmsApi POST handler exception: " .. tostring(err))
+        self:set_status(500)
+        self:write({ ok = false, error = "internal_handler_error" })
+    end
+end
+
 return {
     init = function(handlers)
         table.insert(handlers, 1, {"^/top_menu/JtoolServices$", JtoolTopMenuHandler})
@@ -1967,5 +2158,10 @@ return {
         table.insert(handlers, 1, {"^/(band_locking_api)/(cell_scan)$", BandLockingApiHandler})
         table.insert(handlers, 1, {"^/(band_locking_api)/(cell_lock)$", BandLockingApiHandler})
         table.insert(handlers, 1, {"^/(at_terminal_api)/(run)$", AtTerminalApiHandler})
+        table.insert(handlers, 1, {"^/(sms_api)/(list)$", SmsApiHandler})
+        table.insert(handlers, 1, {"^/(sms_api)/(read)$", SmsApiHandler})
+        table.insert(handlers, 1, {"^/(sms_api)/(send)$", SmsApiHandler})
+        table.insert(handlers, 1, {"^/(sms_api)/(delete)$", SmsApiHandler})
+        table.insert(handlers, 1, {"^/(sms_api)/(delete_all)$", SmsApiHandler})
     end
 }

@@ -210,6 +210,16 @@ return { authTable = {
         writeGroups = {root=true,admin=true},
         skipAuth = false
     },
+    ["sms.html"] = {
+        readGroups = {root=true,admin=true},
+        writeGroups = {root=true,admin=true},
+        skipAuth = false
+    },
+    ["SmsApi"] = {
+        readGroups = {root=true,admin=true},
+        writeGroups = {root=true,admin=true},
+        skipAuth = false
+    },
     ["AtTerminalInfo"] = {
         readGroups = {root=true,admin=true},
         writeGroups = {root=true,admin=true},
