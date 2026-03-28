@@ -408,11 +408,12 @@
     margin-bottom: 0;
 }
 
+/* Theme tokens: previous white-on-glass styling vanished on light cards. */
 .ts-hide-ip-btn {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: var(--qt-bg-card-alt, #f0f3f7);
+    border: 1px solid var(--qt-border-strong, #bfc7cf);
     border-radius: 10px;
-    color: rgba(255, 255, 255, 0.72);
+    color: var(--qt-text-label, #355070);
     cursor: pointer;
     flex-shrink: 0;
     font-family: var(--qt-font-sans);
@@ -420,25 +421,25 @@
     font-weight: 600;
     letter-spacing: 0.02em;
     padding: 7px 16px;
-    transition: all 0.2s ease;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
     white-space: nowrap;
 }
 
 .ts-hide-ip-btn:hover {
-    background: rgba(255, 255, 255, 0.13);
-    border-color: rgba(255, 255, 255, 0.24);
-    color: #fff;
+    background: var(--qt-bg-hover, #edf0f4);
+    border-color: var(--qt-border, #d8d8d8);
+    color: var(--qt-text, #1d313f);
 }
 
 .ts-hide-ip-btn.is-active {
-    background: rgba(255, 138, 0, 0.15);
-    border-color: rgba(255, 138, 0, 0.35);
-    color: #ff8a00;
+    background: rgba(255, 138, 0, 0.14);
+    border-color: rgba(255, 138, 0, 0.42);
+    color: var(--qt-accent-orange, #e06c10);
 }
 
 .ts-hide-ip-btn.is-active:hover {
     background: rgba(255, 138, 0, 0.22);
-    border-color: rgba(255, 138, 0, 0.45);
+    border-color: rgba(255, 138, 0, 0.55);
 }
 
 .ts-search-shell {

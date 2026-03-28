@@ -409,14 +409,15 @@
     text-transform: uppercase;
 }
 
+/* Same conic origin and palette as jtools_dark_mode.css so light/dark gauges match. */
 .ookla-gauge {
     --ookla-gauge-turn: 0turn;
     align-items: center;
     background:
-        radial-gradient(circle at 50% 52%, rgba(7, 14, 29, 0.94) 0 38%, transparent 39%),
-        conic-gradient(from 0.75turn, rgba(96, 114, 140, 0.12) 0turn, rgba(96, 114, 140, 0.12) 0.74turn, transparent 0.74turn 1turn),
-        conic-gradient(from 0.75turn, #39d5ff 0turn, #7ef3ff var(--ookla-gauge-turn), rgba(77, 94, 121, 0.18) var(--ookla-gauge-turn), rgba(77, 94, 121, 0.18) 0.74turn, transparent 0.74turn 1turn);
+        radial-gradient(circle at center, rgba(255, 226, 65, 0.08) 0%, rgba(255, 226, 65, 0) 58%),
+        conic-gradient(#f1d963 0turn, #ffdc43 var(--ookla-gauge-turn), #313746 var(--ookla-gauge-turn), #313746 1turn);
     border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(241, 217, 99, 0.45), 0 0 0 12px rgba(241, 217, 99, 0.08);
     display: flex;
     height: 320px;
     justify-content: center;
@@ -427,16 +428,15 @@
 
 .ookla-gauge-card.is-upload .ookla-gauge {
     background:
-        radial-gradient(circle at 50% 52%, rgba(7, 14, 29, 0.94) 0 38%, transparent 39%),
-        conic-gradient(from 0.75turn, rgba(96, 114, 140, 0.12) 0turn, rgba(96, 114, 140, 0.12) 0.74turn, transparent 0.74turn 1turn),
-        conic-gradient(from 0.75turn, #9a5cff 0turn, #ec76ff var(--ookla-gauge-turn), rgba(77, 94, 121, 0.18) var(--ookla-gauge-turn), rgba(77, 94, 121, 0.18) 0.74turn, transparent 0.74turn 1turn);
+        radial-gradient(circle at center, rgba(255, 153, 87, 0.08) 0%, rgba(255, 153, 87, 0) 58%),
+        conic-gradient(#d7604a 0turn, #f0a45a var(--ookla-gauge-turn), #313746 var(--ookla-gauge-turn), #313746 1turn);
+    box-shadow: 0 0 0 2px rgba(240, 164, 90, 0.38), 0 0 0 12px rgba(215, 96, 74, 0.07);
 }
 
 .ookla-gauge::after {
-    background: radial-gradient(circle at 50% 42%, rgba(20, 27, 46, 0.98) 0%, rgba(8, 12, 29, 0.98) 72%);
+    background: #090b1d;
     border-radius: 50%;
     content: "";
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
     height: 222px;
     position: absolute;
     width: 222px;
@@ -449,12 +449,11 @@
 }
 
 .ookla-gauge-value {
-    color: #eef6ff;
+    color: #f3f6f8;
     font-size: 54px;
     font-weight: 300;
     letter-spacing: -0.04em;
     line-height: 1;
-    text-shadow: 0 0 22px rgba(126, 209, 255, 0.14);
 }
 
 .ookla-gauge-unit,

@@ -894,12 +894,14 @@
 .rat-control-row {
     align-items: center;
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 10px;
 }
 
 .rat-control-row label {
     color: var(--qt-text-label, #355070);
+    flex: 0 0 auto;
     font-size: 13px;
     font-weight: 600;
     min-width: 140px;
@@ -930,8 +932,10 @@
 }
 
 .rat-control-row select {
-    min-width: 240px;
-    width: 240px;
+    flex: 1 1 200px;
+    max-width: 240px;
+    min-width: 0;
+    width: auto;
 }
 
 .cell-lock-form-row select,
@@ -962,13 +966,21 @@
 }
 
 .rat-control-row .band-lock-apply-button {
+    flex: 0 0 auto;
     min-height: 32px;
     min-width: 70px;
     padding: 6px 14px;
 }
 
+/* Full-width row so long “Readback: …” pills are not clipped by the card edge. */
 .rat-control-row .band-lock-indicator {
-    min-width: 100px;
+    box-sizing: border-box;
+    flex: 1 0 100%;
+    max-width: 100%;
+    min-width: 0;
+    text-align: left;
+    white-space: normal;
+    width: 100%;
 }
 
 /* ── Cell locking ───────────────────────────────────── */

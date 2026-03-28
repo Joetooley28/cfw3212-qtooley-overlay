@@ -49,7 +49,7 @@ function genThemeHeader(pageData, userGroups) {
             "field_test.html": true,
             "encrypted_debuginfo.html": true
         };
-        const darkModeHref = "/css/jtools_dark_mode.css?jtools-dark-v20260327a";
+        const darkModeHref = "/css/jtools_dark_mode.css?jtools-dark-v20260327b";
 
         if (!darkModePages[relUrlOfPage]) {
             return false;
@@ -301,7 +301,7 @@ function genThemeHeader(pageData, userGroups) {
     // Inject screensaver idle detector on dark-mode pages
     if (document.querySelector("link[data-jtools-dark-mode]")) {
         var ssScript = document.createElement("script");
-        ssScript.src = "/js/jtools_screensaver.js?jtools-qo-v20260327a";
+        ssScript.src = "/js/jtools_screensaver.js?jtools-qo-v20260327b";
         document.head.appendChild(ssScript);
     }
 
