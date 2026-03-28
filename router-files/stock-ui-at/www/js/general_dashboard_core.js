@@ -1461,15 +1461,37 @@
 
         var primaryArfcn = chooseFirst(adv.earfcn, adv.nrArfcn, qnwinfo.arfcn, servingcell.arfcn);
 
-        var resolvedActiveMbn = hasValue(cellular.activeMbn) ? cellular.activeMbn : adv.simDataMbn;
+        var mbnFromAt = at.active_mbn_from_at == null ? "" : String(at.active_mbn_from_at).replace(/^\s+|\s+$/g, "");
+
+        var resolvedActiveMbn = hasValue(mbnFromAt) ? mbnFromAt : (hasValue(cellular.activeMbn) ? cellular.activeMbn : adv.simDataMbn);
 
         var activeMbnMetric = "";
 
-        if (hasValue(resolvedActiveMbn) && !isUndisplayableMbnValue(resolvedActiveMbn)) {
+        var showActiveMbn = hasValue(mbnFromAt) || (hasValue(resolvedActiveMbn) && !isUndisplayableMbnValue(resolvedActiveMbn));
+
+        if (showActiveMbn) {
 
             activeMbnMetric = createMetric("Active MBN", asText(resolvedActiveMbn, ""));
 
         }
+
+        var primaryBandLabel = asText(chooseFirst(currentBandCarrier.band_label, currentBandCarrier.band, currentBand), "—");
+
+        var signalBandHeroBlock = [
+
+            "<div class='jgd-signal-band-col'>",
+
+            "<div class='jgd-signal-band-kicker'>Primary band</div>",
+
+            "<div class='jgd-signal-band-hero'>",
+
+            renderStatusBandChip(currentBandCarrier, primaryBandLabel),
+
+            "</div>",
+
+            "</div>"
+
+        ].join("");
 
 
 
@@ -1556,8 +1578,6 @@
 
             "<div class='jgd-card-title'>SIM &amp; cell identity</div>",
 
-            "<p class='jgd-card-lede'>Stock RDB / status objects only — same sources as the carrier status page.</p>",
-
             "<div class='jgd-metrics-grid jgd-metrics-grid-identity'>",
 
             createMetric("IMSI", asText(cellular.imsi)),
@@ -1590,6 +1610,10 @@
 
             "<section class='jgd-card jgd-card-signal'>",
 
+            "<div class='jgd-signal-head'>",
+
+            "<div class='jgd-signal-top-left'>",
+
             "<div class='jgd-card-title'>Signal overview</div>",
 
             "<div class='jgd-signal-wrap'>",
@@ -1597,6 +1621,12 @@
             "<div class='jgd-signal-bars'>", buildSignalBars(signalDbm, cellular.signalBar), "</div>",
 
             "<div class='jgd-signal-value'>", escapeHtml(signalText), "</div>",
+
+            "</div>",
+
+            "</div>",
+
+            signalBandHeroBlock,
 
             "</div>",
 

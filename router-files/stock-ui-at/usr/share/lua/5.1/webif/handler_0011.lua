@@ -20,6 +20,10 @@ local JSON = require("JSON")
 
 -- Cached firmware version (AT+QGMR) — fetched once per process lifetime
 local _cached_firmware_version = nil
+local _cached_active_mbn_from_at = nil
+local _cached_qmbncfg_summary = nil
+local _cached_qmbncfg_at = 0
+local ACTIVE_MBN_CACHE_TTL_SEC = 600
 
 local MODE_VALUES = {
     AUTO = true,
@@ -104,6 +108,39 @@ local function summarize_response(command, raw)
         end
     end
     return table.concat(keep, "\n")
+end
+
+-- +QMBNCFG: "List",0,1,1,"Commercial-TMO",0x0A01050F,202303091  (active row has 1,1 before the profile name)
+local function parse_qmbncfg_list_active_name(summary)
+    if not summary or summary == "" or summary:find("^unavailable") then
+        return nil
+    end
+    local active_name = nil
+    for line in summary:gmatch("([^\n]+)") do
+        local f1, f2, name = line:match('%+QMBNCFG:%s*"List",%d+,(%d+),(%d+),"([^"]+)"')
+        if f1 == "1" and f2 == "1" and name and name ~= "" then
+            active_name = name
+            break
+        end
+    end
+    return active_name
+end
+
+local function get_cached_active_mbn(config)
+    local now = os.time()
+    if _cached_qmbncfg_at ~= nil and (now - (_cached_qmbncfg_at or 0)) < ACTIVE_MBN_CACHE_TTL_SEC then
+        return _cached_qmbncfg_summary or "", _cached_active_mbn_from_at
+    end
+
+    local qmbncfg_raw, qmbncfg_err = soft_run_command(config, 'AT+QMBNCFG="List"')
+    local qmbncfg_summary = qmbncfg_raw and summarize_response('AT+QMBNCFG="List"', qmbncfg_raw) or ("unavailable: " .. tostring(qmbncfg_err))
+    local active_mbn_from_at = parse_qmbncfg_list_active_name(qmbncfg_summary)
+
+    _cached_qmbncfg_summary = qmbncfg_summary
+    _cached_active_mbn_from_at = active_mbn_from_at
+    _cached_qmbncfg_at = now
+
+    return qmbncfg_summary, active_mbn_from_at
 end
 
 local function parse_pref_value(group, raw)
@@ -1817,6 +1854,7 @@ function JtoolGeneralApiHandler:get(url, action)
         local qnwinfo_summary = qnwinfo_raw and summarize_response("AT+QNWINFO", qnwinfo_raw) or ("unavailable: " .. tostring(qnwinfo_err))
         local qspn_summary = qspn_raw and summarize_response("AT+QSPN", qspn_raw) or ("unavailable: " .. tostring(qspn_err))
         local cops_summary = cops_raw and summarize_response("AT+COPS?", cops_raw) or ("unavailable: " .. tostring(cops_err))
+        local qmbncfg_summary, active_mbn_from_at = get_cached_active_mbn(config)
         local temperatures, primary_temperature_text = parse_qtemp(qtemp_summary)
 
         local crosscheck_data = nil
@@ -1840,6 +1878,8 @@ function JtoolGeneralApiHandler:get(url, action)
             qnwinfo_summary = qnwinfo_summary,
             qspn_summary = qspn_summary,
             cops_summary = cops_summary,
+            qmbncfg_list_summary = qmbncfg_summary,
+            active_mbn_from_at = active_mbn_from_at,
             carriers = parse_qcainfo(qcainfo_summary),
             servingcell_line = parse_qeng_servingcell(qeng_summary),
             temperatures = temperatures,
