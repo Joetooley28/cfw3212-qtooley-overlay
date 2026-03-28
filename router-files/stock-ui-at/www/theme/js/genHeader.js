@@ -1,5 +1,21 @@
 // Copyright (c) 2020 Casa Systems.
 
+(function (w) {
+    "use strict";
+    /** Plain-text 401 bodies (e.g. "Unauthorized") from the stock web stack → one friendly line for Qtooley banners. */
+    w.QtooleyXhrMessage = function (xhr, fallback) {
+        var status = xhr && typeof xhr.status === "number" ? xhr.status : 0;
+        var raw = xhr && xhr.responseText ? String(xhr.responseText).trim() : "";
+        if (status === 401 || /^unauthorized$/i.test(raw) || /^unauthorised$/i.test(raw)) {
+            return "Login required";
+        }
+        if (raw) {
+            return raw;
+        }
+        return fallback === undefined || fallback === null ? "" : String(fallback);
+    };
+})(window);
+
 // generating header and menu
 function genThemeHeader(pageData, userGroups) {
 
@@ -304,7 +320,7 @@ function genThemeHeader(pageData, userGroups) {
         (typeof relUrlOfPage !== "undefined" && relUrlOfPage === "screensaver_settings.html");
     if (injectScreensaverJs) {
         var ssScript = document.createElement("script");
-        ssScript.src = "/js/jtools_screensaver.js?jtools-qo-v20260331a";
+        ssScript.src = "/js/jtools_screensaver.js?jtools-qo-v20260331e";
         document.head.appendChild(ssScript);
     }
 

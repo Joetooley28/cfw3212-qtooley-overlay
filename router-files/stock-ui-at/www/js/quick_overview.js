@@ -5,7 +5,10 @@
     if (!QO) { return; }
 
     var POLL_INTERVAL = 6500;
-    var MAX_CHART_POINTS = 60;
+    /** Sliding window of samples (~1h at default poll; trimmed by age, not only count). */
+    var CHART_HISTORY_MS = 60 * 60 * 1000;
+    /** Hard cap so a stuck tab cannot grow the array without bound. */
+    var CHART_MAX_POINTS_CAP = 1000;
     var pollTimer = null;
     var chartData = [];
     var chartCanvas = null;
@@ -40,6 +43,10 @@
             "  <div id='qoGradeCard'><div class='qo-no-data'>Loading\u2026</div></div>",
             "</div>",
             "<div class='qo-card'>",
+            "  <div class='qo-card-title'>Connection Info</div>",
+            "  <div id='qoConnInfo'><div class='qo-no-data'>Loading\u2026</div></div>",
+            "</div>",
+            "<div class='qo-card'>",
             "  <div class='qo-card-title'>Signal Over Time</div>",
             "  <div class='qo-chart-wrap' id='qoChartWrap'>",
             "    <canvas class='qo-chart-canvas' id='qoChartCanvas'></canvas>",
@@ -52,10 +59,6 @@
             "<div class='qo-card'>",
             "  <div class='qo-card-title'>Band Change History</div>",
             "  <div class='qo-history-list' id='qoHistoryList'><div class='qo-no-data'>No band changes recorded yet</div></div>",
-            "</div>",
-            "<div class='qo-card'>",
-            "  <div class='qo-card-title'>Connection Info</div>",
-            "  <div id='qoConnInfo'><div class='qo-no-data'>Loading\u2026</div></div>",
             "</div>",
             ""
         ].join("\n");
@@ -198,15 +201,20 @@
     // ── Signal Over Time (sparkline) ──
 
     function updateChartData(data) {
-        var now = new Date();
-        var timeLabel = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+        var now = Date.now();
+        var timeLabel = new Date(now).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
         chartData.push({
+            ts: now,
             time: timeLabel,
             rsrp: QO.asInt(data.rsrp),
             sinr: data.sinr != null ? parseFloat(data.sinr) : null,
             grade: data.grade
         });
-        if (chartData.length > MAX_CHART_POINTS) {
+        var cutoff = now - CHART_HISTORY_MS;
+        while (chartData.length && chartData[0].ts < cutoff) {
+            chartData.shift();
+        }
+        while (chartData.length > CHART_MAX_POINTS_CAP) {
             chartData.shift();
         }
     }
@@ -232,7 +240,7 @@
             return;
         }
 
-        var padding = { top: 10, right: 10, bottom: 20, left: 45 };
+        var padding = { top: 10, right: 14, bottom: 22, left: 45 };
         var plotW = w - padding.left - padding.right;
         var plotH = h - padding.top - padding.bottom;
 
@@ -260,13 +268,16 @@
         ctx.fillText("-70", padding.left - 4, padding.top + 4);
         ctx.fillText("-120", padding.left - 4, padding.top + plotH + 4);
 
-        // Time labels
+        // Time labels (left/right aligned so text is not clipped at canvas edges)
         ctx.fillStyle = "#8a8f98";
-        ctx.textAlign = "center";
         ctx.font = "9px Consolas, monospace";
+        ctx.textBaseline = "alphabetic";
         if (chartData.length > 0) {
-            ctx.fillText(chartData[0].time, padding.left, h - 4);
-            ctx.fillText(chartData[chartData.length - 1].time, w - padding.right, h - 4);
+            var ty = h - 6;
+            ctx.textAlign = "left";
+            ctx.fillText(chartData[0].time, padding.left + 2, ty);
+            ctx.textAlign = "right";
+            ctx.fillText(chartData[chartData.length - 1].time, w - padding.right - 2, ty);
         }
     }
 
@@ -340,7 +351,7 @@
         if (data.carriers && data.carriers.length) {
             data.carriers.forEach(function (c) {
                 var label = QO.escapeHtml(c.band_label || c.band || "?");
-                var bw = c.bandwidth_mhz ? " " + c.bandwidth_mhz + "MHz" : "";
+                var bw = QO.formatBandwidthMhzSuffix(c.bandwidth_mhz);
                 var role = c.role ? " (" + c.role + ")" : "";
                 var rat = String(c.rat || "").toUpperCase();
                 var cls = "qt-band-pill";

@@ -446,11 +446,21 @@
 
     // ── Band Combo Formatting ──
 
+    /** RDB / modem fields sometimes include "MHz" already; avoid "5MHz" + "MHz" → "5MHZMHZ" in UI. */
+    function formatBandwidthMhzSuffix(raw) {
+        if (raw == null || raw === "") { return ""; }
+        var s = String(raw).trim();
+        if (!s) { return ""; }
+        s = s.replace(/\s*(?:MHz|MHZ|mhz)\s*$/i, "").trim();
+        if (!s) { return ""; }
+        return " " + s + "MHz";
+    }
+
     function formatBandCombo(carriers) {
         if (!carriers || !carriers.length) { return "N/A"; }
         return carriers.map(function (c) {
             var label = c.band_label || c.band || "?";
-            var bw = c.bandwidth_mhz ? " " + c.bandwidth_mhz + "MHz" : "";
+            var bw = formatBandwidthMhzSuffix(c.bandwidth_mhz);
             var role = c.role ? " (" + c.role + ")" : "";
             return label + bw + role;
         }).join("  +  ");
@@ -701,6 +711,9 @@
         }
         // HTTP errors
         if (raw.indexOf("HTTP ") === 0) {
+            if (raw === "HTTP 401") {
+                return "Login required";
+            }
             return "Server returned " + raw + ". The router may be busy or restarting.";
         }
         return raw;
@@ -739,6 +752,7 @@
         asInt: asInt,
         formatDb: formatDb,
         friendlyError: friendlyError,
+        formatBandwidthMhzSuffix: formatBandwidthMhzSuffix,
         DEFAULTS: DEFAULTS
     };
 

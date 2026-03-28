@@ -300,14 +300,21 @@
             }
         }).fail(function (xhr) {
             var errMsg = "Request failed.";
-            if (xhr && xhr.responseText) {
+            if (xhr && xhr.status === 401) {
+                errMsg = "Login required";
+            } else if (xhr && xhr.responseText) {
                 try {
                     var body = JSON.parse(xhr.responseText);
                     if (body && body.error) {
                         errMsg = friendlyError(body.error);
                     }
                 } catch (e1) {
-                    errMsg = friendlyError("request_failed");
+                    var plainSaved = String(xhr.responseText || "").trim();
+                    if (/^unauthorized$/i.test(plainSaved) || /^unauthorised$/i.test(plainSaved)) {
+                        errMsg = "Login required";
+                    } else {
+                        errMsg = friendlyError("request_failed");
+                    }
                 }
             }
             if (done) { done(errMsg); }
@@ -479,14 +486,21 @@
         }).fail(function (xhr) {
             appendHistory("command", "Command", command);
             var errMsg = "Request failed.";
-            if (xhr && xhr.responseText) {
+            if (xhr && xhr.status === 401) {
+                errMsg = "Login required";
+            } else if (xhr && xhr.responseText) {
                 try {
                     var body = JSON.parse(xhr.responseText);
                     if (body && body.error) {
                         errMsg = friendlyError(body.error);
                     }
                 } catch (e2) {
-                    errMsg = friendlyError("request_failed");
+                    var plain = String(xhr.responseText || "").trim();
+                    if (/^unauthorized$/i.test(plain) || /^unauthorised$/i.test(plain)) {
+                        errMsg = "Login required";
+                    } else {
+                        errMsg = friendlyError("request_failed");
+                    }
                 }
             }
             appendHistory("error", "Error", errMsg);

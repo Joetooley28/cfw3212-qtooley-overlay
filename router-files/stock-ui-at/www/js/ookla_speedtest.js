@@ -719,7 +719,7 @@
                 return;
             }
 
-            setBanner("error", xhr && xhr.responseText ? xhr.responseText : "Failed to read Ookla Speedtest state.");
+            setBanner("error", window.QtooleyXhrMessage(xhr, "Failed to read Ookla Speedtest state."));
         });
     }
 
@@ -739,7 +739,7 @@
                 setBanner("ok", "Nearby Ookla servers refreshed.");
             }
         }).fail(function (xhr) {
-            setBanner("error", xhr && xhr.responseText ? xhr.responseText : "Failed to load nearby servers.");
+            setBanner("error", window.QtooleyXhrMessage(xhr, "Failed to load nearby servers."));
         });
     }
 
@@ -772,7 +772,7 @@
             render();
             fetchState();
         }).fail(function (xhr) {
-            setBanner("error", xhr && xhr.responseText ? xhr.responseText : "Failed to start Ookla Speedtest.");
+            setBanner("error", window.QtooleyXhrMessage(xhr, "Failed to start Ookla Speedtest."));
         });
     }
 
@@ -795,7 +795,7 @@
             }
             fetchServers(false);
         }).fail(function (xhr) {
-            setBanner("error", xhr && xhr.responseText ? xhr.responseText : "Failed to restart the speedtest backend.");
+            setBanner("error", window.QtooleyXhrMessage(xhr, "Failed to restart the speedtest backend."));
         });
     }
 

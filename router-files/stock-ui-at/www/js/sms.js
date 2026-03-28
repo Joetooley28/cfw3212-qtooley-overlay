@@ -130,7 +130,8 @@
             render();
         }).fail(function (xhr) {
             state.loading = false;
-            state.error = "Connection error: " + (xhr.statusText || "Unknown");
+            var fb = "Connection error: " + (xhr && xhr.statusText ? xhr.statusText : "Unknown");
+            state.error = window.QtooleyXhrMessage(xhr, fb);
             render();
         });
     }
@@ -173,7 +174,7 @@
             if (xhr.status === 409) {
                 setBanner("warn", "AT channel busy \u2014 another operation is in progress. Try again.");
             } else {
-                setBanner("error", "Send failed: " + (xhr.statusText || "Connection error"));
+                setBanner("error", window.QtooleyXhrMessage(xhr, "Send failed: " + (xhr.statusText || "Connection error")));
             }
         });
     }
@@ -203,9 +204,9 @@
             } else {
                 setBanner("error", "Delete failed: " + ((payload && payload.error) || "Unknown error"));
             }
-        }).fail(function () {
+        }).fail(function (xhr) {
             state.busy = false;
-            setBanner("error", "Delete failed: connection error");
+            setBanner("error", window.QtooleyXhrMessage(xhr, "Delete failed: connection error"));
         });
     }
 
@@ -230,9 +231,9 @@
             } else {
                 setBanner("error", "Delete all failed: " + ((payload && payload.error) || "Unknown error"));
             }
-        }).fail(function () {
+        }).fail(function (xhr) {
             state.busy = false;
-            setBanner("error", "Delete all failed: connection error");
+            setBanner("error", window.QtooleyXhrMessage(xhr, "Delete all failed: connection error"));
         });
     }
 

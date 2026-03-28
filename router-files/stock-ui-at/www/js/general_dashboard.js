@@ -71,7 +71,7 @@
             }
             setApiBanner("ok", manual ? "Refreshed CA and modem temperature from live AT responses." : core.buildBannerText(state.stock.cellular || {}, response));
         }).fail(function (xhr) {
-            setApiBanner("error", xhr && xhr.responseText ? xhr.responseText : "AT supplement refresh failed.");
+            setApiBanner("error", window.QtooleyXhrMessage(xhr, "AT supplement refresh failed."));
         });
     }
 

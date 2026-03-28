@@ -309,7 +309,7 @@
             restartPolling();
             render();
         }).fail(function (xhr) {
-            setBanner("error", xhr && xhr.responseText ? xhr.responseText : "Failed to read Tailscale state.");
+            setBanner("error", window.QtooleyXhrMessage(xhr, "Failed to read Tailscale state."));
         });
     }
 
@@ -366,7 +366,7 @@
             state.busy = false;
             state.showForceReinstallModal = false;
             render();
-            setBanner("error", xhr && xhr.responseText ? xhr.responseText : "Tailscale action failed.");
+            setBanner("error", window.QtooleyXhrMessage(xhr, "Tailscale action failed."));
         });
     }
 

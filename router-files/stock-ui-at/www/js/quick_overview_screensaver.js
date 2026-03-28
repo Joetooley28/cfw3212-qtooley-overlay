@@ -29,7 +29,7 @@
         if (data.carriers && data.carriers.length) {
             data.carriers.forEach(function (c) {
                 var label = QO.escapeHtml(c.band_label || c.band || "?");
-                var bw = c.bandwidth_mhz ? " " + c.bandwidth_mhz + "MHz" : "";
+                var bw = QO.formatBandwidthMhzSuffix(c.bandwidth_mhz);
                 var role = c.role ? " (" + c.role + ")" : "";
                 var rat = String(c.rat || "").toUpperCase();
                 var cls = "qt-band-pill";

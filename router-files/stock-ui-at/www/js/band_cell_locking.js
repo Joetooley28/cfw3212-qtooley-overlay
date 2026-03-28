@@ -27,12 +27,19 @@
     }
 
     function extractXhrError(xhr, fallback) {
-        if (xhr && xhr.responseText) {
-            try {
-                var body = JSON.parse(xhr.responseText);
-                if (body && body.error) { return body.error; }
-            } catch (e) { /* not JSON */ }
+        if (!xhr || !xhr.responseText) {
+            return fallback || "request_failed";
         }
+        var status = typeof xhr.status === "number" ? xhr.status : 0;
+        var trimmed = String(xhr.responseText).trim();
+        if (status === 401 || /^unauthorized$/i.test(trimmed) || /^unauthorised$/i.test(trimmed)) {
+            return "Login required";
+        }
+        try {
+            var body = JSON.parse(xhr.responseText);
+            if (body && body.error) { return body.error; }
+        } catch (e) { /* not JSON */ }
+        if (trimmed) { return trimmed; }
         return fallback || "request_failed";
     }
 

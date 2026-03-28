@@ -958,10 +958,23 @@ local function read_bandwidth_rdb_snapshot()
     return snapshot
 end
 
+-- Strip trailing MHz so we never emit "5MHz MHz" when RDB already includes the unit.
+local function normalize_bandwidth_mhz_field(v)
+    if v == nil then
+        return ""
+    end
+    local s = tostring(v):gsub("^%s+", ""):gsub("%s+$", "")
+    if s == "" or s == "nil" then
+        return ""
+    end
+    s = s:gsub("%s*[Mm][Hh][Zz]%s*$", ""):gsub("^%s+", ""):gsub("%s+$", "")
+    return s
+end
+
 local function build_bandwidth_text(carrier)
-    local bw = tostring(carrier.bandwidth_mhz or ""):gsub("^%s+", ""):gsub("%s+$", "")
-    local ul = tostring(carrier.ul_bandwidth_mhz or ""):gsub("^%s+", ""):gsub("%s+$", "")
-    local dl = tostring(carrier.dl_bandwidth_mhz or ""):gsub("^%s+", ""):gsub("%s+$", "")
+    local bw = normalize_bandwidth_mhz_field(carrier.bandwidth_mhz)
+    local ul = normalize_bandwidth_mhz_field(carrier.ul_bandwidth_mhz)
+    local dl = normalize_bandwidth_mhz_field(carrier.dl_bandwidth_mhz)
     if ul ~= "" or dl ~= "" then
         if ul ~= "" and dl ~= "" and ul == dl then
             return "Bandwidth " .. dl .. " MHz"
@@ -1031,6 +1044,9 @@ local function enrich_carriers_with_bandwidth(carriers, servingcell_summary)
                 nr_scell_index = nr_scell_index + 1
             end
         end
+        carrier.bandwidth_mhz = normalize_bandwidth_mhz_field(carrier.bandwidth_mhz)
+        carrier.ul_bandwidth_mhz = normalize_bandwidth_mhz_field(carrier.ul_bandwidth_mhz)
+        carrier.dl_bandwidth_mhz = normalize_bandwidth_mhz_field(carrier.dl_bandwidth_mhz)
         carrier.bandwidth_text = build_bandwidth_text(carrier)
     end
 
