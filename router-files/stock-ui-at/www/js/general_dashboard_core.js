@@ -1360,13 +1360,13 @@
 
         if (hasNrSignals && isNr) {
 
-            return "<div class='jgd-muted'>NR sync-signal metrics currently match the primary metrics, so the separate SS rows are hidden.</div>";
+            return "<div class='jgd-muted jgd-signal-detail-note'>NR sync-signal metrics currently match the primary metrics, so the separate SS rows are hidden.</div>";
 
         }
 
 
 
-        return "<div class='jgd-muted'>Separate NR sync-signal metrics are only shown when the modem reports distinct NR-specific values.</div>";
+        return "<div class='jgd-muted jgd-signal-detail-note'>Separate NR sync-signal metrics are only shown when the modem reports distinct NR-specific values.</div>";
 
     }
 
@@ -1550,6 +1550,8 @@
 
             "<div id='jgd-api-status' class='jgd-banner'>", escapeHtml(bannerText), "</div>",
 
+            "<div class='jgd-main-stack'>",
+
             "<section class='jgd-card jgd-card-identity'>",
 
             "<div class='jgd-card-title'>SIM &amp; cell identity</div>",
@@ -1586,8 +1588,6 @@
 
             "</section>",
 
-            "<div class='jgd-grid jgd-grid-hero'>",
-
             "<section class='jgd-card jgd-card-signal'>",
 
             "<div class='jgd-card-title'>Signal overview</div>",
@@ -1615,7 +1615,7 @@
 
             "</section>",
 
-            "<section class='jgd-card'>",
+            "<section class='jgd-card jgd-card-general'>",
 
             "<div class='jgd-card-title'>General info</div>",
 
@@ -1646,11 +1646,7 @@
 
             "</section>",
 
-            "</div>",
-
-            "<div class='jgd-grid'>",
-
-            "<section class='jgd-card'>",
+            "<section class='jgd-card jgd-card-connection'>",
 
             "<div class='jgd-card-title'>Active connection</div>",
 
@@ -1684,7 +1680,7 @@
 
             "</section>",
 
-            "<section class='jgd-card'>",
+            "<section class='jgd-card jgd-card-ca'>",
 
             "<div class='jgd-card-title'>Carrier aggregation</div>",
 
@@ -1694,11 +1690,7 @@
 
             "</section>",
 
-            "</div>",
-
-            "<div class='jgd-grid'>",
-
-            "<section class='jgd-card'>",
+            "<section class='jgd-card jgd-card-neighbor'>",
 
             "<div class='jgd-card-title'>Neighbor cells</div>",
 
@@ -1706,7 +1698,7 @@
 
             "</section>",
 
-            "<section class='jgd-card'>",
+            "<section class='jgd-card jgd-card-modem'>",
 
             "<div class='jgd-card-title'>Modem health</div>",
 

@@ -1596,15 +1596,112 @@
     text-align: center;
 }
 
+/* General tab: stacked cards (full-width, mobile-first) — avoids empty “holes” beside shorter columns */
+#jtool-general-dashboard .jgd-page {
+    min-height: 0;
+}
+
+#jtool-general-dashboard .jgd-main-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+#jtool-general-dashboard .jgd-main-stack > .jgd-card {
+    margin-bottom: 0;
+}
+
+#jtool-general-dashboard .jgd-card-identity {
+    margin-bottom: 0;
+}
+
+#jtool-general-dashboard .jgd-metric {
+    min-height: 0;
+    padding: 7px 9px;
+}
+
+#jtool-general-dashboard .jgd-metric-label {
+    font-size: 11px;
+    margin-bottom: 3px;
+}
+
+#jtool-general-dashboard .jgd-metric-value {
+    font-size: 15px;
+    line-height: 1.3;
+}
+
+#jtool-general-dashboard .jgd-main-stack > .jgd-card > .jgd-card-title {
+    margin-bottom: 8px;
+}
+
+#jtool-general-dashboard .jgd-main-stack .jgd-metrics-grid {
+    gap: 8px;
+}
+
+#jtool-general-dashboard .jgd-card-signal .jgd-signal-wrap {
+    margin-bottom: 10px;
+}
+
+#jtool-general-dashboard .jgd-card-signal .jgd-metrics-grid .jgd-signal-detail-note {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    font-size: 12px;
+    grid-column: 1 / -1;
+    line-height: 1.4;
+    margin: 0;
+    padding: 6px 8px;
+}
+
+#jtool-general-dashboard .jgd-card-connection > .jgd-card-title,
+#jtool-general-dashboard .jgd-card-ca > .jgd-card-title {
+    margin-bottom: 8px;
+}
+
+#jtool-general-dashboard .jgd-card-connection .jgd-summary-line {
+    font-size: 13px;
+    line-height: 1.35;
+    margin-bottom: 5px;
+}
+
+#jtool-general-dashboard .jgd-card-connection .jgd-summary-line:last-of-type {
+    margin-bottom: 8px;
+}
+
+#jtool-general-dashboard .jgd-card-connection .jgd-metrics-grid {
+    gap: 8px;
+}
+
+#jtool-general-dashboard .jgd-card-ca .jgd-carrier-list {
+    gap: 8px;
+}
+
+#jtool-general-dashboard .jgd-card-ca .jgd-carrier {
+    padding: 8px 10px;
+}
+
+#jtool-general-dashboard .jgd-card-ca .jgd-carrier-meta,
+#jtool-general-dashboard .jgd-card-ca .jgd-carrier-bw {
+    margin-top: 2px;
+}
+
+#jtool-general-dashboard .jgd-card-ca .jgd-details {
+    margin-top: 8px;
+}
+
+#jtool-general-dashboard .jgd-card-ca .jgd-raw {
+    margin-top: 6px;
+    padding: 10px;
+}
+
 @media (max-width: 900px) {
     .jgd-page {
         margin-top: 12px;
         padding: 18px 14px;
     }
 
-    .jgd-grid,
-    .jgd-grid-hero {
-        grid-template-columns: 1fr;
+    #jtool-general-dashboard .jgd-main-stack {
+        gap: 10px;
     }
 
     .jgd-module-strip {
