@@ -5,6 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="format-detection" content="telephone=no">
+<script>
+(function () {
+    "use strict";
+    var prefersDark = true;
+    try {
+        prefersDark = window.localStorage.getItem("jtoolsThemeMode") !== "light";
+    } catch (e) {}
+    if (!prefersDark) {
+        return;
+    }
+    var style = document.createElement("style");
+    style.textContent = "html,body{background:#1e1e1e;color:#d7dde4;}#body{background:transparent;}";
+    document.head.appendChild(style);
+    var link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "/css/jtools_dark_mode.css?jtools-dark-v20260329a";
+    document.head.appendChild(link);
+})();
+</script>
 <link rel="stylesheet" href="/css/style.css?1.1.79.0">
 <link rel="stylesheet" href="/css/jquery-ui.css?1.1.79.0">
 <link rel="stylesheet" href="/css/validationEngine.jquery.css?1.1.79.0">

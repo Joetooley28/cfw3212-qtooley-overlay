@@ -104,7 +104,7 @@
     // ── Render ──
 
     function render() {
-        var host = document.getElementById("body");
+        var host = document.getElementById("htmlGoesHere") || document.getElementById("body");
         if (!host) return;
 
         if (state.loading) {
@@ -269,7 +269,14 @@
 
     // ── Init ──
 
+    function applyShellClass() {
+        if (document.body) {
+            document.body.classList.add("jtools-page-screensaver-settings");
+        }
+    }
+
     function init() {
+        applyShellClass();
         loadSettings(function () {
             render();
         });

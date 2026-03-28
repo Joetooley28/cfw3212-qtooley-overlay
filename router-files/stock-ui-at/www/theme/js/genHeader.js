@@ -122,7 +122,10 @@ function genThemeHeader(pageData, userGroups) {
             ".jt-toggle-track{position:relative;width:36px;height:20px;border-radius:10px;background:#3a3f46;border:1px solid #59606a;transition:background 0.2s,border-color 0.2s;flex-shrink:0;}" +
             ".jt-toggle-track.is-on{background:#4a7cdb;border-color:#5a8ae6;}" +
             ".jt-toggle-knob{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#d7dde4;transition:transform 0.2s;}" +
-            ".jt-toggle-track.is-on .jt-toggle-knob{transform:translateX(16px);}";
+            ".jt-toggle-track.is-on .jt-toggle-knob{transform:translateX(16px);}" +
+            "#jtoolsHeaderBtns{max-width:calc(100vw - 24px);}" +
+            "@media (max-width:1280px){#jtoolsHeaderBtns{right:12px!important;top:12px!important;align-items:flex-end;}}" +
+            "@media (max-width:768px){#jtoolsHeaderBtns{gap:4px;right:8px!important;top:8px!important;transform:scale(.96);transform-origin:top right;}}";
         document.head.appendChild(styleEl);
 
         function makeToggleRow(id, label, isOn, onChange) {
