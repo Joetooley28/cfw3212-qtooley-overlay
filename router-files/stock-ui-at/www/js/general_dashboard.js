@@ -135,6 +135,7 @@
                 hiddenVariable("simICCID", "wwan.0.system_network_status.simICCID"),
                 hiddenVariable("manualroamResetting", "manualroam.resetting"),
                 hiddenVariable("IMSI", "wwan.0.imsi.msin"),
+                hiddenVariable("simDataMbn", "wwan.0.sim.data.mbn"),
                 hiddenVariable("autopin", "wwan.0.sim.autopin"),
                 hiddenVariable("operationMode", "wwan.0.PLMN_selectionMode"),
                 hiddenVariable("currBand", "wwan.0.system_network_status.current_band"),
@@ -174,6 +175,7 @@
                 stockUpdated();
             },
             members: [
+                hiddenVariable("simDataMbn", "wwan.0.sim.data.mbn"),
                 hiddenVariable("MCC", "wwan.0.system_network_status.MCC"),
                 hiddenVariable("MNC", "wwan.0.system_network_status.MNC"),
                 hiddenVariable("simICCID", "wwan.0.system_network_status.simICCID"),

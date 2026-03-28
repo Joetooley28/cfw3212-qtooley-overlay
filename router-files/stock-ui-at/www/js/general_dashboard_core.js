@@ -72,6 +72,42 @@
 
 
 
+    /* Hide MBN when the RDB value is empty or looks like a raw numeric / hex blob rather than a carrier MBN name. */
+
+    function isUndisplayableMbnValue(value) {
+
+        var s = value == null ? "" : String(value).replace(/^\s+|\s+$/g, "");
+
+        if (s === "") {
+
+            return true;
+
+        }
+
+        if (s.length > 128) {
+
+            return true;
+
+        }
+
+        if (/^[\d\s,;.|\\/-]+$/.test(s)) {
+
+            return true;
+
+        }
+
+        if (s.length >= 32 && /^[0-9A-Fa-f\u0020:,;-]+$/i.test(s) && !/[G-Zg-z_]/.test(s)) {
+
+            return true;
+
+        }
+
+        return false;
+
+    }
+
+
+
     function formatModemName(value) {
 
         var text = asText(value, "RG520N");
@@ -512,6 +548,36 @@
 
 
 
+    function formatPlmn(mcc, mnc) {
+
+        var a = mcc == null ? "" : String(mcc).replace(/^\s+|\s+$/g, "");
+
+        var b = mnc == null ? "" : String(mnc).replace(/^\s+|\s+$/g, "");
+
+        if (a === "" && b === "") {
+
+            return "N/A";
+
+        }
+
+        if (a === "") {
+
+            return b;
+
+        }
+
+        if (b === "") {
+
+            return a;
+
+        }
+
+        return a + " / " + b;
+
+    }
+
+
+
     function normalizeCellular(obj) {
 
         var networkRegistration = asText(obj.networkRegistration, "5");
@@ -594,7 +660,27 @@
 
             signalBar: asText(obj.signalBar),
 
-            noSim: noSim
+            noSim: noSim,
+
+            imsi: asText(obj.IMSI),
+
+            simIccid: asText(obj.simICCID),
+
+            /* wwan.0.sim.data.mbn — polled via hiddenVariable on StsCellularConnectionStatus when firmware exposes it. */
+
+            activeMbn: (function () {
+
+                var v = obj.simDataMbn;
+
+                if (v == null) {
+
+                    return "";
+
+                }
+
+                return String(v).replace(/^\s+|\s+$/g, "");
+
+            })()
 
         };
 
@@ -764,7 +850,21 @@
 
             nrSsbIndex: asText(obj.nr5g_ssbIndex),
 
-            sysSo: sysSo
+            sysSo: sysSo,
+
+            simDataMbn: (function () {
+
+                var v = obj.simDataMbn;
+
+                if (v == null) {
+
+                    return "";
+
+                }
+
+                return String(v).replace(/^\s+|\s+$/g, "");
+
+            })()
 
         };
 
@@ -1361,6 +1461,16 @@
 
         var primaryArfcn = chooseFirst(adv.earfcn, adv.nrArfcn, qnwinfo.arfcn, servingcell.arfcn);
 
+        var resolvedActiveMbn = hasValue(cellular.activeMbn) ? cellular.activeMbn : adv.simDataMbn;
+
+        var activeMbnMetric = "";
+
+        if (hasValue(resolvedActiveMbn) && !isUndisplayableMbnValue(resolvedActiveMbn)) {
+
+            activeMbnMetric = createMetric("Active MBN", asText(resolvedActiveMbn, ""));
+
+        }
+
 
 
         return [
@@ -1439,6 +1549,42 @@
             "</div>",
 
             "<div id='jgd-api-status' class='jgd-banner'>", escapeHtml(bannerText), "</div>",
+
+            "<section class='jgd-card jgd-card-identity'>",
+
+            "<div class='jgd-card-title'>SIM &amp; cell identity</div>",
+
+            "<p class='jgd-card-lede'>Stock RDB / status objects only — same sources as the carrier status page.</p>",
+
+            "<div class='jgd-metrics-grid jgd-metrics-grid-identity'>",
+
+            createMetric("IMSI", asText(cellular.imsi)),
+
+            createMetric("ICCID", asText(cellular.simIccid)),
+
+            activeMbnMetric,
+
+            createMetric("LTE cell ID", asText(adv.cellId)),
+
+            createMetric("NR cell ID", asText(adv.nrCellId)),
+
+            createMetric("NR gNB ID", asText(adv.nrGnodeb)),
+
+            createMetric("MCC / MNC", formatPlmn(adv.mcc, adv.mnc)),
+
+            createMetric("ECGI", asText(adv.ecgi)),
+
+            createMetric("NR NCGI", asText(adv.nrNcgi)),
+
+            createMetric("NR SCS", asText(adv.nrScs)),
+
+            createMetric("NR SSB ARFCN", asText(adv.nrSsbArfcn)),
+
+            createMetric("NR SSB index", asText(adv.nrSsbIndex)),
+
+            "</div>",
+
+            "</section>",
 
             "<div class='jgd-grid jgd-grid-hero'>",
 
