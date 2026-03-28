@@ -182,7 +182,11 @@
             buildMetricRow("RSRQ", data.rsrqText, data.rsrq, QO.DEFAULTS.rsrqMin, QO.DEFAULTS.rsrqMax,
                 rsrqNorm != null ? QO.getGradeClass(rsrqNorm) : "qo-sig-na"),
             buildMetricRow("SNR", data.sinrText, data.sinr, QO.DEFAULTS.sinrMin, QO.DEFAULTS.sinrMax,
-                sinrNorm != null ? QO.getGradeClass(sinrNorm) : "qo-sig-na")
+                sinrNorm != null ? QO.getGradeClass(sinrNorm) : "qo-sig-na"),
+            "<div class='qo-metric-row qo-metric-row-plain'>",
+            "  <span class='qo-metric-label'>CQI</span>",
+            "  <span class='qo-metric-value qo-sig-na'>" + QO.escapeHtml(data.cqiText || "N/A") + "</span>",
+            "</div>"
         ].join("");
 
         els.gradeCard.innerHTML = html;
@@ -383,6 +387,10 @@
             "  <div class='qo-conn-item'>",
             "    <span class='qo-conn-label'>ARFCN</span>",
             "    <span class='qo-conn-value'>" + QO.escapeHtml(data.arfcn) + "</span>",
+            "  </div>",
+            "  <div class='qo-conn-item'>",
+            "    <span class='qo-conn-label'>CQI</span>",
+            "    <span class='qo-conn-value'>" + QO.escapeHtml(data.cqiText || "N/A") + "</span>",
             "  </div>",
             bandPills ? "  <div class='qo-conn-bands-row'><span class='qo-conn-label'>Band Combo</span><div style='margin-top:6px;display:flex;flex-wrap:wrap;gap:6px'>" + bandPills + "</div></div>" : "",
             data.firmwareVersion ? "  <div class='qo-conn-item'><span class='qo-conn-label'>Firmware</span><span class='qo-conn-value' style='font-size:11px'>" + QO.escapeHtml(data.firmwareVersion) + "</span></div>" : "",

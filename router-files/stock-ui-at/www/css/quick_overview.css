@@ -463,6 +463,12 @@
     min-width: 0;
 }
 
+.qo-metric-row-plain .qo-metric-value {
+    flex: 1;
+    min-width: 0;
+    width: auto;
+}
+
 /* ── Fill Bar (per-metric) ── */
 .qo-fill-bar {
     height: 8px;

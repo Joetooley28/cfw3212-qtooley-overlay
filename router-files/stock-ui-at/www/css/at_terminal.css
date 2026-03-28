@@ -1185,8 +1185,11 @@
     margin: 0 0 4px;
 }
 
+/* Same shell as Quick Overview tab + SMS (.qo-page / .sms-page): deep 135° gradient + glass border. */
 .jgd-page {
-    --jgd-bg: #1e1e1e;
+    --jgd-bg-deep: #0a0a0f;
+    --jgd-bg-mid: #0f1018;
+    --jgd-bg: #0f1018;
     --jgd-surface: #252526;
     --jgd-surface-alt: #2d2d30;
     --jgd-border: #3f3f46;
@@ -1194,11 +1197,15 @@
     --jgd-muted: #9da3ad;
     --jgd-green: #56b26d;
     --jgd-red: #d16969;
-    background: linear-gradient(180deg, #1b1b1d 0%, #1f2124 100%);
-    border: 1px solid #2f3135;
+    background: linear-gradient(135deg, var(--jgd-bg-deep) 0%, var(--jgd-bg-mid) 50%, #0d0d18 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    box-sizing: border-box;
     color: var(--jgd-text);
     margin-top: 20px;
-    padding: 20px;
+    min-height: 500px;
+    overflow: hidden;
+    padding: 28px;
 }
 
 .jgd-hero {

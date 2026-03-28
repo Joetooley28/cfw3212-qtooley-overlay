@@ -685,6 +685,11 @@ After you edit **static** files (`www/css`, `www/js`, `www/theme/js`, HTML), ass
 
 - Confirm the file on the router under `/usrdata/at-stock-ui/www/...`, re-run `apply_stock_ui_overlay.sh`, then reload. If needed, bump tokens one more time and redeploy the HTML.
 
+## Qtooley dashboard data sources (stock RDB vs AT)
+
+- **Quick Overview** and the **General info** AT supplement both call **`GET /jtools_general_api/state`**, which already includes **`stock_signal`**: LTE and NR5G `rsrp` / `rsrq` / `snr` / **`cqi`** from the same RDB keys the stock CGI **`StsAdvStatus`** (`objStsAdvStatus.lua`) exposes. That snapshot is **read inside the existing locked transaction** with the AT commands — it does **not** add extra AT traffic.
+- **General info** also uses stock **`PageObj`** polling (same objects as stock **status** / **field test**): **`StsCellularConnectionStatus`**, **`StsAdvStatus`**, **`StsWWanStatus`**, neighbor **`cellInfo`**, etc. Prefer surfacing those fields in the UI when they are **already fetched** rather than adding new periodic AT commands.
+
 ## Live Sync And Apply Workflow
 
 The recorded working live path is:

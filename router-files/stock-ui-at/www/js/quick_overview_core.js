@@ -611,6 +611,8 @@
         var rsrp = choosePrimarySignal(stockSignal, "rsrp", servingcell.rsrp || null);
         var rsrq = choosePrimarySignal(stockSignal, "rsrq", servingcell.rsrq || null);
         var sinr = choosePrimarySignal(stockSignal, "snr", servingcell.sinr || null);
+        /* Same RDB keys as StsAdvStatus (objStsAdvStatus.lua): LTE + NR5G CQI, no extra AT. */
+        var cqi = choosePrimarySignal(stockSignal, "cqi", null);
         var pci = servingcell.pci || null;
         var cellId = servingcell.cellId || null;
         var arfcn = chooseFirst(qnwinfo.arfcn, servingcell.arfcn);
@@ -629,6 +631,8 @@
             rsrpText: formatDb(rsrp, " dBm"),
             rsrqText: formatDb(rsrq, " dB"),
             sinrText: formatDb(sinr, " dB"),
+            cqi: cqi,
+            cqiText: asText(cqi, "N/A"),
             signalClass: getSignalClass(rsrp),
             rsrqClass: getRsrqClass(rsrq),
             sinrClass: getSinrClass(sinr),
