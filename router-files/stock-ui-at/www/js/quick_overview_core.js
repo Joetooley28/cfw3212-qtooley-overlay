@@ -52,6 +52,12 @@
         return "N/A";
     }
 
+    function choosePrimarySignal(stockSignal, field, fallback) {
+        var lte = stockSignal && stockSignal.lte ? stockSignal.lte[field] : null;
+        var nr5g = stockSignal && stockSignal.nr5g ? stockSignal.nr5g[field] : null;
+        return chooseFirst(lte, nr5g, fallback);
+    }
+
     function clamp(val, min, max) {
         return val < min ? min : (val > max ? max : val);
     }
@@ -599,11 +605,12 @@
         var cops = parseCops(resp.cops_summary || "");
         var servingcell = parseServingcell(resp.qeng_summary || "");
         var carriers = resp.carriers || [];
+        var stockSignal = resp.stock_signal || {};
         var provider = chooseFirst(qspn.displayName, cops.operatorName);
         var rat = getRatLabel(qnwinfo, servingcell);
-        var rsrp = servingcell.rsrp || null;
-        var rsrq = servingcell.rsrq || null;
-        var sinr = servingcell.sinr || null;
+        var rsrp = choosePrimarySignal(stockSignal, "rsrp", servingcell.rsrp || null);
+        var rsrq = choosePrimarySignal(stockSignal, "rsrq", servingcell.rsrq || null);
+        var sinr = choosePrimarySignal(stockSignal, "snr", servingcell.sinr || null);
         var pci = servingcell.pci || null;
         var cellId = servingcell.cellId || null;
         var arfcn = chooseFirst(qnwinfo.arfcn, servingcell.arfcn);

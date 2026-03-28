@@ -46,7 +46,7 @@
             "  </div>",
             "  <div class='qo-chart-legend'>",
             "    <span><span class='qo-chart-legend-dot' style='background:#8db9ff'></span>RSRP</span>",
-            "    <span><span class='qo-chart-legend-dot' style='background:#00e676'></span>SINR</span>",
+            "    <span><span class='qo-chart-legend-dot' style='background:#00e676'></span>SNR</span>",
             "  </div>",
             "</div>",
             "<div class='qo-card'>",
@@ -181,7 +181,7 @@
             buildMetricRow("RSRP", data.rsrpText, data.rsrp, QO.DEFAULTS.rsrpMin, QO.DEFAULTS.rsrpMax, data.signalClass),
             buildMetricRow("RSRQ", data.rsrqText, data.rsrq, QO.DEFAULTS.rsrqMin, QO.DEFAULTS.rsrqMax,
                 rsrqNorm != null ? QO.getGradeClass(rsrqNorm) : "qo-sig-na"),
-            buildMetricRow("SINR", data.sinrText, data.sinr, QO.DEFAULTS.sinrMin, QO.DEFAULTS.sinrMax,
+            buildMetricRow("SNR", data.sinrText, data.sinr, QO.DEFAULTS.sinrMin, QO.DEFAULTS.sinrMax,
                 sinrNorm != null ? QO.getGradeClass(sinrNorm) : "qo-sig-na")
         ].join("");
 
@@ -422,7 +422,7 @@
             "      <span>%</span>",
             "    </div>",
             "    <div class='qo-weight-item'>",
-            "      <span>SINR</span>",
+            "      <span>SNR</span>",
             "      <input type='number' class='qo-weight-input' id='qoWeightSinr' min='0' max='100' value='" + s.weightSinr + "'>",
             "      <span>%</span>",
             "    </div>",
@@ -438,8 +438,8 @@
             "  Each metric is normalized to 0\u2013100% within its range:<br>",
             "  <code>RSRP: -120 to -70 dBm</code> &nbsp; ",
             "  <code>RSRQ: -20 to -5 dB</code> &nbsp; ",
-            "  <code>SINR: -5 to 30 dB</code><br>",
-            "  Grade = <code>RSRP \u00d7 " + s.weightRsrp + "% + SINR \u00d7 " + s.weightSinr + "% + RSRQ \u00d7 " + s.weightRsrq + "%</code>",
+            "  <code>SNR: -5 to 30 dB</code><br>",
+            "  Grade = <code>RSRP \u00d7 " + s.weightRsrp + "% + SNR \u00d7 " + s.weightSinr + "% + RSRQ \u00d7 " + s.weightRsrq + "%</code>",
             "</div>"
         ].join("\n");
     }

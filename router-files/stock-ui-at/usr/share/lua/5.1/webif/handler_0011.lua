@@ -2,6 +2,7 @@ require("srvrUtils")
 
 local turbo = require("turbo")
 local SessionRequestHandler = require("session_handler")
+local luardb = require("luardb")
 
 package.path = package.path .. ";/usrdata/at-stock-ui/?.lua"
 
@@ -597,6 +598,29 @@ local function lte_bw(code)
     return nil
 end
 
+local function lte_qcainfo_bw(code)
+    code = tonumber(code)
+    if not code then
+        return nil
+    end
+
+    if code == 6 then
+        return "1.4"
+    elseif code == 15 then
+        return "3"
+    elseif code == 25 then
+        return "5"
+    elseif code == 50 then
+        return "10"
+    elseif code == 75 then
+        return "15"
+    elseif code == 100 then
+        return "20"
+    end
+
+    return lte_bw(code)
+end
+
 local function nr_bw(code)
     code = tonumber(code)
     if not code then
@@ -645,10 +669,10 @@ local function parse_qcainfo(summary)
                 local band_label = strip_quotes(tokens[band_index])
                 local rat = band_label:match("^([A-Z0-9]+)")
                 local band = band_label:match("BAND%s+([0-9]+)")
-                local bw_code = first_numeric_after(tokens, band_index + 1)
+                local bw_code = tokens[band_index - 1]
                 local bandwidth_mhz = nil
                 if rat == "LTE" then
-                    bandwidth_mhz = lte_bw(bw_code)
+                    bandwidth_mhz = lte_qcainfo_bw(bw_code)
                 elseif rat == "NR5G" then
                     bandwidth_mhz = nr_bw(bw_code)
                 end
@@ -759,6 +783,220 @@ local function parse_qeng_servingcell(summary)
     return ""
 end
 
+local function parse_qeng_bandwidths(summary)
+    local out = {
+        serving = {},
+        nr5g_nsa = {}
+    }
+
+    for line in (summary or ""):gmatch("([^\n]+)") do
+        if line:find("+QENG:") then
+            local body = line:gsub("^%+QENG:%s*", "")
+            local parts = split_csv_preserving_quotes(body)
+            local i
+            for i = 1, #parts do
+                parts[i] = strip_quotes(parts[i] or "")
+            end
+
+            if parts[1] == "servingcell" then
+                local radio = tostring(parts[3] or ""):upper()
+                if radio:find("LTE") then
+                    out.serving.lte_ul_bw_mhz = lte_bw(parts[11]) or ""
+                    out.serving.lte_dl_bw_mhz = lte_bw(parts[12]) or ""
+                elseif radio == "NR5G-SA" then
+                    out.serving.nr_dl_bw_mhz = nr_bw(parts[12]) or ""
+                end
+            elseif parts[1] == "NR5G-NSA" then
+                out.nr5g_nsa.nr_dl_bw_mhz = nr_bw(parts[10]) or ""
+            end
+        end
+    end
+
+    return out
+end
+
+local function first_nonempty(...)
+    local i
+    for i = 1, select("#", ...) do
+        local value = select(i, ...)
+        if value ~= nil then
+            local text = tostring(value):gsub("^%s+", ""):gsub("%s+$", "")
+            if text ~= "" then
+                return text
+            end
+        end
+    end
+    return ""
+end
+
+local function rdb_get_trim(key)
+    local value = luardb.get(key)
+    if value == nil then
+        return ""
+    end
+    return tostring(value):gsub("^%s+", ""):gsub("%s+$", "")
+end
+
+local function read_stock_signal_snapshot()
+    return {
+        lte = {
+            rsrp = rdb_get_trim("wwan.0.signal.0.rsrp"),
+            rsrq = rdb_get_trim("wwan.0.signal.rsrq"),
+            snr = rdb_get_trim("wwan.0.signal.snr"),
+            cqi = rdb_get_trim("wwan.0.servcell_info.avg_wide_band_cqi")
+        },
+        nr5g = {
+            rsrp = rdb_get_trim("wwan.0.radio_stack.nr5g.rsrp"),
+            rsrq = rdb_get_trim("wwan.0.radio_stack.nr5g.rsrq"),
+            snr = rdb_get_trim("wwan.0.radio_stack.nr5g.snr"),
+            cqi = rdb_get_trim("wwan.0.radio_stack.nr5g.cqi")
+        }
+    }
+end
+
+local function parse_lte_rf_bandwidth_text(value)
+    local text = tostring(value or "")
+    return text:match("LTE%s+([%d%.]+MHz)")
+        or text:match("([%d%.]+MHz)")
+        or ""
+end
+
+local function read_bandwidth_rdb_snapshot()
+    local snapshot = {
+        lte = {
+            serving = {
+                bandwidth = parse_lte_rf_bandwidth_text(rdb_get_trim("wwan.0.system_network_status.current_rf_bandwidth"))
+            },
+            pcc = {
+                bandwidth = rdb_get_trim("wwan.0.system_network_status.lte_ca_pcell.bandwidth")
+            },
+            scell = {}
+        },
+        nr5g = {
+            serving = {
+                dl_bw = rdb_get_trim("wwan.0.radio_stack.nr5g.dl_bw"),
+                ul_bw = rdb_get_trim("wwan.0.radio_stack.nr5g.ul_bw")
+            },
+            scell = {}
+        }
+    }
+
+    local idx = 1
+    while idx <= 8 do
+        local prefix = "wwan.0.system_network_status.lte_ca_scell.list." .. idx .. "."
+        local bandwidth = rdb_get_trim(prefix .. "bandwidth")
+        local band = rdb_get_trim(prefix .. "band")
+        local freq = rdb_get_trim(prefix .. "freq")
+        local pci = rdb_get_trim(prefix .. "pci")
+        if bandwidth == "" and band == "" and freq == "" and pci == "" then
+            break
+        end
+        table.insert(snapshot.lte.scell, {
+            bandwidth = bandwidth,
+            band = band,
+            channel = freq,
+            pci = pci
+        })
+        idx = idx + 1
+    end
+
+    local num_cc = tonumber(rdb_get_trim("wwan.0.radio_stack.nr5g.num_active_cc")) or 0
+    local cc = 0
+    while cc < num_cc do
+        local prefix = "wwan.0.radio_stack.nr5g.scell." .. cc .. "."
+        table.insert(snapshot.nr5g.scell, {
+            dl_bw = rdb_get_trim(prefix .. "dl_bw"),
+            ul_bw = rdb_get_trim(prefix .. "ul_bw"),
+            band = rdb_get_trim(prefix .. "band"),
+            channel = rdb_get_trim(prefix .. "dl_arfcn"),
+            pci = rdb_get_trim(prefix .. "cell_id"),
+            cc_id = rdb_get_trim(prefix .. "cc_id")
+        })
+        cc = cc + 1
+    end
+
+    return snapshot
+end
+
+local function build_bandwidth_text(carrier)
+    local bw = tostring(carrier.bandwidth_mhz or ""):gsub("^%s+", ""):gsub("%s+$", "")
+    local ul = tostring(carrier.ul_bandwidth_mhz or ""):gsub("^%s+", ""):gsub("%s+$", "")
+    local dl = tostring(carrier.dl_bandwidth_mhz or ""):gsub("^%s+", ""):gsub("%s+$", "")
+    if ul ~= "" or dl ~= "" then
+        if ul ~= "" and dl ~= "" and ul == dl then
+            return "Bandwidth " .. dl .. " MHz"
+        end
+        if ul ~= "" and dl ~= "" then
+            return "UL " .. ul .. " MHz / DL " .. dl .. " MHz"
+        end
+        if dl ~= "" then
+            return "DL " .. dl .. " MHz"
+        end
+        return "UL " .. ul .. " MHz"
+    end
+    if bw ~= "" then
+        return "Bandwidth " .. bw .. " MHz"
+    end
+    return "Bandwidth unavailable"
+end
+
+local function enrich_carriers_with_bandwidth(carriers, servingcell_summary)
+    local qeng_bw = parse_qeng_bandwidths(servingcell_summary or "")
+    local rdb_bw = read_bandwidth_rdb_snapshot()
+    local lte_scell_index = 1
+    local nr_scell_index = 1
+    local i
+
+    for i = 1, #carriers do
+        local carrier = carriers[i]
+        local role = tostring(carrier.role or ""):upper()
+        local rat = tostring(carrier.rat or ""):upper()
+        if rat == "LTE" then
+            if role == "PCC" then
+                carrier.bandwidth_mhz = first_nonempty(
+                    rdb_bw.lte.pcc.bandwidth,
+                    rdb_bw.lte.serving.bandwidth,
+                    qeng_bw.serving.lte_dl_bw_mhz,
+                    carrier.bandwidth_mhz
+                )
+                carrier.ul_bandwidth_mhz = first_nonempty(carrier.ul_bandwidth_mhz, qeng_bw.serving.lte_ul_bw_mhz)
+                carrier.dl_bandwidth_mhz = first_nonempty(carrier.dl_bandwidth_mhz, qeng_bw.serving.lte_dl_bw_mhz, carrier.bandwidth_mhz)
+            else
+                local sc = rdb_bw.lte.scell[lte_scell_index]
+                carrier.bandwidth_mhz = first_nonempty(carrier.bandwidth_mhz, sc and sc.bandwidth or "")
+                carrier.dl_bandwidth_mhz = first_nonempty(carrier.dl_bandwidth_mhz, carrier.bandwidth_mhz)
+                lte_scell_index = lte_scell_index + 1
+            end
+        elseif rat == "NR5G" then
+            if role == "PCC" then
+                carrier.bandwidth_mhz = first_nonempty(
+                    rdb_bw.nr5g.serving.dl_bw,
+                    qeng_bw.serving.nr_dl_bw_mhz,
+                    qeng_bw.nr5g_nsa.nr_dl_bw_mhz,
+                    carrier.bandwidth_mhz
+                )
+                carrier.dl_bandwidth_mhz = first_nonempty(
+                    rdb_bw.nr5g.serving.dl_bw,
+                    qeng_bw.serving.nr_dl_bw_mhz,
+                    qeng_bw.nr5g_nsa.nr_dl_bw_mhz,
+                    carrier.dl_bandwidth_mhz,
+                    carrier.bandwidth_mhz
+                )
+                carrier.ul_bandwidth_mhz = first_nonempty(carrier.ul_bandwidth_mhz, rdb_bw.nr5g.serving.ul_bw)
+            else
+                local sc = rdb_bw.nr5g.scell[nr_scell_index]
+                carrier.bandwidth_mhz = first_nonempty(carrier.bandwidth_mhz, sc and sc.dl_bw or "")
+                carrier.dl_bandwidth_mhz = first_nonempty(carrier.dl_bandwidth_mhz, sc and sc.dl_bw or "", carrier.bandwidth_mhz)
+                carrier.ul_bandwidth_mhz = first_nonempty(carrier.ul_bandwidth_mhz, sc and sc.ul_bw or "")
+                nr_scell_index = nr_scell_index + 1
+            end
+        end
+        carrier.bandwidth_text = build_bandwidth_text(carrier)
+    end
+
+    return carriers
+end
+
 -- Parse AT+QRSRP/QRSRQ/QSINR: per-antenna values + sys_mode
 -- Format: +QRSRP: <v0>,<v1>,<v2>,<v3>,<sys_mode>
 local function parse_qsignal(summary, prefix)
@@ -834,7 +1072,7 @@ local function extract_servingcell_bands(line)
 end
 
 local function build_ca_snapshot(qcainfo_summary, servingcell_summary)
-    local carriers = parse_qcainfo(qcainfo_summary or "")
+    local carriers = enrich_carriers_with_bandwidth(parse_qcainfo(qcainfo_summary or ""), servingcell_summary or "")
     local servingcell_line = parse_qeng_servingcell(servingcell_summary or "")
     local bands = {}
     local seen = {}
@@ -868,7 +1106,7 @@ end
 local JtoolTopMenuHandler = class("JtoolTopMenuHandler", turbo.web.RequestHandler)
 
 function JtoolTopMenuHandler:get()
-    self:redirect("/general_dashboard.html")
+    self:redirect("/quick_overview.html")
 end
 
 local AtTerminalApiHandler = class("AtTerminalApiHandler", SessionRequestHandler)
@@ -1607,6 +1845,7 @@ function JtoolGeneralApiHandler:get(url, action)
             temperatures = temperatures,
             primary_temperature_text = primary_temperature_text,
             firmware_version = _cached_firmware_version,
+            stock_signal = read_stock_signal_snapshot(),
             signal_crosscheck = crosscheck_data
         }
     end)

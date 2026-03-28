@@ -29,11 +29,14 @@ This is the current proven model on the tested CFW-3212. Do not casually redesig
 
 - A top-level authenticated `Jtools` tab in the stock UI.
 - Pages under that tab:
+  - `Quick Overview`
   - `General info`
   - `AT terminal`
+  - `SMS`
   - `Band / cell locking`
   - `Ookla Speedtest`
   - `TTL helper`
+  - `Tailscale` (when packaged)
 - Shared stock patches for:
   - `generatedMenuEntries.js`
   - `top_menu_entries.lua`

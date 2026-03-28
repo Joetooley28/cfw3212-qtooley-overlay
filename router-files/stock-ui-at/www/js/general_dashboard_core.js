@@ -696,7 +696,7 @@
             return [
                 createMetric("SS-RSRP", formatDb(adv.nrRsrp, " dBm"), getSignalClassForDb(adv.nrRsrp, "rsrp")),
                 createMetric("SS-RSRQ", formatDb(adv.nrRsrq, " dB"), getSignalClassForDb(adv.nrRsrq, "rsrq")),
-                createMetric("SS-SINR", formatDb(adv.nrSnr, " dB"), getSignalClassForDb(adv.nrSnr, "sinr")),
+                createMetric("SS-SNR", formatDb(adv.nrSnr, " dB"), getSignalClassForDb(adv.nrSnr, "sinr")),
                 createMetric("NR CQI", asText(adv.nrCqi))
             ].join("");
         }
@@ -807,7 +807,7 @@
             "<div class='jgd-metrics-grid'>",
             createMetric("Primary RSRP", formatDb(primaryRsrp, " dBm"), getSignalClassForDb(primaryRsrp, "rsrp")),
             createMetric("Primary RSRQ", formatDb(primaryRsrq, " dB"), getSignalClassForDb(primaryRsrq, "rsrq")),
-            createMetric("Primary SINR", formatDb(primarySinr, " dB"), getSignalClassForDb(primarySinr, "sinr")),
+            createMetric("Primary SNR", formatDb(primarySinr, " dB"), getSignalClassForDb(primarySinr, "sinr")),
             createMetric("Primary CQI", primaryCqi),
             renderSignalDetailBlock(primaryRsrp, primaryRsrq, primarySinr, primaryCqi, adv, rat),
             "</div>",

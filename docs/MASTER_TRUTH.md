@@ -232,6 +232,11 @@ At the time of writing, the Jtools tab has included pages such as:
 - `TTL helper`
 - `Tailscale` (when packaged)
 
+Current top-level Jtools landing behavior:
+
+- the shared Jtools redirect currently lands on `Quick Overview`, not `General info`
+- `General info` is still an important reference page for wiring and mixed stock/RDB plus AT data usage, but it is no longer the default landing page
+
 Quick Overview notes:
 
 - Quick Overview has its own frontend assets and a screensaver integration path
@@ -654,6 +659,31 @@ In browser and access checks:
 - if shared files changed, spot-check another stock page too
 
 If a risky shared-file change breaks the stock UI, stop and recover before stacking more edits.
+
+## Cache Busting, Shared Assets, and Turbo Reload
+
+After you edit **static** files (`www/css`, `www/js`, `www/theme/js`, HTML), assume the browser may still show the **old** copy until the URL changes.
+
+**Query strings are the cache key**
+
+- Stock and Jtools pages load CSS/JS as `/path/file.css?token`. The browser treats `?v1` and `?v2` as different resources.
+- When you change a file, **bump the query string** on every **HTML** `<link>` / `<script>` that references that file. Tokens like `jtools-ui-v20260328c` are arbitrary; any **new** suffix works.
+
+**Shared CSS/JS across pages**
+
+- Some bundles (notably `at_terminal.css`) are linked from **multiple** HTML files. Bump the token on **each** of those pages when you change the shared file. Otherwise one page can look updated while another tab still uses a cached URL.
+
+**`genHeader.js` is two layers**
+
+- Dark mode loads `jtools_dark_mode.css?...` from **inside** `genHeader.js`. When you change that CSS, bump the URL **in genHeader.js** and bump the **`genHeader.js` `src=`** query on **every** Jtools page that includes it. Leaving `genHeader.js?1.1.79.0` while changing injected CSS is a common “stale theme” trap.
+
+**Lua / Turbo (not cache)**
+
+- Changes under `usr/share/lua/5.1/webif/` (e.g. `handler_0011.lua`) are not picked up reliably until the web stack reloads: `systemctl restart turbontc.service`. Plain HTML/CSS/JS edits do **not** require this.
+
+**Still stale after deploy?**
+
+- Confirm the file on the router under `/usrdata/at-stock-ui/www/...`, re-run `apply_stock_ui_overlay.sh`, then reload. If needed, bump tokens one more time and redeploy the HTML.
 
 ## Live Sync And Apply Workflow
 
