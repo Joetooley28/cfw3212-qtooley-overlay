@@ -65,6 +65,10 @@
             }
             state.at = response;
             renderDashboard();
+            if (response.degraded) {
+                setApiBanner("warn", "Modem AT path unavailable (" + (response.degraded_reason || "unknown") + "). Showing RDB-backed signal and identity only.");
+                return;
+            }
             setApiBanner("ok", manual ? "Refreshed CA and modem temperature from live AT responses." : core.buildBannerText(state.stock.cellular || {}, response));
         }).fail(function (xhr) {
             setApiBanner("error", xhr && xhr.responseText ? xhr.responseText : "AT supplement refresh failed.");

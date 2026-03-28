@@ -574,7 +574,7 @@
         }
         var xhr = new XMLHttpRequest();
         xhr.open("GET", url, true);
-        xhr.timeout = 8000;
+        xhr.timeout = 25000;
         xhr.ontimeout = function () {
             callback(null, "timeout");
         };
@@ -606,8 +606,21 @@
         var servingcell = parseServingcell(resp.qeng_summary || "");
         var carriers = resp.carriers || [];
         var stockSignal = resp.stock_signal || {};
-        var provider = chooseFirst(qspn.displayName, cops.operatorName);
+        var provider = chooseFirst(qspn.displayName, cops.operatorName, resp.rdb_network || "");
         var rat = getRatLabel(qnwinfo, servingcell);
+        if (rat === "N/A" && carriers.length) {
+            var hasNr = false;
+            var hasLte = false;
+            var ci;
+            for (ci = 0; ci < carriers.length; ci += 1) {
+                var cr = String(carriers[ci].rat || "").toUpperCase();
+                if (cr === "NR5G") { hasNr = true; }
+                if (cr === "LTE") { hasLte = true; }
+            }
+            if (hasNr && hasLte) { rat = "5G NSA"; }
+            else if (hasNr) { rat = "NR5G"; }
+            else if (hasLte) { rat = "LTE"; }
+        }
         var rsrp = choosePrimarySignal(stockSignal, "rsrp", servingcell.rsrp || null);
         var rsrq = choosePrimarySignal(stockSignal, "rsrq", servingcell.rsrq || null);
         var sinr = choosePrimarySignal(stockSignal, "snr", servingcell.sinr || null);

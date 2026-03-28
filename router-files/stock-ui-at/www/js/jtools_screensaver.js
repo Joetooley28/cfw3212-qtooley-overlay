@@ -88,7 +88,63 @@
         if (idleTimer) { clearTimeout(idleTimer); }
         var timeout = getTimeout();
         if (timeout <= 0) { return; }
-        idleTimer = setTimeout(activateScreensaver, timeout);
+        idleTimer = setTimeout(function () { activateScreensaver({}); }, timeout);
+    }
+
+    function htmlEscape(s) {
+        return String(s == null ? "" : s)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/"/g, "&quot;");
+    }
+
+    function formatClockNow() {
+        var d = new Date();
+        var h24 = d.getHours();
+        var h = h24 % 12;
+        if (h === 0) { h = 12; }
+        var m = d.getMinutes();
+        var mm = m < 10 ? "0" + m : String(m);
+        var ampm = h24 >= 12 ? "PM" : "AM";
+        return { clock: h + ":" + mm, ampm: ampm };
+    }
+
+    function buildScreensaverLoadingHtml() {
+        var t = formatClockNow();
+        return (
+            "<div class='qo-ss-center'>" +
+            "<div class='qo-ss-clock' id='qoSsClock'>" + t.clock + "</div>" +
+            "<div class='qo-ss-ampm' id='qoSsAmpm'>" + t.ampm + "</div>" +
+            "<div class='qo-ss-device' style='margin-top:20px'>Loading signal\u2026</div>" +
+            "</div>"
+        );
+    }
+
+    function buildScreensaverFallbackHtml(err) {
+        var t = formatClockNow();
+        var headline = "Unable to load signal data";
+        var detail = "";
+        if (typeof err === "string") {
+            detail = err;
+            if (err.indexOf("502") !== -1 || err.indexOf("HTTP 5") !== -1) {
+                headline = "Router busy or restarting";
+            } else if (err === "timeout") {
+                headline = "Request timed out";
+            }
+        } else if (err) {
+            detail = String(err);
+        }
+        return (
+            "<div class='qo-ss-corner'></div>" +
+            "<div class='qo-ss-center'>" +
+            "<div class='qo-ss-clock' id='qoSsClock'>" + t.clock + "</div>" +
+            "<div class='qo-ss-ampm' id='qoSsAmpm'>" + t.ampm + "</div>" +
+            "<div class='qo-ss-device' style='margin-top:12px'>" + htmlEscape(headline) + "</div>" +
+            (detail ? "<div class='qo-ss-provider' style='font-size:13px;color:#8a8f98;margin-top:8px'>" + htmlEscape(detail) + "</div>" : "") +
+            "<div class='qo-ss-device' style='margin-top:22px;font-size:12px'>Move or tap to dismiss</div>" +
+            "</div>" +
+            "<div class='qo-toast-container' id='qoToastContainer'></div>"
+        );
     }
 
     // ── Lazy-load resources ──
@@ -122,7 +178,7 @@
 
         if (!cssLoaded) {
             remaining++;
-            loadCSS("/css/quick_overview.css?jtools-qo-v20260329a", function () {
+            loadCSS("/css/quick_overview.css?jtools-qo-v20260331a", function () {
                 cssLoaded = true;
                 done();
             });
@@ -132,14 +188,14 @@
             remaining++;
             // Load core first, then screensaver renderer
             if (!window.JtoolsQuickOverview) {
-                loadScript("/js/quick_overview_core.js?jtools-qo-v20260329a", function () {
-                    loadScript("/js/quick_overview_screensaver.js?jtools-qo-v20260329a", function () {
+                loadScript("/js/quick_overview_core.js?jtools-qo-v20260331a", function () {
+                    loadScript("/js/quick_overview_screensaver.js?jtools-qo-v20260331a", function () {
                         scriptsLoaded = true;
                         done();
                     });
                 });
             } else if (!window.JtoolsScreensaverRenderer) {
-                loadScript("/js/quick_overview_screensaver.js?jtools-qo-v20260329a", function () {
+                loadScript("/js/quick_overview_screensaver.js?jtools-qo-v20260331a", function () {
                     scriptsLoaded = true;
                     done();
                 });
@@ -152,15 +208,17 @@
 
     // ── Overlay lifecycle ──
 
-    function activateScreensaver() {
+    function activateScreensaver(opts) {
+        opts = opts || {};
         if (isVisible) { return; }
-        if (window._jtoolsSsPaused) { resetIdleTimer(); return; }
+        if (!opts.manual && window._jtoolsSsPaused) { resetIdleTimer(); return; }
         ensureResources(function () {
             if (!window.JtoolsQuickOverview || !window.JtoolsScreensaverRenderer) { return; }
             isVisible = true;
             canDismiss = false;
             overlay = document.createElement("div");
             overlay.className = "qo-screensaver";
+            overlay.innerHTML = buildScreensaverLoadingHtml();
             document.body.appendChild(overlay);
 
             // First fetch and render
@@ -219,11 +277,26 @@
 
     function fetchAndRender() {
         if (!isVisible || !overlay) { return; }
+        if (!window.JtoolsQuickOverview || typeof window.JtoolsQuickOverview.fetchData !== "function") {
+            overlay.innerHTML = buildScreensaverFallbackHtml("Quick Overview not loaded");
+            return;
+        }
+        if (!window.JtoolsScreensaverRenderer || typeof window.JtoolsScreensaverRenderer.renderScreensaver !== "function") {
+            overlay.innerHTML = buildScreensaverFallbackHtml("Screensaver renderer not loaded");
+            return;
+        }
         window.JtoolsQuickOverview.fetchData(function (data, err) {
             if (!isVisible || !overlay) { return; }
-            if (err || !data) { return; }
-            overlay.innerHTML = window.JtoolsScreensaverRenderer.renderScreensaver(data);
-            window.JtoolsScreensaverRenderer.checkForBandChange(data);
+            if (err || !data) {
+                overlay.innerHTML = buildScreensaverFallbackHtml(err || "No data");
+                return;
+            }
+            try {
+                overlay.innerHTML = window.JtoolsScreensaverRenderer.renderScreensaver(data);
+                window.JtoolsScreensaverRenderer.checkForBandChange(data);
+            } catch (e) {
+                overlay.innerHTML = buildScreensaverFallbackHtml(e && e.message ? e.message : "Render error");
+            }
         });
     }
 
@@ -242,5 +315,11 @@
     // Start the idle timer
     refreshSettingsFromServer();
     resetIdleTimer();
+
+    window.JtoolsScreensaver = {
+        show: function () {
+            activateScreensaver({ manual: true });
+        }
+    };
 
 })();

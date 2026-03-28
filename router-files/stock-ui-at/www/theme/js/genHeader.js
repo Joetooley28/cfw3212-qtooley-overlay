@@ -15,6 +15,7 @@ function genThemeHeader(pageData, userGroups) {
             "ttl_helper.html": true,
             "tailscale.html": true,
             "sms.html": true,
+            "screensaver_settings.html": true,
             "status.html": true,
             "profile_list.html": true,
             "operator_setting.html": true,
@@ -298,10 +299,12 @@ function genThemeHeader(pageData, userGroups) {
     $("#side-menu").append(h_side);
     renderThemeToggle();
 
-    // Inject screensaver idle detector on dark-mode pages
-    if (document.querySelector("link[data-jtools-dark-mode]")) {
+    // Screensaver: dark-mode pages + Screensaver Settings (light mode needs manual open)
+    var injectScreensaverJs = document.querySelector("link[data-jtools-dark-mode]") ||
+        (typeof relUrlOfPage !== "undefined" && relUrlOfPage === "screensaver_settings.html");
+    if (injectScreensaverJs) {
         var ssScript = document.createElement("script");
-        ssScript.src = "/js/jtools_screensaver.js?jtools-qo-v20260329a";
+        ssScript.src = "/js/jtools_screensaver.js?jtools-qo-v20260331a";
         document.head.appendChild(ssScript);
     }
 

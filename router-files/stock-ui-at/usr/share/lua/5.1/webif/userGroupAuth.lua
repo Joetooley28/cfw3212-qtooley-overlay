@@ -215,6 +215,11 @@ return { authTable = {
         writeGroups = {root=true,admin=true},
         skipAuth = false
     },
+    ["screensaver_settings.html"] = {
+        readGroups = {root=true,admin=true},
+        writeGroups = {root=true,admin=true},
+        skipAuth = false
+    },
     ["SmsApi"] = {
         readGroups = {root=true,admin=true},
         writeGroups = {root=true,admin=true},

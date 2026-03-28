@@ -57,12 +57,7 @@
             "  <div class='qo-card-title'>Connection Info</div>",
             "  <div id='qoConnInfo'><div class='qo-no-data'>Loading\u2026</div></div>",
             "</div>",
-            "<div class='qo-card qo-card-collapsible' id='qoSettingsCard'>",
-            "  <div class='qo-card-title qo-card-toggle' id='qoSettingsToggle'>Screensaver Settings <span class='qo-card-arrow' id='qoSettingsArrow'>\u25BC</span></div>",
-            "  <div class='qo-settings' id='qoSettingsWrap'>",
-            "    <div class='qo-settings-inner' id='qoSettingsBody'></div>",
-            "  </div>",
-            "</div>"
+            ""
         ].join("\n");
 
         host.appendChild(page);
@@ -78,7 +73,6 @@
         els.chartWrap     = $("qoChartWrap");
         els.historyList   = $("qoHistoryList");
         els.connInfo      = $("qoConnInfo");
-        els.settingsBody  = $("qoSettingsBody");
         els.statusDot     = $("qoStatusDot");
         els.errorBanner   = $("qoErrorBanner");
         chartCanvas       = $("qoChartCanvas");
@@ -87,11 +81,7 @@
             chartCtx = chartCanvas.getContext("2d");
         }
 
-        renderSettings();
-        bindSettingsEvents();
-        QO.loadSettings(function () {
-            renderSettings();
-        });
+        QO.loadSettings(function () {});
 
         // Initial fetch
         fetchAndRender();
@@ -396,104 +386,6 @@
             data.firmwareVersion ? "  <div class='qo-conn-item'><span class='qo-conn-label'>Firmware</span><span class='qo-conn-value' style='font-size:11px'>" + QO.escapeHtml(data.firmwareVersion) + "</span></div>" : "",
             "</div>"
         ].join("\n");
-    }
-
-    // ── Settings ──
-
-    function renderSettings() {
-        if (!els.settingsBody) { return; }
-        var s = QO.getSettings();
-
-        els.settingsBody.innerHTML = [
-            "<div class='qo-setting-row'>",
-            "  <span class='qo-setting-label'>Screensaver</span>",
-            "  <label class='qo-toggle'>",
-            "    <input type='checkbox' id='qoSettingEnabled' " + (s.enabled ? "checked" : "") + ">",
-            "    <span class='qo-toggle-track'></span>",
-            "  </label>",
-            "</div>",
-            "<div class='qo-setting-row'>",
-            "  <span class='qo-setting-label'>Idle timeout</span>",
-            "  <select class='qo-select' id='qoSettingTimeout'>",
-            "    <option value='30000'" + (s.timeout === 30000 ? " selected" : "") + ">30 seconds</option>",
-            "    <option value='45000'" + (s.timeout === 45000 ? " selected" : "") + ">45 seconds</option>",
-            "    <option value='60000'" + (s.timeout === 60000 ? " selected" : "") + ">60 seconds</option>",
-            "    <option value='120000'" + (s.timeout === 120000 ? " selected" : "") + ">2 minutes</option>",
-            "  </select>",
-            "</div>",
-            "<div class='qo-setting-row'>",
-            "  <span class='qo-setting-label'>Grade weights</span>",
-            "  <div class='qo-weight-group'>",
-            "    <div class='qo-weight-item'>",
-            "      <span>RSRP</span>",
-            "      <input type='number' class='qo-weight-input' id='qoWeightRsrp' min='0' max='100' value='" + s.weightRsrp + "'>",
-            "      <span>%</span>",
-            "    </div>",
-            "    <div class='qo-weight-item'>",
-            "      <span>SNR</span>",
-            "      <input type='number' class='qo-weight-input' id='qoWeightSinr' min='0' max='100' value='" + s.weightSinr + "'>",
-            "      <span>%</span>",
-            "    </div>",
-            "    <div class='qo-weight-item'>",
-            "      <span>RSRQ</span>",
-            "      <input type='number' class='qo-weight-input' id='qoWeightRsrq' min='0' max='100' value='" + s.weightRsrq + "'>",
-            "      <span>%</span>",
-            "    </div>",
-            "    <span class='qo-weight-sum is-valid' id='qoWeightSum'>\u03A3 100%</span>",
-            "  </div>",
-            "</div>",
-            "<div class='qo-formula-info'>",
-            "  Each metric is normalized to 0\u2013100% within its range:<br>",
-            "  <code>RSRP: -120 to -70 dBm</code> &nbsp; ",
-            "  <code>RSRQ: -20 to -5 dB</code> &nbsp; ",
-            "  <code>SNR: -5 to 30 dB</code><br>",
-            "  Grade = <code>RSRP \u00d7 " + s.weightRsrp + "% + SNR \u00d7 " + s.weightSinr + "% + RSRQ \u00d7 " + s.weightRsrq + "%</code>",
-            "</div>"
-        ].join("\n");
-    }
-
-    function bindSettingsEvents() {
-        document.addEventListener("change", function (e) {
-            var id = e.target.id;
-            if (id === "qoSettingEnabled") {
-                QO.saveSettings({ enabled: e.target.checked });
-            } else if (id === "qoSettingTimeout") {
-                QO.saveSettings({ timeout: parseInt(e.target.value, 10) });
-            }
-        });
-
-        document.addEventListener("input", function (e) {
-            var id = e.target.id;
-            if (id === "qoWeightRsrp" || id === "qoWeightSinr" || id === "qoWeightRsrq") {
-                var rEl = document.getElementById("qoWeightRsrp");
-                var sEl = document.getElementById("qoWeightSinr");
-                var qEl = document.getElementById("qoWeightRsrq");
-                var sumEl = document.getElementById("qoWeightSum");
-                if (!rEl || !sEl || !qEl) { return; }
-                var r = parseInt(rEl.value, 10) || 0;
-                var s = parseInt(sEl.value, 10) || 0;
-                var q = parseInt(qEl.value, 10) || 0;
-                var sum = r + s + q;
-                if (sumEl) {
-                    sumEl.textContent = "\u03A3 " + sum + "%";
-                    sumEl.className = "qo-weight-sum " + (sum === 100 ? "is-valid" : "is-invalid");
-                }
-                if (sum === 100) {
-                    QO.saveSettings({ weightRsrp: r, weightSinr: s, weightRsrq: q });
-                }
-            }
-        });
-
-        // Settings toggle (collapsible card)
-        var toggleBtn = document.getElementById("qoSettingsToggle");
-        var settingsWrap = document.getElementById("qoSettingsWrap");
-        var arrow = document.getElementById("qoSettingsArrow");
-        if (toggleBtn && settingsWrap) {
-            toggleBtn.addEventListener("click", function () {
-                settingsWrap.classList.toggle("is-open");
-                if (arrow) { arrow.classList.toggle("is-open"); }
-            });
-        }
     }
 
     // ── Public API ──

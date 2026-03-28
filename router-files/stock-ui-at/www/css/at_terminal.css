@@ -1377,6 +1377,12 @@
     color: #ffd8d8;
 }
 
+.jgd-banner.is-warn {
+    background: rgba(255, 193, 7, 0.12);
+    border-color: rgba(255, 193, 7, 0.35);
+    color: #ffe8b8;
+}
+
 .jgd-grid {
     display: grid;
     gap: 16px;
@@ -1639,8 +1645,76 @@
     gap: 8px;
 }
 
+#jtool-general-dashboard .jgd-signal-head {
+    align-items: flex-end;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.065);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    justify-content: space-between;
+    margin-bottom: 0;
+    padding-bottom: 18px;
+}
+
+#jtool-general-dashboard .jgd-signal-top-left {
+    align-items: flex-start;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+}
+
+#jtool-general-dashboard .jgd-signal-top-left > .jgd-card-title {
+    margin-bottom: 0;
+}
+
+#jtool-general-dashboard .jgd-signal-top-left .jgd-signal-wrap {
+    margin-bottom: 0;
+}
+
+#jtool-general-dashboard .jgd-signal-band-col {
+    align-items: flex-end;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+    text-align: right;
+}
+
+#jtool-general-dashboard .jgd-signal-band-kicker {
+    color: #ffb86b;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-shadow: 0 0 18px rgba(255, 184, 107, 0.55);
+    text-transform: uppercase;
+}
+
+#jtool-general-dashboard .jgd-signal-band-hero .qt-band-pill {
+    border-radius: 10px;
+    box-shadow:
+        0 0 22px rgba(255, 154, 60, 0.45),
+        0 0 48px rgba(61, 169, 252, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    line-height: 1.25;
+    max-width: min(100%, 300px);
+    padding: 11px 18px;
+    text-align: center;
+    white-space: normal;
+    word-break: break-word;
+}
+
+#jtool-general-dashboard .jgd-card-signal > .jgd-metrics-grid {
+    margin-top: 18px;
+}
+
 #jtool-general-dashboard .jgd-card-signal .jgd-signal-wrap {
-    margin-bottom: 10px;
+    margin-bottom: 0;
 }
 
 #jtool-general-dashboard .jgd-card-signal .jgd-metrics-grid .jgd-signal-detail-note {
@@ -1702,6 +1776,10 @@
 
     #jtool-general-dashboard .jgd-main-stack {
         gap: 10px;
+    }
+
+    #jtool-general-dashboard .jgd-signal-head {
+        align-items: flex-start;
     }
 
     .jgd-module-strip {

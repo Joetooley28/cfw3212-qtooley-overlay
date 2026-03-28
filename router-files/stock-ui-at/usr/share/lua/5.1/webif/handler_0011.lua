@@ -18,6 +18,8 @@ local sms = require("sms_backend")
 local at_saved_commands = require("at_saved_commands")
 local JSON = require("JSON")
 
+local soft_run_command
+
 -- Cached firmware version (AT+QGMR) — fetched once per process lifetime
 local _cached_firmware_version = nil
 local _cached_active_mbn_from_at = nil
@@ -569,7 +571,7 @@ local function must_run_command(config, command)
     return response
 end
 
-local function soft_run_command(config, command)
+soft_run_command = function(config, command)
     local response, err = run_command(config, command)
     if not response then
         return nil, err or "backend_internal_error"
@@ -871,7 +873,8 @@ local function rdb_get_trim(key)
     if value == nil then
         return ""
     end
-    return tostring(value):gsub("^%s+", ""):gsub("%s+$", "")
+    local text = tostring(value):gsub("^%s+", ""):gsub("%s+$", "")
+    return text
 end
 
 local function read_stock_signal_snapshot()
@@ -1032,6 +1035,132 @@ local function enrich_carriers_with_bandwidth(carriers, servingcell_summary)
     end
 
     return carriers
+end
+
+-- When AT+QCAINFO is missing or empty, synthesize carriers from RDB (stock UI keys).
+local function lte_band_text_to_num(text)
+    if not text or text == "" then
+        return ""
+    end
+    local n = text:match("LTE%s+[Bb]and%s+(%d+)") or text:match("LTE%s+(%d+)%s*$") or text:match("^%s*(%d+)%s*$")
+    return n or ""
+end
+
+local function build_carriers_from_rdb()
+    local out = {}
+    if rdb_get_trim("wwan.0.system_network_status.attached") ~= "1" then
+        return out
+    end
+    local sys_so = rdb_get_trim("wwan.0.system_network_status.current_system_so")
+    local rdb_bw = read_bandwidth_rdb_snapshot()
+    local nr_up = rdb_get_trim("wwan.0.radio_stack.nr5g.up")
+
+    if sys_so:find("LTE CA") then
+        local pcc_band = rdb_get_trim("wwan.0.system_network_status.lte_ca_pcell.band")
+        if pcc_band ~= "" then
+            local bw = first_nonempty(rdb_bw.lte.pcc.bandwidth, rdb_bw.lte.serving.bandwidth)
+            table.insert(out, {
+                role = "PCC",
+                rat = "LTE",
+                band = pcc_band,
+                band_label = "LTE BAND " .. pcc_band,
+                channel = rdb_get_trim("wwan.0.system_network_status.lte_ca_pcell.freq"),
+                bandwidth_mhz = bw,
+                bandwidth_text = build_bandwidth_text({ bandwidth_mhz = bw }),
+                raw = "rdb"
+            })
+        end
+        for _, sc in ipairs(rdb_bw.lte.scell) do
+            if sc.band and sc.band ~= "" then
+                table.insert(out, {
+                    role = "SCC",
+                    rat = "LTE",
+                    band = sc.band,
+                    band_label = "LTE BAND " .. sc.band,
+                    channel = sc.channel or "",
+                    bandwidth_mhz = sc.bandwidth,
+                    bandwidth_text = build_bandwidth_text({ bandwidth_mhz = sc.bandwidth }),
+                    raw = "rdb"
+                })
+            end
+        end
+    else
+        local band_num = lte_band_text_to_num(rdb_get_trim("wwan.0.system_network_status.current_band"))
+        if band_num == "" then
+            band_num = rdb_get_trim("wwan.0.system_network_status.lte_ca_pcell.band")
+        end
+        if band_num ~= "" then
+            local bw = rdb_bw.lte.serving.bandwidth or ""
+            local cb = rdb_get_trim("wwan.0.system_network_status.current_band")
+            table.insert(out, {
+                role = "PCC",
+                rat = "LTE",
+                band = band_num,
+                band_label = (cb ~= "" and cb) or ("LTE BAND " .. band_num),
+                channel = rdb_get_trim("wwan.0.system_network_status.channel"),
+                bandwidth_mhz = bw,
+                bandwidth_text = build_bandwidth_text({ bandwidth_mhz = bw }),
+                raw = "rdb"
+            })
+        end
+    end
+
+    if nr_up == "1" or sys_so:find("5G") or sys_so:find("NR") then
+        local nr_band = rdb_get_trim("wwan.0.radio_stack.nr5g.band")
+        if nr_band == "" then
+            local arfcn = rdb_get_trim("wwan.0.radio_stack.nr5g.arfcn")
+            if arfcn ~= "" then
+                local b = earfcn_to_nr_band(arfcn)
+                if b and b ~= "-" then
+                    nr_band = b
+                end
+            end
+        end
+        local dl = rdb_bw.nr5g.serving.dl_bw or ""
+        local so_u = sys_so:upper()
+        local nr_role = (#out > 0 and (so_u:find("NSA", 1, true) or so_u:find("ENDC", 1, true))) and "SCC" or "PCC"
+        if nr_band ~= "" then
+            table.insert(out, {
+                role = nr_role,
+                rat = "NR5G",
+                band = nr_band,
+                band_label = "NR5G BAND " .. nr_band,
+                channel = rdb_get_trim("wwan.0.radio_stack.nr5g.arfcn"),
+                bandwidth_mhz = dl,
+                bandwidth_text = build_bandwidth_text({ bandwidth_mhz = dl }),
+                raw = "rdb"
+            })
+        end
+        for _, sc in ipairs(rdb_bw.nr5g.scell) do
+            if sc.band and sc.band ~= "" then
+                table.insert(out, {
+                    role = "SCC",
+                    rat = "NR5G",
+                    band = sc.band,
+                    band_label = "NR5G BAND " .. sc.band,
+                    channel = sc.channel or "",
+                    bandwidth_mhz = sc.dl_bw,
+                    bandwidth_text = build_bandwidth_text({ bandwidth_mhz = sc.dl_bw }),
+                    raw = "rdb"
+                })
+            end
+        end
+    end
+
+    return out
+end
+
+local function merge_rdb_carriers_if_empty(carriers, qeng_summary)
+    if type(carriers) ~= "table" then
+        carriers = {}
+    end
+    if #carriers > 0 then
+        enrich_carriers_with_bandwidth(carriers, qeng_summary or "")
+        return carriers
+    end
+    local merged = build_carriers_from_rdb()
+    enrich_carriers_with_bandwidth(merged, qeng_summary or "")
+    return merged
 end
 
 -- Parse AT+QRSRP/QRSRQ/QSINR: per-antenna values + sys_mode
@@ -1869,6 +1998,8 @@ function JtoolGeneralApiHandler:get(url, action)
             }
         end
 
+        local carriers = merge_rdb_carriers_if_empty(parse_qcainfo(qcainfo_summary), qeng_summary)
+
         return {
             ok = true,
             fetched_at = os.time(),
@@ -1880,20 +2011,55 @@ function JtoolGeneralApiHandler:get(url, action)
             cops_summary = cops_summary,
             qmbncfg_list_summary = qmbncfg_summary,
             active_mbn_from_at = active_mbn_from_at,
-            carriers = parse_qcainfo(qcainfo_summary),
+            carriers = carriers,
             servingcell_line = parse_qeng_servingcell(qeng_summary),
             temperatures = temperatures,
             primary_temperature_text = primary_temperature_text,
             firmware_version = _cached_firmware_version,
             stock_signal = read_stock_signal_snapshot(),
-            signal_crosscheck = crosscheck_data
+            signal_crosscheck = crosscheck_data,
+            rdb_network = rdb_get_trim("wwan.0.system_network_status.network")
         }
     end)
 
     if not payload then
-        local status = err == "at_channel_busy" and 409 or 502
-        self:set_status(status)
-        self:write({ ok = false, error = err })
+        if err == "at_channel_busy" then
+            self:set_status(409)
+            self:write({ ok = false, error = err })
+            return
+        end
+        local degraded_ok, degraded = pcall(function()
+            local rdb_carriers = build_carriers_from_rdb()
+            enrich_carriers_with_bandwidth(rdb_carriers, "")
+            return {
+                ok = true,
+                degraded = true,
+                degraded_reason = err or "at_unavailable",
+                fetched_at = os.time(),
+                qcainfo_summary = "unavailable: degraded",
+                qeng_summary = "unavailable: degraded",
+                qtemp_summary = "unavailable: degraded",
+                qnwinfo_summary = "unavailable: degraded",
+                qspn_summary = "unavailable: degraded",
+                cops_summary = "unavailable: degraded",
+                qmbncfg_list_summary = "",
+                active_mbn_from_at = nil,
+                carriers = rdb_carriers,
+                servingcell_line = "",
+                temperatures = {},
+                primary_temperature_text = "N/A",
+                firmware_version = _cached_firmware_version,
+                stock_signal = read_stock_signal_snapshot(),
+                signal_crosscheck = nil,
+                rdb_network = rdb_get_trim("wwan.0.system_network_status.network")
+            }
+        end)
+        if degraded_ok and type(degraded) == "table" then
+            self:write(degraded)
+            return
+        end
+        self:set_status(502)
+        self:write({ ok = false, error = err or "degraded_build_failed" })
         return
     end
 
