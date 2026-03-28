@@ -567,11 +567,46 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+/* Matches Quick Overview spectrum + blue tail (Jtools “flow” language). */
 .ookla-live-strip {
-    background: var(--qt-bg-card-alt, linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%));
-    border: 1px solid var(--qt-border, #d8e0ea);
+    --ookla-flow-gradient: linear-gradient(
+        90deg,
+        #ff1744 0%,
+        #d16969 14%,
+        #ff8a00 30%,
+        #ffc107 46%,
+        #4caf50 62%,
+        #00e676 76%,
+        #22d3ee 88%,
+        #4bb6df 100%
+    );
+    background-color: #0c0e14;
+    background-image:
+        linear-gradient(180deg, rgba(14, 16, 22, 0.82) 0%, rgba(10, 12, 18, 0.9) 100%),
+        var(--ookla-flow-gradient);
+    background-size: 100% 100%, 200% 100%;
+    animation: ookla-live-flow 6s linear infinite;
+    border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: var(--qt-radius-sm, 6px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 20px rgba(255, 138, 0, 0.08);
     padding: 16px 18px;
+    position: relative;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ookla-live-strip {
+        animation: none;
+        background-size: 100% 100%, 100% 100%;
+    }
+}
+
+@keyframes ookla-live-flow {
+    0% {
+        background-position: 0% 0%, 0% 50%;
+    }
+    100% {
+        background-position: 0% 0%, 100% 50%;
+    }
 }
 
 .ookla-live-strip-top {
@@ -582,13 +617,14 @@
 }
 
 .ookla-live-stage {
-    color: #18405f;
+    color: #f3f6f8;
     font-size: 16px;
     font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 .ookla-live-progress {
-    color: #587290;
+    color: rgba(255, 255, 255, 0.82);
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -596,7 +632,9 @@
 }
 
 .ookla-live-bar {
-    background: #dfe8f1;
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 5px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
     height: 10px;
     margin-bottom: 14px;
     overflow: hidden;
@@ -604,10 +642,30 @@
 }
 
 .ookla-live-bar span {
-    background: linear-gradient(90deg, #d75445 0%, #e59a49 45%, #4bb6df 100%);
+    background: var(--ookla-flow-gradient);
+    background-size: 200% 100%;
+    animation: ookla-live-bar-flow 4.5s linear infinite;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.25);
     display: block;
     height: 100%;
     transition: width 0.4s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ookla-live-bar span {
+        animation: none;
+        background-size: 100% 100%;
+    }
+}
+
+@keyframes ookla-live-bar-flow {
+    0% {
+        background-position: 0% 50%;
+    }
+    100% {
+        background-position: 100% 50%;
+    }
 }
 
 .ookla-live-metrics {
@@ -617,13 +675,14 @@
 }
 
 .ookla-live-metric {
-    background: rgba(255, 255, 255, 0.8);
-    border: 1px solid #d6e0ea;
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--qt-radius-sm, 6px);
     padding: 12px;
 }
 
 .ookla-live-metric span {
-    color: #5e7895;
+    color: rgba(255, 255, 255, 0.62);
     display: block;
     font-size: 12px;
     font-weight: 700;
@@ -633,7 +692,7 @@
 }
 
 .ookla-live-metric strong {
-    color: #15324f;
+    color: #ffffff;
     font-size: 16px;
 }
 

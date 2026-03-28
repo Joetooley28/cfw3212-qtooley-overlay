@@ -14,6 +14,7 @@ local ttl_helper = require("ttl_helper")
 local quick_overview_settings = require("quick_overview_settings")
 local band_locking_settings = require("band_locking_settings")
 local sms = require("sms_backend")
+local at_saved_commands = require("at_saved_commands")
 local JSON = require("JSON")
 
 -- Cached firmware version (AT+QGMR) — fetched once per process lifetime
@@ -876,8 +877,68 @@ function AtTerminalApiHandler:getUrl(url, action)
     return "AtTerminalApi"
 end
 
+function AtTerminalApiHandler:get(url, action)
+    action = normalize_action("at_terminal_api", url, action)
+    if action ~= "saved_commands" then
+        error(turbo.web.HTTPError(404))
+    end
+    local ok, result = pcall(at_saved_commands.get_state)
+    if not ok then
+        turbo.log.error("at_saved_commands.get_state failed: " .. tostring(result))
+        self:set_status(500)
+        self:write({ ok = false, error = "saved_commands_read_failed" })
+        return
+    end
+    self:write(result)
+end
+
 function AtTerminalApiHandler:post(url, action)
     action = normalize_action("at_terminal_api", url, action)
+
+    if action == "saved_commands" then
+        local ok, err = xpcall(function()
+            local config, config_err = read_config()
+            if not config then
+                self:set_status(500)
+                self:write({ ok = false, error = config_err or "config_read_failed" })
+                return
+            end
+
+            local op = self:get_argument("op", "")
+            local payload, status
+
+            if op == "add" then
+                payload, status = at_saved_commands.add_custom(
+                    config,
+                    self:get_argument("cmd", ""),
+                    self:get_argument("desc", "")
+                )
+            elseif op == "remove_custom" then
+                payload, status = at_saved_commands.remove_custom(self:get_argument("id", ""))
+            elseif op == "hide_builtin" then
+                payload, status = at_saved_commands.hide_builtin(config, self:get_argument("cmd", ""))
+            elseif op == "unhide_builtin" then
+                payload, status = at_saved_commands.unhide_builtin(self:get_argument("cmd", ""))
+            elseif op == "reset_hidden_builtins" then
+                payload, status = at_saved_commands.reset_hidden_builtins()
+            else
+                self:set_status(400)
+                self:write({ ok = false, error = "unknown_op" })
+                return
+            end
+
+            self:set_status(status or 200)
+            self:write(payload)
+        end, debug.traceback)
+
+        if not ok then
+            turbo.log.error("AtTerminalApi saved_commands exception: " .. tostring(err))
+            self:set_status(500)
+            self:write({ ok = false, error = "internal_handler_error" })
+        end
+        return
+    end
+
     local ok, err = xpcall(function()
         if action ~= "run" then
             error(turbo.web.HTTPError(404))
@@ -2157,6 +2218,7 @@ return {
         table.insert(handlers, 1, {"^/(band_locking_api)/(cell_state)$", BandLockingApiHandler})
         table.insert(handlers, 1, {"^/(band_locking_api)/(cell_scan)$", BandLockingApiHandler})
         table.insert(handlers, 1, {"^/(band_locking_api)/(cell_lock)$", BandLockingApiHandler})
+        table.insert(handlers, 1, {"^/(at_terminal_api)/(saved_commands)$", AtTerminalApiHandler})
         table.insert(handlers, 1, {"^/(at_terminal_api)/(run)$", AtTerminalApiHandler})
         table.insert(handlers, 1, {"^/(sms_api)/(list)$", SmsApiHandler})
         table.insert(handlers, 1, {"^/(sms_api)/(read)$", SmsApiHandler})

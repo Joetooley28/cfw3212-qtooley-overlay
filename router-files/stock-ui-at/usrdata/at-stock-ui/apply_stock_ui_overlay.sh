@@ -28,16 +28,24 @@ build_live_tree() {
     cp -a "$BASE/www/." "$LIVE_WWW/"
     cp -a "$BASE/usr/share/lua/5.1/webif/." "$LIVE_WEBIF/"
 
+    # Menu + auth must land in the live webif even when /usrdata/at-stock-ui/overlay/ is missing
+    # (e.g. partial sync of handler + www only). Stock pivot userGroupAuth has no Jtools pages -> /sms.html redirects to index.
     if [ -f "$BASE/overlay/www/js/generatedMenuEntries.js" ]; then
         cp "$BASE/overlay/www/js/generatedMenuEntries.js" "$LIVE_WWW/js/generatedMenuEntries.js"
+    elif [ -f "$BASE/www/js/generatedMenuEntries.js" ]; then
+        cp "$BASE/www/js/generatedMenuEntries.js" "$LIVE_WWW/js/generatedMenuEntries.js"
     fi
 
     if [ -f "$BASE/overlay/usr/share/lua/5.1/webif/top_menu_entries.lua" ]; then
         cp "$BASE/overlay/usr/share/lua/5.1/webif/top_menu_entries.lua" "$LIVE_WEBIF/top_menu_entries.lua"
+    elif [ -f "$BASE/usr/share/lua/5.1/webif/top_menu_entries.lua" ]; then
+        cp "$BASE/usr/share/lua/5.1/webif/top_menu_entries.lua" "$LIVE_WEBIF/top_menu_entries.lua"
     fi
 
     if [ -f "$BASE/overlay/usr/share/lua/5.1/webif/userGroupAuth.lua" ]; then
         cp "$BASE/overlay/usr/share/lua/5.1/webif/userGroupAuth.lua" "$LIVE_WEBIF/userGroupAuth.lua"
+    elif [ -f "$BASE/usr/share/lua/5.1/webif/userGroupAuth.lua" ]; then
+        cp "$BASE/usr/share/lua/5.1/webif/userGroupAuth.lua" "$LIVE_WEBIF/userGroupAuth.lua"
     fi
 }
 

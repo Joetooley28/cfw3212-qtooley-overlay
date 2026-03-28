@@ -835,9 +835,13 @@ form .title-box,
 .ookla-field,
 .ookla-meta-item,
 .ookla-history-item,
-.ookla-ca-card,
-.ookla-live-strip {
+.ookla-ca-card {
     background: var(--qt-bg-card, rgba(37, 37, 38, 0.9));
+    border-color: var(--qt-border, #3c3c3c);
+}
+
+/* Spectrum live strip: background comes from ookla_speedtest.css (do not flatten). */
+.ookla-live-strip {
     border-color: var(--qt-border, #3c3c3c);
 }
 
@@ -970,11 +974,12 @@ button.ookla-link-button[disabled],
 }
 
 .ookla-live-bar {
-    background: #343b43;
+    background: rgba(0, 0, 0, 0.4);
 }
 
+/* Fill uses --ookla-flow-gradient from parent .ookla-live-strip (Quick Overview–style spectrum). */
 .ookla-live-bar span {
-    background: linear-gradient(90deg, #ffdc43 0%, #f09b43 55%, #d85a4c 100%);
+    background-size: 200% 100%;
 }
 
 .ookla-live-metric {

@@ -171,6 +171,32 @@ Important verification trap:
 - plain `mount` output is misleading on this box
 - use `/proc/self/mountinfo` to verify active bind mounts
 
+### Overlay reapply rebuild order (do not underestimate this)
+
+`apply_stock_ui_overlay.sh` **removes** `/usrdata/at-stock-ui/live` and rebuilds it roughly as:
+
+1. Copy stock pivot trees into `live` (`/overlay/pivot/www` and `.../webif`)
+2. Merge `/usrdata/at-stock-ui/www` onto `live/www`
+3. Merge `/usrdata/at-stock-ui/usr/share/lua/5.1/webif` onto `live/.../webif`
+4. Apply Jtools menu/auth files: prefer `overlay/www/js/generatedMenuEntries.js` and `overlay/.../top_menu_entries.lua` and `overlay/.../userGroupAuth.lua` when those paths exist on the router; the package also keeps **fallback copies** under `www/js/` and `usr/share/lua/5.1/webif/` so reapply still works if `overlay/` is missing
+
+If step 4 does **not** place complete Jtools **`top_menu_entries.lua`** and **`userGroupAuth.lua`** into the live `webif` tree, those slots stay **stock** from the pivot. Casa Turbo’s `MustacheHandler` builds **`AUTH_TABLE`** from `userGroupAuth.lua`. Stock auth does **not** include Jtools pages (for example `sms.html`) or Jtools API keys (for example `SmsApi`). The browser can show a menu line from cached or client-side data while **GET `/sms.html` is rejected server-side** — typically **redirect to `index.html`** — so the failure looks like a “dead” or “lost” page even when **`sms.html`**, **`sms.js`**, **`sms.css`**, and **`handler_0011.lua`** API routes are all present.
+
+**Lesson:** before concluding a Jtools page bug is front-end-only, verify **server-side** menu and auth wiring in the **live** tree (or the payload that reapply will copy), not only the HTML and handler routes.
+
+### Jtools page wiring checklist (all integration points)
+
+A Jtools page is not done until **all** of these agree (trace a known-good page such as Speedtest or SMS):
+
+- **`generatedMenuEntries.js`** — menu entry, URL, view groups
+- **`top_menu_entries.lua`** — the page’s `*.html` name appears under the correct top menu key (usually `JtoolServices`)
+- **`userGroupAuth.lua`** — auth for the **`*.html`** page **and** for **each** API object name returned by handlers’ `getUrl()` (for example `SmsApi`, `AtTerminalApi`, `OoklaSpeedtestApi`)
+- **`handler_0011.lua`** — route patterns registered for any custom APIs
+- **Page assets** — `www/<page>.html`, `www/js/`, `www/css/` as used by that page
+- **`/usrdata/at-stock-ui`** helpers (scripts, extra Lua modules) if the page depends on them
+
+Treat **`top_menu_entries.lua`** and **`userGroupAuth.lua`** as **critical shared stock wiring**. Partial syncs that update only `handler_0011.lua` or only `www/` **plus reapply** can otherwise **silently revert** live menu/auth toward stock and **drop** Jtools entries.
+
 ## Standalone AT Versus Stock UI Jtools
 
 These are separate systems and should stay conceptually separate.
@@ -200,9 +226,11 @@ At the time of writing, the Jtools tab has included pages such as:
 - `Quick Overview`
 - `General info`
 - `AT terminal`
+- `SMS`
 - `Band / cell locking`
 - `Ookla Speedtest`
 - `TTL helper`
+- `Tailscale` (when packaged)
 
 Quick Overview notes:
 
@@ -692,5 +720,6 @@ This file was consolidated from the current project docs and notes, especially:
 - [CFW3212_stock_ui_AT_integration_note.txt](/c:/at_terminal/notes/CFW3212_stock_ui_AT_integration_note.txt)
 - [CFW3212_ookla_speedtest_page_plan.txt](/c:/at_terminal/notes/CFW3212_ookla_speedtest_page_plan.txt)
 - [CFW3212_proven_commands_cheatsheet.txt](/c:/at_terminal/notes/CFW3212_proven_commands_cheatsheet.txt)
+- [CFW3212_jtools_overlay_wiring_SMS_lesson.txt](/c:/at_terminal/notes/CFW3212_jtools_overlay_wiring_SMS_lesson.txt)
 
 If anything in this file conflicts with a newer detailed note, update this file so it stays the top-level truth.
