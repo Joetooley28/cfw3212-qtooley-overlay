@@ -18,6 +18,30 @@ body.jtools-page-band-locking #htmlGoesHere {
     background: #0a0a0f !important;
 }
 
+@media (min-width: 769px) {
+    body.jtools-page-band-locking #content .grid-9.omega {
+        box-sizing: border-box;
+        flex: 1 1 calc(100% - 284px);
+        max-width: calc(100% - 284px);
+        width: calc(100% - 284px);
+    }
+
+    body.jtools-page-band-locking #band-lock-panel,
+    body.jtools-page-band-locking .at-page {
+        box-sizing: border-box;
+        max-width: 100%;
+        width: 100%;
+    }
+
+    body.jtools-page-band-locking #cell-lock-scan-results {
+        overflow-x: auto;
+    }
+
+    body.jtools-page-band-locking .cell-lock-scan-table {
+        min-width: 760px;
+    }
+}
+
 .at-page {
     background: linear-gradient(135deg, #0a0a0f 0%, #0f1018 50%, #0d0d18 100%);
     border: 1px solid rgba(255,255,255,0.08);
