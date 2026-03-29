@@ -799,8 +799,15 @@
         });
     }
 
+    function applyShellClass() {
+        if (!document.body) { return; }
+        document.body.classList.add("jtools-layout-wide-sticky");
+        document.body.classList.add("jtools-page-ookla-speedtest");
+    }
+
     window.JtoolsOoklaSpeedtest = {
         init: function () {
+            applyShellClass();
             loadHistory();
             renderPanel();
             render();

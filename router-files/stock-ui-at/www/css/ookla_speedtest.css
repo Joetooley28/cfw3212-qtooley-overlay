@@ -1,5 +1,20 @@
+html,
+body.jtools-page-ookla-speedtest,
+body.jtools-page-ookla-speedtest #body,
+body.jtools-page-ookla-speedtest .site-content,
+body.jtools-page-ookla-speedtest #content,
+body.jtools-page-ookla-speedtest #content > .container,
+body.jtools-page-ookla-speedtest #content .grid-9.omega,
+body.jtools-page-ookla-speedtest #content .body-box,
+body.jtools-page-ookla-speedtest #content .body-box > .pad,
+body.jtools-page-ookla-speedtest #htmlGoesHere {
+    background: #0a0a0f !important;
+}
+
 #ookla-speedtest-panel {
+    box-sizing: border-box;
     margin-top: 20px;
+    width: 100%;
 }
 
 .ookla-page {
