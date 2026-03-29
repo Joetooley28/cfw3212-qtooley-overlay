@@ -20,6 +20,12 @@
 
     function $(id) { return document.getElementById(id); }
 
+    function applyShellClass() {
+        if (!document.body) { return; }
+        document.body.classList.add("jtools-layout-wide-sticky");
+        document.body.classList.add("jtools-page-quick-overview");
+    }
+
     // ── Build page DOM into #htmlGoesHere ──
 
     function buildPage() {
@@ -69,6 +75,7 @@
     // ── Init ──
 
     function init() {
+        applyShellClass();
         buildPage();
 
         els.activeBand    = $("qoActiveBand");

@@ -309,6 +309,19 @@
    TAB PAGE
    ================================================================ */
 
+html,
+body.jtools-page-quick-overview,
+body.jtools-page-quick-overview #body,
+body.jtools-page-quick-overview .site-content,
+body.jtools-page-quick-overview #content,
+body.jtools-page-quick-overview #content > .container,
+body.jtools-page-quick-overview #content .grid-9.omega,
+body.jtools-page-quick-overview #content .body-box,
+body.jtools-page-quick-overview #content .body-box > .pad,
+body.jtools-page-quick-overview #htmlGoesHere {
+    background: #0a0a0f !important;
+}
+
 .qo-page {
     background: linear-gradient(135deg, var(--qo-bg-deep) 0%, var(--qo-bg-mid) 100%);
     min-height: 100vh;
