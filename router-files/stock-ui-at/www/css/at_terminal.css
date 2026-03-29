@@ -5,6 +5,19 @@
 
 /* ── Page Root ── */
 
+html,
+body.jtools-page-band-locking,
+body.jtools-page-band-locking #body,
+body.jtools-page-band-locking .site-content,
+body.jtools-page-band-locking #content,
+body.jtools-page-band-locking #content > .container,
+body.jtools-page-band-locking #content .grid-9.omega,
+body.jtools-page-band-locking #content .body-box,
+body.jtools-page-band-locking #content .body-box > .pad,
+body.jtools-page-band-locking #htmlGoesHere {
+    background: #0a0a0f !important;
+}
+
 .at-page {
     background: linear-gradient(135deg, #0a0a0f 0%, #0f1018 50%, #0d0d18 100%);
     border: 1px solid rgba(255,255,255,0.08);
@@ -1810,4 +1823,3 @@
         gap: 8px;
     }
 }
-

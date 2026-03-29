@@ -744,6 +744,12 @@
         }
     }
 
+    function applyShellClass() {
+        if (!document.body) { return; }
+        document.body.classList.add("jtools-layout-wide-sticky");
+        document.body.classList.add("jtools-page-band-locking");
+    }
+
     function renderPanel() {
         if (document.getElementById("band-lock-panel")) {
             return;
@@ -767,6 +773,7 @@
 
     window.JtoolsBandLocking = {
         init: function () {
+            applyShellClass();
             renderPanel();
         }
     };
