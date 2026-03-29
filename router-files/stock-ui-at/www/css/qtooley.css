@@ -573,6 +573,16 @@ body.jtools-layout-wide-sticky #content > .container {
     overflow: visible;
 }
 
+body.jtools-layout-wide-sticky #content .grid-3.alpha {
+    align-self: flex-start;
+    float: none;
+    margin: 0;
+    position: sticky;
+    top: 16px;
+    width: 260px;
+    z-index: 31;
+}
+
 body.jtools-layout-wide-sticky #content > .container {
     align-items: flex-start;
     box-sizing: border-box;
@@ -594,9 +604,9 @@ body.jtools-layout-wide-sticky #side-menu {
     margin: 0;
     max-height: calc(100vh - 32px);
     overflow: auto;
-    position: sticky;
-    top: 16px;
-    width: 260px;
+    position: sticky !important;
+    top: 16px !important;
+    width: 100%;
     z-index: 30;
 }
 
@@ -637,6 +647,12 @@ body.jtools-layout-wide-sticky #htmlGoesHere {
 }
 
 @media (max-width: 768px) {
+    body.jtools-layout-wide-sticky #content .grid-3.alpha {
+        position: static;
+        top: auto;
+        width: auto;
+    }
+
     body.jtools-layout-wide-sticky #content > .container {
         display: block;
         gap: 12px;

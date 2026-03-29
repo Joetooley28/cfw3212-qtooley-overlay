@@ -30,6 +30,19 @@ body.jtools-page-screensaver-settings {
     overflow-x: hidden;
 }
 
+html,
+body.jtools-page-screensaver-settings,
+body.jtools-page-screensaver-settings #body,
+body.jtools-page-screensaver-settings .site-content,
+body.jtools-page-screensaver-settings #content,
+body.jtools-page-screensaver-settings #content > .container,
+body.jtools-page-screensaver-settings #content .grid-9.omega,
+body.jtools-page-screensaver-settings #content .body-box,
+body.jtools-page-screensaver-settings #content .body-box > .pad,
+body.jtools-page-screensaver-settings #htmlGoesHere {
+    background: #0a0a0f !important;
+}
+
 body.jtools-page-screensaver-settings .sidemenu {
     overflow: visible;
 }
