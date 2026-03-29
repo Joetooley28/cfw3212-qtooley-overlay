@@ -45,6 +45,14 @@
         return document.getElementById(id);
     }
 
+    function prefersDarkMode() {
+        try {
+            return window.localStorage.getItem("jtoolsThemeMode") !== "light";
+        } catch (e) {
+            return true;
+        }
+    }
+
     function applyShellClass() {
         if (!document.body) { return; }
         document.body.classList.add("jtools-layout-wide-sticky");
@@ -52,7 +60,7 @@
     }
 
     function currentLogoPath() {
-        return document.querySelector("link[data-jtools-dark-mode]")
+        return prefersDarkMode()
             ? "/img/qtooley/tailscale-logo-white.svg"
             : "/img/qtooley/tailscale-logo-black.svg";
     }
