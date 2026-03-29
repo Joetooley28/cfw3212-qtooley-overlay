@@ -31,6 +31,19 @@ body.jtools-page-general-dashboard #htmlGoesHere {
     background: #0a0a0f !important;
 }
 
+html,
+body.jtools-page-at-terminal,
+body.jtools-page-at-terminal #body,
+body.jtools-page-at-terminal .site-content,
+body.jtools-page-at-terminal #content,
+body.jtools-page-at-terminal #content > .container,
+body.jtools-page-at-terminal #content .grid-9.omega,
+body.jtools-page-at-terminal #content .body-box,
+body.jtools-page-at-terminal #content .body-box > .pad,
+body.jtools-page-at-terminal #htmlGoesHere {
+    background: #0a0a0f !important;
+}
+
 @media (min-width: 769px) {
     body.jtools-page-band-locking #content .grid-9.omega {
         box-sizing: border-box;
@@ -52,6 +65,13 @@ body.jtools-page-general-dashboard #htmlGoesHere {
 
     body.jtools-page-band-locking .cell-lock-scan-table {
         min-width: 760px;
+    }
+
+    body.jtools-page-at-terminal #at-terminal-page-root,
+    body.jtools-page-at-terminal .at-page {
+        box-sizing: border-box;
+        max-width: 100%;
+        width: 100%;
     }
 }
 

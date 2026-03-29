@@ -700,8 +700,15 @@
         refreshSavedCommands();
     }
 
+    function applyShellClass() {
+        if (!document.body) { return; }
+        document.body.classList.add("jtools-layout-wide-sticky");
+        document.body.classList.add("jtools-page-at-terminal");
+    }
+
     window.StockAtTerminal = {
         init: function () {
+            applyShellClass();
             renderPanel();
         }
     };
