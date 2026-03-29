@@ -575,10 +575,12 @@ body.jtools-layout-wide-sticky #content > .container {
 
 body.jtools-layout-wide-sticky #content .grid-3.alpha {
     align-self: flex-start;
+    flex: 0 0 260px;
     float: none;
+    height: 100%;
     margin: 0;
-    position: sticky;
-    top: 16px;
+    position: relative;
+    top: auto;
     width: 260px;
     z-index: 31;
 }
@@ -602,12 +604,13 @@ body.jtools-layout-wide-sticky #side-menu {
     float: none;
     height: auto;
     margin: 0;
-    max-height: calc(100vh - 32px);
+    max-height: calc(100vh - 172px);
     overflow: auto;
-    position: sticky !important;
-    top: 16px !important;
-    width: 100%;
-    z-index: 30;
+    position: fixed !important;
+    left: max(12px, calc((100vw - 1720px) / 2 + 12px));
+    top: 152px !important;
+    width: 260px;
+    z-index: 40;
 }
 
 body.jtools-layout-wide-sticky .sidemenu {
@@ -648,6 +651,8 @@ body.jtools-layout-wide-sticky #htmlGoesHere {
 
 @media (max-width: 768px) {
     body.jtools-layout-wide-sticky #content .grid-3.alpha {
+        flex: none;
+        height: auto;
         position: static;
         top: auto;
         width: auto;
@@ -665,7 +670,8 @@ body.jtools-layout-wide-sticky #htmlGoesHere {
         flex: none;
         max-height: none;
         overflow: visible;
-        position: static;
+        left: auto;
+        position: static !important;
         top: auto;
         width: auto;
     }
