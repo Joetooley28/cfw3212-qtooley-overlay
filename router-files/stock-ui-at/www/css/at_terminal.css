@@ -18,6 +18,19 @@ body.jtools-page-band-locking #htmlGoesHere {
     background: #0a0a0f !important;
 }
 
+html,
+body.jtools-page-general-dashboard,
+body.jtools-page-general-dashboard #body,
+body.jtools-page-general-dashboard .site-content,
+body.jtools-page-general-dashboard #content,
+body.jtools-page-general-dashboard #content > .container,
+body.jtools-page-general-dashboard #content .grid-9.omega,
+body.jtools-page-general-dashboard #content .body-box,
+body.jtools-page-general-dashboard #content .body-box > .pad,
+body.jtools-page-general-dashboard #htmlGoesHere {
+    background: #0a0a0f !important;
+}
+
 @media (min-width: 769px) {
     body.jtools-page-band-locking #content .grid-9.omega {
         box-sizing: border-box;
