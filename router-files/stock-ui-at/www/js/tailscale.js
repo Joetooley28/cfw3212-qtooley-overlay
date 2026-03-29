@@ -45,6 +45,12 @@
         return document.getElementById(id);
     }
 
+    function applyShellClass() {
+        if (!document.body) { return; }
+        document.body.classList.add("jtools-layout-wide-sticky");
+        document.body.classList.add("jtools-page-tailscale");
+    }
+
     function currentLogoPath() {
         return document.querySelector("link[data-jtools-dark-mode]")
             ? "/img/qtooley/tailscale-logo-white.svg"
@@ -537,6 +543,7 @@
     }
 
     function init() {
+        applyShellClass();
         buildShell();
         bindPageEvents();
         render();

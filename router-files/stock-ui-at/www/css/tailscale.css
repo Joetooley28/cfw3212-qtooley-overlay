@@ -1,3 +1,16 @@
+html,
+body.jtools-page-tailscale,
+body.jtools-page-tailscale #body,
+body.jtools-page-tailscale .site-content,
+body.jtools-page-tailscale #content,
+body.jtools-page-tailscale #content > .container,
+body.jtools-page-tailscale #content .grid-9.omega,
+body.jtools-page-tailscale #content .body-box,
+body.jtools-page-tailscale #content .body-box > .pad,
+body.jtools-page-tailscale #htmlGoesHere {
+    background: #0a0a0f !important;
+}
+
 #tailscale-panel {
     margin-top: 20px;
 }
