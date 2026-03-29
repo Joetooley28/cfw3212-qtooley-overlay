@@ -30,59 +30,8 @@ body.jtools-page-screensaver-settings {
     overflow-x: hidden;
 }
 
-body.jtools-page-screensaver-settings #content > .container {
-    box-sizing: border-box;
-    align-items: start;
-    display: grid;
-    gap: 20px;
-    grid-template-columns: minmax(220px, 250px) minmax(0, 1fr);
-    margin: 0 auto;
-    max-width: none;
-    padding: 18px 12px 28px;
-    width: min(1600px, 100%);
-}
-
-body.jtools-page-screensaver-settings #content,
-body.jtools-page-screensaver-settings #content > .container {
-    overflow: visible;
-}
-
-body.jtools-page-screensaver-settings #side-menu {
-    align-self: start;
-    float: none;
-    height: fit-content;
-    margin: 0;
-    max-height: calc(100vh - 32px);
-    overflow: auto;
-    position: -webkit-sticky;
-    position: sticky !important;
-    top: 16px;
-    width: auto;
-    z-index: 20;
-}
-
 body.jtools-page-screensaver-settings .sidemenu {
     overflow: visible;
-}
-
-body.jtools-page-screensaver-settings #content .grid-9.omega {
-    float: none;
-    margin: 0;
-    min-width: 0;
-    width: auto;
-}
-
-body.jtools-page-screensaver-settings #content .body-box {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    margin: 0;
-}
-
-body.jtools-page-screensaver-settings #content .body-box > .pad,
-body.jtools-page-screensaver-settings #htmlGoesHere {
-    background: transparent;
-    padding: 0;
 }
 
 /* ── Page wrapper ── */
@@ -396,38 +345,6 @@ body.jtools-page-screensaver-settings #htmlGoesHere {
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
-    body.jtools-page-screensaver-settings #content > .container {
-        box-sizing: border-box;
-        gap: 12px;
-        grid-template-columns: 1fr;
-        padding: 12px 8px 20px;
-        width: 100%;
-    }
-    body.jtools-page-screensaver-settings #side-menu {
-        max-height: none;
-        overflow: visible;
-        position: sticky;
-        top: 0;
-        z-index: 50;
-    }
-    body.jtools-page-screensaver-settings #side-menu > ul,
-    body.jtools-page-screensaver-settings .sidemenu > ul {
-        display: flex;
-        gap: 8px;
-        overflow-x: auto;
-        overflow-y: hidden;
-        padding: 4px;
-        white-space: nowrap;
-    }
-    body.jtools-page-screensaver-settings .sidemenu li {
-        flex: 0 0 auto;
-        margin: 0;
-    }
-    body.jtools-page-screensaver-settings .sidemenu li a,
-    body.jtools-page-screensaver-settings .sidemenu li a.inactive,
-    body.jtools-page-screensaver-settings .sidemenu li.open > div.submenu > a {
-        white-space: nowrap;
-    }
     .ss-page {
         padding: 12px;
         min-height: auto;

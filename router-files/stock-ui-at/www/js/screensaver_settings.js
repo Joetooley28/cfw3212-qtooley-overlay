@@ -1,12 +1,12 @@
 /* ================================================================
    Screensaver Settings — Standalone Page
-   Talks directly to /quick_overview_api/settings (GET/POST)
-   No dependency on quick_overview_core.js
+   Talks directly to /screensaver_api/settings (GET/POST)
+   No dependency on quick_overview_core.js or quick_overview.js
    ================================================================ */
 (function () {
     "use strict";
 
-    var API_URL = "/quick_overview_api/settings";
+    var API_URL = "/screensaver_api/settings";
 
     var defaults = {
         enabled: true,
@@ -24,7 +24,6 @@
     };
 
     var toastTimer = null;
-
     // ── Helpers ──
 
     function $(id) {
@@ -57,7 +56,8 @@
             if (xhr.readyState !== 4) return;
             if (xhr.status === 200) {
                 try {
-                    var data = JSON.parse(xhr.responseText);
+                    var response = JSON.parse(xhr.responseText);
+                    var data = response && response.settings ? response.settings : response;
                     state.settings = {};
                     for (var k in defaults) {
                         state.settings[k] = data.hasOwnProperty(k) ? data[k] : defaults[k];
@@ -103,8 +103,12 @@
 
     // ── Render ──
 
+    function getHost() {
+        return document.getElementById("htmlGoesHere");
+    }
+
     function render() {
-        var host = document.getElementById("htmlGoesHere") || document.getElementById("body");
+        var host = getHost();
         if (!host) return;
 
         if (state.loading) {
@@ -271,15 +275,29 @@
 
     function applyShellClass() {
         if (document.body) {
+            document.body.classList.add("jtools-layout-wide-sticky");
             document.body.classList.add("jtools-page-screensaver-settings");
         }
     }
 
     function init() {
         applyShellClass();
-        loadSettings(function () {
-            render();
-        });
+        waitForShellReady(80);
+    }
+
+    function waitForShellReady(remainingChecks) {
+        if (getHost()) {
+            loadSettings(function () {
+                render();
+            });
+            return;
+        }
+        if (remainingChecks <= 0) {
+            return;
+        }
+        setTimeout(function () {
+            waitForShellReady(remainingChecks - 1);
+        }, 50);
     }
 
     window.JtoolsScreensaverSettings = {

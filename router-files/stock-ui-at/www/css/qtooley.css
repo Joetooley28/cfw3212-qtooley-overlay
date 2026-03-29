@@ -561,3 +561,118 @@
         text-align: center;
     }
 }
+
+/* ================================================================
+   WIDE JTOOLS SHELL
+   Shared page-shell mode for immersive Jtools pages that should
+   keep the Casa navigation while giving the content column more room.
+   ================================================================ */
+body.jtools-layout-wide-sticky,
+body.jtools-layout-wide-sticky #content,
+body.jtools-layout-wide-sticky #content > .container {
+    overflow: visible;
+}
+
+body.jtools-layout-wide-sticky #content > .container {
+    align-items: flex-start;
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 24px;
+    margin: 0 auto;
+    max-width: 1720px;
+    padding: 18px 12px 32px;
+    width: 100%;
+}
+
+body.jtools-layout-wide-sticky #side-menu {
+    align-self: flex-start;
+    display: block;
+    flex: 0 0 260px;
+    float: none;
+    height: auto;
+    margin: 0;
+    max-height: calc(100vh - 32px);
+    overflow: auto;
+    position: sticky;
+    top: 16px;
+    width: 260px;
+    z-index: 30;
+}
+
+body.jtools-layout-wide-sticky .sidemenu {
+    overflow: visible;
+}
+
+body.jtools-layout-wide-sticky #side-menu > ul,
+body.jtools-layout-wide-sticky .sidemenu > ul {
+    margin: 0;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+body.jtools-layout-wide-sticky #content .grid-9.omega {
+    flex: 1 1 auto;
+    float: none;
+    margin: 0;
+    max-width: none;
+    min-width: 0;
+    position: relative;
+    width: auto;
+    z-index: 1;
+}
+
+body.jtools-layout-wide-sticky #content .body-box {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    margin: 0;
+}
+
+body.jtools-layout-wide-sticky #content .body-box > .pad,
+body.jtools-layout-wide-sticky #htmlGoesHere {
+    background: transparent;
+    padding: 0;
+}
+
+@media (max-width: 768px) {
+    body.jtools-layout-wide-sticky #content > .container {
+        display: block;
+        gap: 12px;
+        padding: 12px 8px 20px;
+        width: 100%;
+    }
+
+    body.jtools-layout-wide-sticky #side-menu {
+        display: block;
+        flex: none;
+        max-height: none;
+        overflow: visible;
+        position: static;
+        top: auto;
+        width: auto;
+    }
+
+    body.jtools-layout-wide-sticky #side-menu > ul,
+    body.jtools-layout-wide-sticky .sidemenu > ul {
+        display: flex;
+        gap: 8px;
+        max-height: none;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 4px 0;
+        white-space: nowrap;
+    }
+
+    body.jtools-layout-wide-sticky .sidemenu li {
+        flex: 0 0 auto;
+        margin: 0;
+    }
+
+    body.jtools-layout-wide-sticky .sidemenu li a,
+    body.jtools-layout-wide-sticky .sidemenu li a.inactive,
+    body.jtools-layout-wide-sticky .sidemenu li.open > div.submenu > a {
+        white-space: nowrap;
+    }
+}

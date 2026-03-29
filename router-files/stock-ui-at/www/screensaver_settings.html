@@ -24,8 +24,9 @@
 <link rel="stylesheet" href="/css/style.css?1.1.79.0">
 <link rel="stylesheet" href="/css/jquery-ui.css?1.1.79.0">
 <link rel="stylesheet" href="/css/validationEngine.jquery.css?1.1.79.0">
-<link rel="stylesheet" href="/css/qtooley.css?qtooley-v20260324a">
-<link rel="stylesheet" href="/css/screensaver_settings.css?jtools-ss-v20260331c">
+<link rel="stylesheet" href="/css/qtooley.css?qtooley-v20260329b">
+<link rel="stylesheet" href="/css/jtools_dark_mode.css?jtools-dark-v20260329a">
+<link rel="stylesheet" href="/css/screensaver_settings.css?jtools-ss-v20260329h">
 <script>
 if (top !== self) top.location = self.location;
 var nas_installed = '<<<system.package.installed.nas>>>';
@@ -51,10 +52,10 @@ for (const [key, value] of searchParams) { queryParams[key] = value; }
 <script src="/js/script.js?1.1.79.0"></script>
 <script src="/js/language_selection.js?1.1.79.0"></script>
 <script src="/js/generatedSupportedLanguages.js?1.1.79.0"></script>
-<script src="/js/generatedMenuEntries.js?jtools-menu-v20260331d"></script>
-<script src="/theme/js/genHeader.js?jtools-genheader-v20260331d"></script>
+<script src="/js/generatedMenuEntries.js?jtools-menu-v20260327c"></script>
+<script src="/theme/js/genHeader.js?jtools-genheader-v20260328c"></script>
 <script src="/theme/js/genFooter.js?1.1.79.0"></script>
-<script src="/js/screensaver_settings.js?jtools-ss-v20260331b"></script>
+<script src="/js/screensaver_settings.js?jtools-ss-v20260329h"></script>
 <script>
 var pageData = {
     title: "Screensaver Settings",
@@ -67,12 +68,16 @@ var pageData = {
     }
 };
 if (pageData.disabled !== true) {
-    $(document).ready(function () {
-        if (typeof pageData.onReady === "function") {
-            pageData.onReady();
-        }
-        setVisible("#body", "1");
-    });
+    if (pageData.pageObjects.length) {
+        requestPageObjects();
+    } else {
+        $(document).ready(function () {
+            if (typeof pageData.onReady === "function") {
+                pageData.onReady();
+            }
+            setVisible("#body", "1");
+        });
+    }
 }
 </script>
 </head>
