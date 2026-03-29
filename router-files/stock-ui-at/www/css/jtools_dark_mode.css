@@ -87,6 +87,38 @@ select {
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
 }
 
+.top-right {
+    position: relative;
+    z-index: 3;
+}
+
+.top-right .list-inline,
+.top-right .list-inline li,
+.top-right .list-inline li a {
+    position: relative;
+    z-index: 4;
+}
+
+.right-item.account-btn {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+    height: 40px;
+    margin-right: 16px;
+    min-width: 0;
+    pointer-events: none;
+    padding-right: 0;
+    width: auto;
+    z-index: 2;
+}
+
+.right-item.account-btn .login-foot-user,
+.right-item.account-btn #logOff,
+.right-item.account-btn #logOffForm,
+.right-item.account-btn #logOffForm button {
+    pointer-events: auto;
+}
+
 .site-header h1 {
     filter: sepia(1) saturate(6.6) hue-rotate(338deg) brightness(1.16);
 }
@@ -255,9 +287,9 @@ button:disabled {
 /* ── Qtooley sidebar nav ── */
 .sidemenu,
 .sidemenu ul {
-    background: linear-gradient(180deg, #12161c 0%, #0e1117 100%);
-    overflow: hidden;
-    padding: 6px 0;
+    background: transparent;
+    overflow: visible;
+    padding: 0;
 }
 
 .sidemenu li {
