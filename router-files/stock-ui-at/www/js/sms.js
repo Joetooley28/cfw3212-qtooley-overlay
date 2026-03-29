@@ -37,6 +37,12 @@
 
     function byId(id) { return document.getElementById(id); }
 
+    function applyShellClass() {
+        if (!document.body) { return; }
+        document.body.classList.add("jtools-layout-wide-sticky");
+        document.body.classList.add("jtools-page-sms");
+    }
+
     function tipAttr(text) {
         return " title='" + escapeHtml(text) + "'";
     }
@@ -714,6 +720,7 @@
     }
 
     function init() {
+        applyShellClass();
         buildShell();
         render();
         fetchMessages();

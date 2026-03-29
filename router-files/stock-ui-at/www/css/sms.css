@@ -29,6 +29,19 @@
 
 /* ── Page Root ── */
 
+html,
+body.jtools-page-sms,
+body.jtools-page-sms #body,
+body.jtools-page-sms .site-content,
+body.jtools-page-sms #content,
+body.jtools-page-sms #content > .container,
+body.jtools-page-sms #content .grid-9.omega,
+body.jtools-page-sms #content .body-box,
+body.jtools-page-sms #content .body-box > .pad,
+body.jtools-page-sms #htmlGoesHere {
+    background: #0a0a0f !important;
+}
+
 #sms-panel {
     margin-top: 20px;
 }
