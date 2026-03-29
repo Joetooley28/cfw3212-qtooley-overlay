@@ -276,11 +276,11 @@
 
             '<div class="ttl-rules-card">',
             '  <div class="ttl-rules-header" onclick="JtoolsTtlHelper.toggleRules()">',
-            '    <span id="ttl-rules-arrow" class="ttl-rules-arrow">&#9654;</span>',
+            '    <span id="ttl-rules-arrow" class="ttl-rules-arrow">&#9660;</span>',
             '    <h3>iptables mangle rules</h3>',
             '    <button type="button" class="ttl-rules-refresh qt-btn qt-btn-secondary" onclick="event.stopPropagation(); JtoolsTtlHelper.refreshRules()">Refresh</button>',
             '  </div>',
-            '  <div id="ttl-rules-body" class="ttl-rules-body" style="display:none">',
+            '  <div id="ttl-rules-body" class="ttl-rules-body">',
             '    <div class="ttl-rules-section">',
             '      <span class="ttl-rules-label">IPv4 (iptables)</span>',
             '      <pre id="ttl-rules-ipv4" class="ttl-rules-pre">Not loaded</pre>',
@@ -296,7 +296,7 @@
         container.appendChild(panel);
     }
 
-    var rulesOpen = false;
+    var rulesOpen = true;
 
     function toggleRulesPanel() {
         var body = document.getElementById("ttl-rules-body");
@@ -336,6 +336,7 @@
             renderPanel();
             render();
             fetchStatus();
+            fetchRules();
             var input = document.getElementById("ttl-custom-input");
             if (input) {
                 input.addEventListener("input", showUpdateBtn);
