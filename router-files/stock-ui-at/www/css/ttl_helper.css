@@ -1,5 +1,20 @@
+html,
+body.jtools-page-ttl-helper,
+body.jtools-page-ttl-helper #body,
+body.jtools-page-ttl-helper .site-content,
+body.jtools-page-ttl-helper #content,
+body.jtools-page-ttl-helper #content > .container,
+body.jtools-page-ttl-helper #content .grid-9.omega,
+body.jtools-page-ttl-helper #content .body-box,
+body.jtools-page-ttl-helper #content .body-box > .pad,
+body.jtools-page-ttl-helper #htmlGoesHere {
+    background: #0a0a0f !important;
+}
+
 #ttl-panel {
+    box-sizing: border-box;
     margin-top: 20px;
+    width: 100%;
 }
 
 .ttl-top-row {

@@ -324,8 +324,15 @@
         });
     }
 
+    function applyShellClass() {
+        if (!document.body) { return; }
+        document.body.classList.add("jtools-layout-wide-sticky");
+        document.body.classList.add("jtools-page-ttl-helper");
+    }
+
     window.JtoolsTtlHelper = {
         init: function () {
+            applyShellClass();
             renderPanel();
             render();
             fetchStatus();
