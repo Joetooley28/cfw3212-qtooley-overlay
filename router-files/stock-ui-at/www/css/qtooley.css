@@ -628,7 +628,7 @@ body.jtools-layout-wide-sticky .sidemenu > ul {
 body.jtools-layout-wide-sticky #content .grid-9.omega {
     flex: 1 1 auto;
     float: none;
-    margin: 0;
+    margin: 0 0 0 284px;
     max-width: none;
     min-width: 0;
     position: relative;
@@ -656,6 +656,10 @@ body.jtools-layout-wide-sticky #htmlGoesHere {
         position: static;
         top: auto;
         width: auto;
+    }
+
+    body.jtools-layout-wide-sticky #content .grid-9.omega {
+        margin-left: 0;
     }
 
     body.jtools-layout-wide-sticky #content > .container {
