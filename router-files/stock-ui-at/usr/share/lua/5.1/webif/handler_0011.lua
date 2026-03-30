@@ -13,6 +13,7 @@ local speedtest = require("ookla_speedtest")
 local tailscale = require("tailscale")
 local ttl_helper = require("ttl_helper")
 local quick_overview_settings = require("quick_overview_settings")
+local screensaver_settings = require("screensaver_settings")
 local band_locking_settings = require("band_locking_settings")
 local sms = require("sms_backend")
 local at_saved_commands = require("at_saved_commands")
@@ -2383,6 +2384,105 @@ function QuickOverviewApiHandler:post(url, action)
     self:write({ ok = false, error = "unknown_action" })
 end
 
+local ScreensaverApiHandler = class("ScreensaverApiHandler", SessionRequestHandler)
+
+function ScreensaverApiHandler:getUrl(url, action)
+    return "ScreensaverApi"
+end
+
+function ScreensaverApiHandler:get(url, action)
+    action = normalize_action("screensaver_api", url, action)
+
+    if action == "settings" then
+        local ok, result = pcall(screensaver_settings.get_settings)
+        if not ok then
+            self:set_status(500)
+            self:write({ ok = false, error = "screensaver_settings_read_failed" })
+            return
+        end
+        self:write(result)
+        return
+    end
+
+    error(turbo.web.HTTPError(404))
+end
+
+function ScreensaverApiHandler:post(url, action)
+    action = normalize_action("screensaver_api", url, action)
+
+    if action == "settings" then
+        -- Try JSON body first (from screensaver_settings.js), fall back to form-encoded
+        local payload = {}
+        local content_type = self.request.headers:get("Content-Type") or ""
+        if content_type:find("application/json") then
+            local body = self.request.body or ""
+            local decode_ok, decoded = pcall(function() return JSON:decode(body) end)
+            if decode_ok and type(decoded) == "table" then
+                local s = decoded.settings or decoded
+                if s.enabled ~= nil then
+                    payload.enabled = s.enabled
+                end
+                if s.timeout ~= nil then
+                    payload.timeout = tonumber(s.timeout)
+                end
+                if s.dismissMode ~= nil then
+                    payload.dismissMode = s.dismissMode
+                end
+                if s.weightRsrp ~= nil then
+                    payload.weightRsrp = tonumber(s.weightRsrp)
+                end
+                if s.weightSinr ~= nil then
+                    payload.weightSinr = tonumber(s.weightSinr)
+                end
+                if s.weightRsrq ~= nil then
+                    payload.weightRsrq = tonumber(s.weightRsrq)
+                end
+            end
+        else
+            local enabled = self:get_argument("enabled", nil)
+            local timeout = self:get_argument("timeout", nil)
+            local dismiss_mode = self:get_argument("dismissMode", nil)
+            local weight_rsrp = self:get_argument("weightRsrp", nil)
+            local weight_sinr = self:get_argument("weightSinr", nil)
+            local weight_rsrq = self:get_argument("weightRsrq", nil)
+
+            if enabled ~= nil then
+                payload.enabled = tostring(enabled) == "true" or tostring(enabled) == "1"
+            end
+            if timeout ~= nil and timeout ~= "" then
+                payload.timeout = tonumber(timeout)
+            end
+            if dismiss_mode ~= nil and dismiss_mode ~= "" then
+                payload.dismissMode = dismiss_mode
+            end
+            if weight_rsrp ~= nil and weight_rsrp ~= "" then
+                payload.weightRsrp = tonumber(weight_rsrp)
+            end
+            if weight_sinr ~= nil and weight_sinr ~= "" then
+                payload.weightSinr = tonumber(weight_sinr)
+            end
+            if weight_rsrq ~= nil and weight_rsrq ~= "" then
+                payload.weightRsrq = tonumber(weight_rsrq)
+            end
+        end
+
+        local ok, result = pcall(screensaver_settings.save_settings, payload)
+        if not ok then
+            self:set_status(500)
+            self:write({ ok = false, error = "screensaver_settings_write_failed" })
+            return
+        end
+        if result and not result.ok then
+            self:set_status(500)
+        end
+        self:write(result)
+        return
+    end
+
+    self:set_status(404)
+    self:write({ ok = false, error = "unknown_action" })
+end
+
 local TailscaleApiHandler = class("TailscaleApiHandler", SessionRequestHandler)
 
 function TailscaleApiHandler:getUrl(url, action)
@@ -2668,6 +2768,7 @@ return {
         table.insert(handlers, 1, {"^/(ttl_helper_api)/(apply)$", TtlHelperApiHandler})
         table.insert(handlers, 1, {"^/(ttl_helper_api)/(remove)$", TtlHelperApiHandler})
         table.insert(handlers, 1, {"^/(quick_overview_api)/(settings)$", QuickOverviewApiHandler})
+        table.insert(handlers, 1, {"^/(screensaver_api)/(settings)$", ScreensaverApiHandler})
         table.insert(handlers, 1, {"^/(jtools_general_api)/(state)$", JtoolGeneralApiHandler})
         table.insert(handlers, 1, {"^/(band_locking_api)/(state)$", BandLockingApiHandler})
         table.insert(handlers, 1, {"^/(band_locking_api)/(mode)$", BandLockingApiHandler})

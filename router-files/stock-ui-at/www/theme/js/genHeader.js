@@ -20,55 +20,55 @@
 function genThemeHeader(pageData, userGroups) {
 
     const themeStorageKey = "jtoolsThemeMode";
+    const themedPages = {
+        "quick_overview.html": true,
+        "general_dashboard.html": true,
+        "at_terminal.html": true,
+        "band_cell_locking.html": true,
+        "ookla_speedtest.html": true,
+        "ttl_helper.html": true,
+        "tailscale.html": true,
+        "sms.html": true,
+        "screensaver_settings.html": true,
+        "status.html": true,
+        "profile_list.html": true,
+        "operator_setting.html": true,
+        "roaming.html": true,
+        "lan.html": true,
+        "dhcp.html": true,
+        "vlan.html": true,
+        "NAT.html": true,
+        "mac_whitelist.html": true,
+        "routing.html": true,
+        "service_assurance.html": true,
+        "NTP.html": true,
+        "TR069.html": true,
+        "dns_server.html": true,
+        "gps_configuration.html": true,
+        "agps.html": true,
+        "gps_odometer.html": true,
+        "gps_geofence.html": true,
+        "lwm2m.html": true,
+        "logfile.html": true,
+        "logsettings.html": true,
+        "ping_diag.html": true,
+        "FactoryReset.html": true,
+        "web_server_setting.html": true,
+        "admin_credentials.html": true,
+        "webui_credentials.html": true,
+        "settings_backup.html": true,
+        "runtime_config.html": true,
+        "upgrade.html": true,
+        "access_control.html": true,
+        "Reboot.html": true,
+        "field_test.html": true,
+        "encrypted_debuginfo.html": true
+    };
 
     function ensureJtoolsDarkModeStylesheet() {
-        const darkModePages = {
-            "quick_overview.html": true,
-            "general_dashboard.html": true,
-            "at_terminal.html": true,
-            "band_cell_locking.html": true,
-            "ookla_speedtest.html": true,
-            "ttl_helper.html": true,
-            "tailscale.html": true,
-            "sms.html": true,
-            "screensaver_settings.html": true,
-            "status.html": true,
-            "profile_list.html": true,
-            "operator_setting.html": true,
-            "roaming.html": true,
-            "lan.html": true,
-            "dhcp.html": true,
-            "vlan.html": true,
-            "NAT.html": true,
-            "mac_whitelist.html": true,
-            "routing.html": true,
-            "service_assurance.html": true,
-            "NTP.html": true,
-            "TR069.html": true,
-            "dns_server.html": true,
-            "gps_configuration.html": true,
-            "agps.html": true,
-            "gps_odometer.html": true,
-            "gps_geofence.html": true,
-            "lwm2m.html": true,
-            "logfile.html": true,
-            "logsettings.html": true,
-            "ping_diag.html": true,
-            "FactoryReset.html": true,
-            "web_server_setting.html": true,
-            "admin_credentials.html": true,
-            "webui_credentials.html": true,
-            "settings_backup.html": true,
-            "runtime_config.html": true,
-            "upgrade.html": true,
-            "access_control.html": true,
-            "Reboot.html": true,
-            "field_test.html": true,
-            "encrypted_debuginfo.html": true
-        };
         const darkModeHref = "/css/jtools_dark_mode.css?jtools-dark-v20260329a";
 
-        if (!darkModePages[relUrlOfPage]) {
+        if (!themedPages[relUrlOfPage]) {
             return false;
         }
 
@@ -123,9 +123,9 @@ function genThemeHeader(pageData, userGroups) {
             ".jt-toggle-track.is-on{background:#4a7cdb;border-color:#5a8ae6;}" +
             ".jt-toggle-knob{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#d7dde4;transition:transform 0.2s;}" +
             ".jt-toggle-track.is-on .jt-toggle-knob{transform:translateX(16px);}" +
-            "#jtoolsHeaderBtns{max-width:calc(100vw - 24px);}" +
-            "@media (max-width:1280px){#jtoolsHeaderBtns{right:12px!important;top:12px!important;align-items:flex-end;}}" +
-            "@media (max-width:768px){#jtoolsHeaderBtns{gap:4px;right:8px!important;top:8px!important;transform:scale(.96);transform-origin:top right;}}";
+            "#jtoolsHeaderBtns{max-width:240px;}" +
+            "@media (max-width:1280px){#jtoolsHeaderBtns{top:12px!important;align-items:flex-end;}}" +
+            "@media (max-width:768px){#jtoolsHeaderBtns{gap:4px;top:8px!important;transform:translateX(42px) scale(.96);transform-origin:top right;}}";
         document.head.appendChild(styleEl);
 
         function makeToggleRow(id, label, isOn, onChange) {
@@ -155,11 +155,10 @@ function genThemeHeader(pageData, userGroups) {
             return row;
         }
 
-        // Container — stacked vertically, positioned outside the Casa container's right edge
         const wrap = document.createElement("div");
         wrap.id = "jtoolsHeaderBtns";
         wrap.setAttribute("style",
-            "position:absolute;right:-216px;top:80px;z-index:99999;" +
+            "position:fixed;right:12px;top:30px;z-index:99999;transform:translateX(110px);" +
             "display:flex;flex-direction:column;gap:6px;align-items:flex-start;");
 
         // Dark mode toggle (on = dark, off = light)
@@ -181,13 +180,7 @@ function genThemeHeader(pageData, userGroups) {
         wrap.appendChild(darkRow);
         wrap.appendChild(ssRow);
 
-        const host = document.querySelector(".container");
-        if (host) {
-            if (!host.style.position || host.style.position === "static") {
-                host.style.position = "relative";
-            }
-            host.appendChild(wrap);
-        }
+        document.body.appendChild(wrap);
     }
 
     // This generates all the html for a simple menu with no submenus
@@ -318,13 +311,18 @@ function genThemeHeader(pageData, userGroups) {
     $("#side-menu").append(h_side);
     renderThemeToggle();
 
-    // Screensaver: dark-mode pages + Screensaver Settings (light mode needs manual open)
-    var injectScreensaverJs = document.querySelector("link[data-jtools-dark-mode]") ||
-        (typeof relUrlOfPage !== "undefined" && relUrlOfPage === "screensaver_settings.html");
-    if (injectScreensaverJs) {
+    var injectScreensaverJs = typeof relUrlOfPage !== "undefined" && themedPages[relUrlOfPage];
+    if (injectScreensaverJs && !document.querySelector("script[src*='/js/jtools_screensaver.js']")) {
         var ssScript = document.createElement("script");
         ssScript.src = "/js/jtools_screensaver.js?jtools-qo-v20260331e";
         document.head.appendChild(ssScript);
+    }
+
+    var injectKeepaliveJs = pageData && pageData.menuPos && pageData.menuPos[0] === "JtoolServices";
+    if (injectKeepaliveJs && !document.querySelector("script[src*='/js/jtools_session_keepalive.js']")) {
+        var keepaliveScript = document.createElement("script");
+        keepaliveScript.src = "/js/jtools_session_keepalive.js?jtools-session-v20260330a";
+        document.head.appendChild(keepaliveScript);
     }
 
     $("input[type=text]").keyup(function(e) {

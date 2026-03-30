@@ -24,8 +24,11 @@
 
     function readSettingsFromStorage() {
         try {
-            var raw = window.localStorage.getItem("jtoolsQoSettings");
+            var raw = window.localStorage.getItem("jtoolsScreensaverSettings");
             if (raw) { return normalizeSettings(JSON.parse(raw)); }
+            // Migration: try old QO key
+            var oldRaw = window.localStorage.getItem("jtoolsQoSettings");
+            if (oldRaw) { return normalizeSettings(JSON.parse(oldRaw)); }
         } catch (e) { /* ignore */ }
         return normalizeSettings({});
     }
@@ -33,18 +36,18 @@
     function writeSettingsToStorage(settings) {
         try {
             var merged = {};
-            var raw = window.localStorage.getItem("jtoolsQoSettings");
+            var raw = window.localStorage.getItem("jtoolsScreensaverSettings");
             if (raw) { merged = JSON.parse(raw) || {}; }
             merged.enabled = settings.enabled;
             merged.timeout = settings.timeout;
             merged.dismissMode = settings.dismissMode;
-            window.localStorage.setItem("jtoolsQoSettings", JSON.stringify(merged));
+            window.localStorage.setItem("jtoolsScreensaverSettings", JSON.stringify(merged));
         } catch (e) { /* ignore */ }
     }
 
     function getSettings() {
-        if (window.JtoolsQuickOverview && typeof window.JtoolsQuickOverview.getSettings === "function") {
-            return window.JtoolsQuickOverview.getSettings();
+        if (window.JtoolsScreensaverCore && typeof window.JtoolsScreensaverCore.getSettings === "function") {
+            return window.JtoolsScreensaverCore.getSettings();
         }
         return cachedSettings;
     }
@@ -53,7 +56,7 @@
         if (!window.XMLHttpRequest) { return; }
         try {
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", "/quick_overview_api/settings", true);
+            xhr.open("GET", "/screensaver_api/settings", true);
             xhr.onreadystatechange = function () {
                 if (xhr.readyState !== 4) { return; }
                 if (xhr.status !== 200) { return; }
@@ -112,10 +115,10 @@
     function buildScreensaverLoadingHtml() {
         var t = formatClockNow();
         return (
-            "<div class='qo-ss-center'>" +
-            "<div class='qo-ss-clock' id='qoSsClock'>" + t.clock + "</div>" +
-            "<div class='qo-ss-ampm' id='qoSsAmpm'>" + t.ampm + "</div>" +
-            "<div class='qo-ss-device' style='margin-top:20px'>Loading signal\u2026</div>" +
+            "<div class='ss-ov-center'>" +
+            "<div class='ss-ov-clock' id='ssOvClock'>" + t.clock + "</div>" +
+            "<div class='ss-ov-ampm' id='ssOvAmpm'>" + t.ampm + "</div>" +
+            "<div class='ss-ov-device' style='margin-top:20px'>Loading signal\u2026</div>" +
             "</div>"
         );
     }
@@ -135,22 +138,22 @@
             detail = String(err);
         }
         return (
-            "<div class='qo-ss-corner'></div>" +
-            "<div class='qo-ss-center'>" +
-            "<div class='qo-ss-clock' id='qoSsClock'>" + t.clock + "</div>" +
-            "<div class='qo-ss-ampm' id='qoSsAmpm'>" + t.ampm + "</div>" +
-            "<div class='qo-ss-device' style='margin-top:12px'>" + htmlEscape(headline) + "</div>" +
-            (detail ? "<div class='qo-ss-provider' style='font-size:13px;color:#8a8f98;margin-top:8px'>" + htmlEscape(detail) + "</div>" : "") +
-            "<div class='qo-ss-device' style='margin-top:22px;font-size:12px'>Move or tap to dismiss</div>" +
+            "<div class='ss-ov-corner'></div>" +
+            "<div class='ss-ov-center'>" +
+            "<div class='ss-ov-clock' id='ssOvClock'>" + t.clock + "</div>" +
+            "<div class='ss-ov-ampm' id='ssOvAmpm'>" + t.ampm + "</div>" +
+            "<div class='ss-ov-device' style='margin-top:12px'>" + htmlEscape(headline) + "</div>" +
+            (detail ? "<div class='ss-ov-provider' style='font-size:13px;color:#8a8f98;margin-top:8px'>" + htmlEscape(detail) + "</div>" : "") +
+            "<div class='ss-ov-device' style='margin-top:22px;font-size:12px'>Move or tap to dismiss</div>" +
             "</div>" +
-            "<div class='qo-toast-container' id='qoToastContainer'></div>"
+            "<div class='ss-toast-container' id='ssToastContainer'></div>"
         );
     }
 
     // ── Lazy-load resources ──
 
     function loadCSS(href, cb) {
-        if (document.querySelector("link[href*='quick_overview.css']")) { cb(); return; }
+        if (document.querySelector("link[href*='screensaver_overlay.css']")) { cb(); return; }
         var link = document.createElement("link");
         link.rel = "stylesheet";
         link.href = href;
@@ -178,7 +181,7 @@
 
         if (!cssLoaded) {
             remaining++;
-            loadCSS("/css/quick_overview.css?jtools-qo-v20260331a", function () {
+            loadCSS("/css/screensaver_overlay.css?jtools-ss-v20260328a", function () {
                 cssLoaded = true;
                 done();
             });
@@ -186,16 +189,15 @@
 
         if (!scriptsLoaded) {
             remaining++;
-            // Load core first, then screensaver renderer
-            if (!window.JtoolsQuickOverview) {
-                loadScript("/js/quick_overview_core.js?jtools-qo-v20260331a", function () {
-                    loadScript("/js/quick_overview_screensaver.js?jtools-qo-v20260331e", function () {
+            if (!window.JtoolsScreensaverCore) {
+                loadScript("/js/screensaver_core.js?jtools-ss-v20260328a", function () {
+                    loadScript("/js/screensaver_renderer.js?jtools-ss-v20260328a", function () {
                         scriptsLoaded = true;
                         done();
                     });
                 });
             } else if (!window.JtoolsScreensaverRenderer) {
-                loadScript("/js/quick_overview_screensaver.js?jtools-qo-v20260331e", function () {
+                loadScript("/js/screensaver_renderer.js?jtools-ss-v20260328a", function () {
                     scriptsLoaded = true;
                     done();
                 });
@@ -213,11 +215,11 @@
         if (isVisible) { return; }
         if (!opts.manual && window._jtoolsSsPaused) { resetIdleTimer(); return; }
         ensureResources(function () {
-            if (!window.JtoolsQuickOverview || !window.JtoolsScreensaverRenderer) { return; }
+            if (!window.JtoolsScreensaverCore || !window.JtoolsScreensaverRenderer) { return; }
             isVisible = true;
             canDismiss = false;
             overlay = document.createElement("div");
-            overlay.className = "qo-screensaver";
+            overlay.className = "ss-screensaver";
             overlay.innerHTML = buildScreensaverLoadingHtml();
             document.body.appendChild(overlay);
 
@@ -239,7 +241,7 @@
                 if (!overlay) { return; }
                 if (getDismissMode() === "button") {
                     var btn = document.createElement("div");
-                    btn.className = "qo-ss-dismiss";
+                    btn.className = "ss-ov-dismiss";
                     btn.textContent = "Tap to dismiss";
                     btn.addEventListener("click", dismissScreensaver);
                     btn.addEventListener("touchstart", dismissScreensaver);
@@ -277,15 +279,15 @@
 
     function fetchAndRender() {
         if (!isVisible || !overlay) { return; }
-        if (!window.JtoolsQuickOverview || typeof window.JtoolsQuickOverview.fetchData !== "function") {
-            overlay.innerHTML = buildScreensaverFallbackHtml("Quick Overview not loaded");
+        if (!window.JtoolsScreensaverCore || typeof window.JtoolsScreensaverCore.fetchData !== "function") {
+            overlay.innerHTML = buildScreensaverFallbackHtml("Screensaver core not loaded");
             return;
         }
         if (!window.JtoolsScreensaverRenderer || typeof window.JtoolsScreensaverRenderer.renderScreensaver !== "function") {
             overlay.innerHTML = buildScreensaverFallbackHtml("Screensaver renderer not loaded");
             return;
         }
-        window.JtoolsQuickOverview.fetchData(function (data, err) {
+        window.JtoolsScreensaverCore.fetchData(function (data, err) {
             if (!isVisible || !overlay) { return; }
             if (err || !data) {
                 overlay.innerHTML = buildScreensaverFallbackHtml(err || "No data");

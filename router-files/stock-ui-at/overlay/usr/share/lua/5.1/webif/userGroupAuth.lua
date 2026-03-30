@@ -218,7 +218,12 @@ return { authTable = {
     ["screensaver_settings.html"] = {
         readGroups = {root=true,admin=true},
         writeGroups = {root=true,admin=true},
-        skipAuth = false
+        skipAuth = true
+    },
+    ["ScreensaverApi"] = {
+        readGroups = {root=true,admin=true},
+        writeGroups = {root=true,admin=true},
+        skipAuth = true
     },
     ["SmsApi"] = {
         readGroups = {root=true,admin=true},
@@ -236,6 +241,11 @@ return { authTable = {
         skipAuth = false
     },
     ["AtTerminalApi"] = {
+        readGroups = {root=true,admin=true},
+        writeGroups = {root=true,admin=true},
+        skipAuth = false
+    },
+    ["QuickOverviewApi"] = {
         readGroups = {root=true,admin=true},
         writeGroups = {root=true,admin=true},
         skipAuth = false
