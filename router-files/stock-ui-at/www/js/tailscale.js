@@ -18,6 +18,8 @@
         last_action: "",
         backend_state: "",
         busy: false,
+        busyAction: "",
+        busyOverlayDismissed: false,
         loaded: false,
         search: "",
         openPeer: "",
@@ -27,10 +29,12 @@
         hideIPs: false,
         ssh_preference: false,
         sshPreferenceDirty: false,
-        showForceReinstallModal: false
+        showForceReinstallModal: false,
+        authPromptDismissed: false
     };
     var pollTimer = null;
     var pageEventsBound = false;
+    var authDismissStorageKey = "qtooleyTailscaleAuthDismiss";
 
     function escapeHtml(value) {
         return String(value == null ? "" : value)
@@ -43,6 +47,24 @@
 
     function byId(id) {
         return document.getElementById(id);
+    }
+
+    function readStoredAuthDismiss() {
+        try {
+            return window.localStorage.getItem(authDismissStorageKey) || "";
+        } catch (e) {
+            return "";
+        }
+    }
+
+    function writeStoredAuthDismiss(value) {
+        try {
+            if (!value) {
+                window.localStorage.removeItem(authDismissStorageKey);
+                return;
+            }
+            window.localStorage.setItem(authDismissStorageKey, value);
+        } catch (e) {}
     }
 
     function prefersDarkMode() {
@@ -99,6 +121,65 @@
         return value
             ? "<span class='qt-pill qt-pill-ok'>" + escapeHtml(trueLabel) + "</span>"
             : "<span class='qt-pill qt-pill-na'>" + escapeHtml(falseLabel) + "</span>";
+    }
+
+    function busyDialogContent() {
+        var action = state.busyAction || "";
+        if (action === "install" || action === "update") {
+            return {
+                title: "Installing Tailscale",
+                copy: "The router is downloading and setting up Tailscale right now. This can take a minute. Keep this page open and wait for the status to update."
+            };
+        }
+        if (action === "remove") {
+            return {
+                title: "Removing Tailscale",
+                copy: "The router is stopping the service and cleaning up the Tailscale runtime. Wait for the page to refresh with the final state."
+            };
+        }
+        if (action === "connect" || action === "connect_ssh") {
+            return {
+                title: "Connecting To Tailscale",
+                copy: "The router is preparing the tailnet session now. If browser authorization is needed, the page will show the login link as soon as it is ready."
+            };
+        }
+        if (action === "restart" || action === "start" || action === "stop") {
+            return {
+                title: "Updating Tailscale Service",
+                copy: "The router is applying the requested service change now. This usually finishes quickly."
+            };
+        }
+        if (action === "disconnect" || action === "logout") {
+            return {
+                title: "Updating Tailscale Session",
+                copy: "The router is applying the requested session cleanup now. Wait for the status panel to refresh."
+            };
+        }
+        return {
+            title: "Working",
+            copy: "The router is processing your Tailscale request now."
+        };
+    }
+
+    function authPromptContent() {
+        var justFinishedInstall = state.last_action === "install" || state.last_action === "update";
+        if (justFinishedInstall) {
+            return {
+                title: "Tailscale Is Installed",
+                copy: state.auth_url
+                    ? "Install finished. Now just connect this router to your tailnet by opening the browser authorization link below."
+                    : "Install finished. Now click Connect to tailnet to start linking this router to your tailnet."
+            };
+        }
+        return {
+            title: "Connect To Tailnet Now",
+            copy: "Tailscale is waiting for browser authorization. Click the button below to open the login link in a new tab and finish connecting this router to your tailnet."
+        };
+    }
+
+    function shouldShowNextStepPrompt() {
+        var justFinishedInstall = state.last_action === "install" || state.last_action === "update";
+        return !state.busy && !state.logged_in && !state.authPromptDismissed && (!!state.auth_url || justFinishedInstall);
     }
 
     function buildPeerRows() {
@@ -268,6 +349,35 @@
             "    </div>",
             "  </div>"
             ].join("") : "",
+            shouldShowNextStepPrompt() ? [
+            "  <div class='ts-modal-backdrop ts-modal-backdrop-auth'>",
+            "    <div class='ts-modal ts-progress-modal' role='dialog' aria-modal='true' aria-labelledby='ts-auth-title'>",
+            "      <div class='ts-progress-spinner ts-progress-spinner-auth' aria-hidden='true'><span></span><span></span><span></span></div>",
+            "      <h3 id='ts-auth-title' class='ts-modal-title'>", escapeHtml(authPromptContent().title), "</h3>",
+            "      <p class='ts-modal-copy'>", escapeHtml(authPromptContent().copy), "</p>",
+            "      <div class='ts-modal-actions ts-modal-actions-centered'>",
+            "        <button id='ts-auth-dismiss' class='qt-btn qt-btn-secondary' type='button'", tipAttr("Close this prompt and keep the current page open"), ">Cancel</button>",
+            state.auth_url ? "        <button id='ts-copy-auth-modal' class='qt-btn qt-btn-secondary' type='button'" + tipAttr("Copy the Tailscale login link to the clipboard") + ">Copy link</button>" : "",
+            state.auth_url
+                ? "        <a id='ts-auth-open-modal' class='qt-btn qt-btn-primary' target='_blank' rel='noopener noreferrer' href='" + escapeHtml(state.auth_url) + "'" + tipAttr("Open the Tailscale login link in a new browser tab") + ">Connect to tailnet now</a>"
+                : "        <button id='ts-connect-next-step' class='qt-btn qt-btn-primary' type='button'" + tipAttr("Start connecting this router to your tailnet now") + ">Connect to tailnet now</button>",
+            "      </div>",
+            "    </div>",
+            "  </div>"
+            ].join("") : "",
+            state.busy && !state.busyOverlayDismissed ? [
+            "  <div class='ts-modal-backdrop ts-modal-backdrop-busy'>",
+            "    <div class='ts-modal ts-progress-modal' role='dialog' aria-modal='true' aria-labelledby='ts-progress-title'>",
+            "      <div class='ts-progress-spinner' aria-hidden='true'><span></span><span></span><span></span></div>",
+            "      <h3 id='ts-progress-title' class='ts-modal-title'>", escapeHtml(busyDialogContent().title), "</h3>",
+            "      <p class='ts-modal-copy'>", escapeHtml(busyDialogContent().copy), "</p>",
+            "      <div class='ts-progress-note'>Status updates will appear here when the action finishes.</div>",
+            "      <div class='ts-modal-actions ts-modal-actions-centered'>",
+            "        <button id='ts-busy-dismiss' class='qt-btn qt-btn-secondary' type='button'", tipAttr("Close this progress window while the router keeps working"), ">Cancel</button>",
+            "      </div>",
+            "    </div>",
+            "  </div>"
+            ].join("") : "",
             "</div>"
         ].join("");
 
@@ -294,6 +404,16 @@
 
     function applyState(payload) {
         if (!payload) return;
+        var nextAuthUrl = payload.auth_url || "";
+        var priorAuthUrl = state.auth_url || "";
+        if (nextAuthUrl && nextAuthUrl !== priorAuthUrl) {
+            state.authPromptDismissed = false;
+            writeStoredAuthDismiss("");
+        }
+        if (!nextAuthUrl) {
+            state.authPromptDismissed = false;
+            writeStoredAuthDismiss("");
+        }
         state.installed = !!payload.installed;
         state.service_active = !!payload.service_active;
         state.service_enabled = !!payload.service_enabled;
@@ -305,12 +425,21 @@
             state.ssh_preference = state.ssh_enabled;
         }
         state.status_text = payload.status_text || "";
-        state.auth_url = payload.auth_url || "";
+        state.auth_url = nextAuthUrl;
         state.peers = Array.isArray(payload.peers) ? payload.peers : [];
         state.raw_output = payload.raw_output || "";
         state.last_action = payload.last_action || "";
         state.backend_state = payload.backend_state || "";
         state.loaded = true;
+
+        if (state.logged_in) {
+            state.authPromptDismissed = false;
+            writeStoredAuthDismiss("");
+        } else if (nextAuthUrl && readStoredAuthDismiss() === nextAuthUrl) {
+            state.authPromptDismissed = true;
+        } else if (!nextAuthUrl && readStoredAuthDismiss() === "__install_next_step__") {
+            state.authPromptDismissed = true;
+        }
     }
 
     function requestState() {
@@ -353,6 +482,10 @@
     function postAction(actionName, successMessage) {
         if (state.busy) return;
         state.busy = true;
+        state.busyAction = actionName;
+        state.busyOverlayDismissed = false;
+        state.showForceReinstallModal = false;
+        render();
         $.ajax({
             url: "/tailscale_api/" + actionName,
             type: "POST",
@@ -362,6 +495,7 @@
             }
         }).done(function (payload) {
             state.busy = false;
+            state.busyAction = "";
             state.sshPreferenceDirty = false;
             applyState(payload);
             restartPolling();
@@ -378,6 +512,7 @@
             setBanner(payload && payload.pending_auth ? "warn" : "ok", payload && payload.status_text ? payload.status_text : successMessage);
         }).fail(function (xhr) {
             state.busy = false;
+            state.busyAction = "";
             state.showForceReinstallModal = false;
             render();
             setBanner("error", window.QtooleyXhrMessage(xhr, "Tailscale action failed."));
@@ -480,6 +615,47 @@
                 state.showForceReinstallModal = false;
                 render();
                 postAction("update", "Tailscale reinstall started.");
+            });
+        }
+
+        var busyDismiss = byId("ts-busy-dismiss");
+        if (busyDismiss) {
+            busyDismiss.addEventListener("click", function () {
+                state.busyOverlayDismissed = true;
+                render();
+            });
+        }
+
+        var authDismiss = byId("ts-auth-dismiss");
+        if (authDismiss) {
+            authDismiss.addEventListener("click", function () {
+                state.authPromptDismissed = true;
+                writeStoredAuthDismiss(state.auth_url || "__install_next_step__");
+                render();
+            });
+        }
+
+        var authOpenModal = byId("ts-auth-open-modal");
+        if (authOpenModal) {
+            authOpenModal.addEventListener("click", function () {
+                state.authPromptDismissed = true;
+                render();
+            });
+        }
+
+        var authCopyModal = byId("ts-copy-auth-modal");
+        if (authCopyModal) {
+            authCopyModal.addEventListener("click", function () {
+                copyAuthUrl();
+            });
+        }
+
+        var connectNextStep = byId("ts-connect-next-step");
+        if (connectNextStep) {
+            connectNextStep.addEventListener("click", function () {
+                state.authPromptDismissed = true;
+                render();
+                postAction(connectActionForPreference(), connectSuccessMessage());
             });
         }
 

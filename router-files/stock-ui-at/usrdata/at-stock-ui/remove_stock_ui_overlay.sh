@@ -23,9 +23,15 @@ fi
 # --- Speedtest: clean up temp files ---
 rm -f /tmp/ookla-speedtest-state.json /tmp/ookla-speedtest-state.json.tmp
 rm -f /tmp/ookla-speedtest.pid
+rm -f /tmp/ookla-speedtest.lock /tmp/ookla-speedtest-runner.log
+rm -f /tmp/ookla-speedtest-ca-snapshot.json /tmp/ookla-speedtest-ca-snapshot.json.tmp
+rm -rf /tmp/ookla-speedtest-home
 
 # --- Quick Overview: remove persisted settings ---
 rm -f /usrdata/at-stock-ui/quick_overview_settings.json
+
+# --- Screensaver: remove persisted settings ---
+rm -f /usrdata/at-stock-ui/screensaver_settings.json
 
 # --- RAT/Band: remove persisted settings ---
 rm -f /usrdata/at-stock-ui/band_locking_config.json

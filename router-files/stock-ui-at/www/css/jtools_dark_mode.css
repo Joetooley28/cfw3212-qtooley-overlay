@@ -104,12 +104,40 @@ select {
     display: flex;
     gap: 8px;
     height: 40px;
+    justify-content: flex-end;
     margin-right: 16px;
     min-width: 0;
     pointer-events: none;
     padding-right: 0;
+    position: relative;
+    top: -6px;
     width: auto;
     z-index: 2;
+}
+
+.right-item.account-btn .login-foot {
+    background-position: center center;
+    flex: 0 0 35px;
+    margin-left: 0;
+    margin-top: 0;
+}
+
+.right-item.account-btn .login-foot-user {
+    margin-left: 0;
+    position: static;
+    top: auto;
+}
+
+.right-item.account-btn #logOff {
+    display: flex;
+}
+
+.right-item.account-btn .log-off,
+.right-item.account-btn #logOffForm button {
+    left: auto;
+    margin: 0;
+    position: static;
+    top: auto;
 }
 
 .right-item.account-btn .login-foot-user,

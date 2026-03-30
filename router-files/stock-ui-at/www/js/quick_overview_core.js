@@ -573,15 +573,11 @@
     // ── Data Fetch ──
 
     var _pollCount = 0;
-    var CROSSCHECK_EVERY = 5; // run extra signal commands every Nth poll
     var _lastCrosscheck = null; // cache between polls
 
     function fetchData(callback) {
         _pollCount++;
         var url = "/jtools_general_api/state";
-        if (_pollCount % CROSSCHECK_EVERY === 1) {
-            url += "?crosscheck=1";
-        }
         var xhr = new XMLHttpRequest();
         xhr.open("GET", url, true);
         xhr.timeout = 25000;
