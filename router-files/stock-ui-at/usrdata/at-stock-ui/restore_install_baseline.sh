@@ -25,6 +25,7 @@ tar -xf "$BASELINE_DIR/install_www.tar" -C "$VERIFY_ROOT"
 tar -xf "$BASELINE_DIR/install_webif.tar" -C "$VERIFY_ROOT"
 
 for pair in \
+    "/www/js/generatedMenuEntries.js:$VERIFY_ROOT/www/js/generatedMenuEntries.js" \
     "/www/theme/js/genHeader.js:$VERIFY_ROOT/www/theme/js/genHeader.js" \
     "/usr/share/lua/5.1/webif/top_menu_entries.lua:$VERIFY_ROOT/usr/share/lua/5.1/webif/top_menu_entries.lua" \
     "/usr/share/lua/5.1/webif/userGroupAuth.lua:$VERIFY_ROOT/usr/share/lua/5.1/webif/userGroupAuth.lua"

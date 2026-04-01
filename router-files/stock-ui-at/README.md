@@ -123,6 +123,13 @@ Release ZIP notes:
 - build a versioned ZIP with `scripts\build_stock_ui_at_release.ps1`
 - the release ZIP includes the stock UI package plus the Windows install/uninstall wrappers
 - the release ZIP intentionally excludes `stock-snapshots`; install-time rollback now comes from the one-time router baseline instead
+- on first install, that baseline is captured from the router's live `/www` and `/usr/share/lua/5.1/webif` trees before any Qtooley live overlay mounts are active
+- uninstall currently assumes protected stock files were not modified in place and verifies the install-time baseline after the overlay is unmounted
+- the shared stock verification set currently covers:
+  - `/www/js/generatedMenuEntries.js`
+  - `/www/theme/js/genHeader.js`
+  - `/usr/share/lua/5.1/webif/top_menu_entries.lua`
+  - `/usr/share/lua/5.1/webif/userGroupAuth.lua`
 - the offline Ookla archive should be placed at:
   - `usrdata\at-stock-ui\bundles\ookla\ookla-speedtest-1.2.0-linux-armhf.tgz`
 - if that archive is present in the ZIP, the install path can place Ookla without the router downloading it

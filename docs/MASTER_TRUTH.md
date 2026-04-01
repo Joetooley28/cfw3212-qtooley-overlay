@@ -857,7 +857,7 @@ Date: 2026-03-30
   - update/reinstall flow
   - overlay-only uninstall
   - full uninstall with optional Ookla / Tailscale cleanup
-  - first-install baseline capture
+  - first-install baseline capture from the router's live stock trees
   - bundled offline Ookla path
 - Important current router state:
   - `jtools-stock-ui.timer` and `.service` are part of the package
@@ -867,6 +867,7 @@ Date: 2026-03-30
   - finish UI cleanup/regression fixes from recent polish work
   - keep installer/uninstaller notes current while UI work continues
   - revisit the stock-side dark-mode cleanup boundary later so install-time overlay behavior and uninstall-time stock expectations stay honest
+  - keep uninstall verification aligned with the real shared-file override set as stock-side dark-mode ownership evolves
 - Practical handoff rule:
   - do not assume installer/uninstaller is “done done”
   - treat it as working infrastructure that should be resumed after the current UI polish pass

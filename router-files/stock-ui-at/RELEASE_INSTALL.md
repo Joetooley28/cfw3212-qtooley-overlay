@@ -35,10 +35,15 @@ Normal uninstall
    - `2` full uninstall including optional runtimes such as Ookla and Tailscale
 
 Notes
-- on first install, the installer captures a compact stock baseline from the router itself for `/www` and `/usr/share/lua/5.1/webif`
-- that baseline is captured only once and then reused across updates so uninstall can verify the box is back on its install-time stock files after the overlay is unmounted
+- on first install, the installer captures a compact baseline from the router's live stock trees for `/www` and `/usr/share/lua/5.1/webif`
+- that baseline is captured only once, before Qtooley live overlay mounts are active, and then reused across updates so uninstall can verify the box is back on its install-time stock files after the overlay is unmounted
 - the install flow refreshes `/usrdata/at-stock-ui`, refreshes the late-start units, and runs the overlay apply immediately
-- on this Casa rootfs, the stock web trees are read-only, so uninstall returns to stock by unmounting the live overlay trees, then verifies the key stock files against the saved install-time baseline, restarts `turbontc`, and removes the payload
+- on this Casa rootfs, the stock web trees are expected to remain unmodified in place, so uninstall returns to stock by unmounting the live overlay trees, then verifies the key shared stock files against the saved install-time baseline, restarts `turbontc`, and removes the payload
+- the current baseline verification set includes:
+  - `/www/js/generatedMenuEntries.js`
+  - `/www/theme/js/genHeader.js`
+  - `/usr/share/lua/5.1/webif/top_menu_entries.lua`
+  - `/usr/share/lua/5.1/webif/userGroupAuth.lua`
 - full uninstall also removes optional runtimes when selected
 
 Offline Ookla bundle
@@ -49,7 +54,7 @@ Offline Ookla bundle
 
 Release ZIP trimming
 - the GitHub ZIP intentionally does not include the old `stock-snapshots` reference folder
-- first install now captures the smaller install-time stock baseline directly from the router instead
+- first install now captures the smaller install-time stock baseline directly from the router's live stock trees instead
 
 Safety
 - if something goes wrong, use the router-side recovery snapshots under `/usrdata/at-stock-ui/recovery-snapshots`
