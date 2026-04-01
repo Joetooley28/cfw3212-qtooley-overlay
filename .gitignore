@@ -1,2 +1,5 @@
 # Backup snapshots (local only, not tracked)
 router-files/stock-ui-at_backup_*/
+recovery-snapshots/
+router-files/stock-ui-at/SNAPSHOT_NOTE.txt
+router-files/stock-ui-at/usrdata/at-stock-ui/bundles/ookla/

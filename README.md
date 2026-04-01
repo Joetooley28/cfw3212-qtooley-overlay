@@ -34,6 +34,8 @@ The overlay adds Qtooley pages into the stock Casa interface while preserving:
 
 The current preferred direction is the stock UI overlay, not the older standalone-only web terminal.
 
+Legacy standalone AT terminal files are still preserved in the local workspace under [legacy-standalone-at](/c:/at_terminal/legacy-standalone-at), but they are reference material rather than the main repo story.
+
 ## Device Scope
 
 Tested / documented project target:
@@ -135,6 +137,13 @@ Important areas:
 - [router-files/stock-ui-at/usrdata/at-stock-ui](/c:/at_terminal/repo-public/router-files/stock-ui-at/usrdata/at-stock-ui)
 - [docs](/c:/at_terminal/repo-public/docs)
 
+Local-only workspace support folders kept outside the repo root:
+
+- [legacy-standalone-at](/c:/at_terminal/legacy-standalone-at)
+- [tools](/c:/at_terminal/tools)
+- [screenshots](/c:/at_terminal/screenshots)
+- [archive](/c:/at_terminal/archive)
+
 ## Current Pages
 
 - Quick Overview
@@ -170,6 +179,13 @@ The current expected flow is:
 - sync only the intended files to the router
 - reapply the overlay
 - verify the live bind mounts and actual in-browser behavior
+
+Current user-facing installer direction:
+
+- versioned Windows ZIP release
+- install / uninstall over SSH from a normal Windows PC
+- password prompt is supported; SSH keys are optional, not required
+- router must already be rooted and SSH-reachable before using the ZIP
 
 ## Current Version
 

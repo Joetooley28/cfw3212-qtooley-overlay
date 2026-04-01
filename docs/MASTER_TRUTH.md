@@ -31,7 +31,7 @@ This workspace is a rooted Casa Systems `CFW-3212` project built around a Quecte
 
 There are two related but separate tool tracks in this repo:
 
-- a standalone LAN AT terminal served at `http://192.168.1.1:8088/`
+- a standalone LAN AT terminal served on the router LAN IP at `:8088` (historically often `http://192.168.1.1:8088/`)
 - a stock Casa Turbo web UI overlay that adds a top-level `Jtools` tab and custom pages inside the stock UI
 
 This is not a normal host-PC plus USB modem project.
@@ -46,8 +46,8 @@ On this device, the modem and application processor are effectively the platform
 - Tested module firmware seen in notes: `RG520NNADAR03A03M4G`
 - Proven standalone AT backend default: `/dev/smd7`
 - Standalone AT backend mode name: `smd7_direct`
-- Standalone AT terminal listens on `192.168.1.1:8088`
-- The standalone AT service binds to `192.168.1.1`, not `127.0.0.1`
+- Standalone AT terminal listens on the router LAN IP at `:8088`
+- The standalone AT service binds to the router LAN IP, not `127.0.0.1`
 - Shared AT lock path is `/tmp/at-http.lock`
 - `/usrdata` is the writable persistent area on-box
 
@@ -104,13 +104,21 @@ Useful documented keys/flags live in:
 
 ## SSH Info
 
-The project’s working LAN-side SSH target is:
+The project’s working LAN-side SSH target is the router root account on the current box LAN IP.
 
-- `root@192.168.1.1`
+Current box IP map:
 
-Local workspace config already allowed:
+- Device 01: `192.168.10.1`
+- Device 02: `192.168.20.1`
+- Device 03: `192.168.30.1`
 
-- `ssh root@192.168.1.1:*`
+Examples:
+
+- `root@192.168.10.1`
+- `root@192.168.20.1`
+- `root@192.168.30.1`
+
+Do not hard-code `192.168.1.1` in new notes or scripts. The router LAN subnet can change.
 
 If an AI needs live router work, it should assume plain SSH is available before assuming anything fancier.
 
@@ -121,6 +129,54 @@ Important transfer note from the project history:
 - tar-over-SSH streaming also works and remains a good default for package-style syncs
 
 Do not assume plain modern `scp` works without the `-O` flag.
+
+## Recovery Snapshot Rule
+
+Before any edit that touches shared stock shell files, create a router-side recovery snapshot first.
+
+Use:
+
+- `/bin/sh /usrdata/at-stock-ui/capture_overlay_recovery_snapshot.sh <label>`
+
+If a deploy breaks Qtooley or the stock shell, restore from the router-side snapshot instead of trying to reconstruct the overlay from Windows copy operations:
+
+- `/bin/sh /usrdata/at-stock-ui/restore_overlay_recovery_snapshot.sh /usrdata/at-stock-ui/recovery-snapshots/<snapshot_dir>`
+
+Reason:
+
+- router-side snapshots preserve exact file bytes and accepted line endings
+- Windows-side ad hoc copy paths have already been proven to mangle shared files and leave the router in a mixed state
+- restoring from a router-side snapshot is safer than piecemeal rollback when `genHeader.js`, `handler_0011.lua`, auth wiring, or menu wiring are involved
+
+## Windows Rolling Snapshot Rule
+
+On Windows, keep rolling last-known-good stock UI snapshots in two places:
+
+- inside the repo
+- outside the repo on the Desktop
+
+Keep only the last 3 in each location.
+
+Scripts:
+
+- [update_last_good_stock_ui_snapshot.ps1](/c:/at_terminal/repo-public/scripts/update_last_good_stock_ui_snapshot.ps1)
+- [restore_last_good_stock_ui_snapshot.ps1](/c:/at_terminal/repo-public/scripts/restore_last_good_stock_ui_snapshot.ps1)
+- [import_router_recovery_snapshot.ps1](/c:/at_terminal/repo-public/scripts/import_router_recovery_snapshot.ps1)
+
+Default snapshot roots:
+
+- `C:\at_terminal\repo-public\recovery-snapshots\stock-ui-last-good`
+- `C:\Users\jbake\Desktop\qtooley-recovery-snapshots`
+
+Trusted checkpoint flow:
+
+1. capture a router-side recovery snapshot
+2. import that exact on-box snapshot to Windows:
+   - `powershell -ExecutionPolicy Bypass -File C:\at_terminal\repo-public\scripts\import_router_recovery_snapshot.ps1 -RouterSnapshotPath <router_snapshot_path>`
+3. after a trusted commit, refresh the rolling Windows snapshots from the repo working tree if needed:
+   - `powershell -ExecutionPolicy Bypass -File C:\at_terminal\repo-public\scripts\update_last_good_stock_ui_snapshot.ps1 -Commit <hash> -Label <label>`
+
+Keep using router-side recovery snapshots as well. The router snapshot is the exact on-box fallback. The two Windows snapshot roots are for fast local recovery and off-repo backup.
 
 ## Local Repo Layout
 
@@ -139,8 +195,8 @@ Original pre-Qtooley baseline preserved locally:
 
 Standalone AT tool local files:
 
-- [config.json](/c:/at_terminal/config.json)
-- standalone Lua/HTML/CSS/JS files under [c:\at_terminal](/c:/at_terminal)
+- [legacy-standalone-at/config.json](/c:/at_terminal/legacy-standalone-at/config.json)
+- standalone Lua/HTML/CSS/JS files under [legacy-standalone-at](/c:/at_terminal/legacy-standalone-at)
 
 Stock UI overlay package root:
 
@@ -203,7 +259,7 @@ These are separate systems and should stay conceptually separate.
 
 Standalone AT terminal:
 
-- LAN tool on `192.168.1.1:8088`
+- LAN tool on the router LAN IP at `:8088`
 - no stock UI dependency
 - useful fallback even if stock UI overlay work breaks
 
@@ -513,7 +569,7 @@ The current proven workflow is:
 1. Edit local files first.
 2. Validate the local package layout.
 3. Commit the local repo checkpoint.
-4. Save a fresh copy of the latest stock UI package to the Desktop backup folder.
+4. Save a fresh snapshot copy of the latest stock UI package to the rolling Windows snapshot roots.
 5. Sync only the selected changed files to the live router.
 6. Reapply the overlay on the router.
 7. Verify carefully.
@@ -542,16 +598,16 @@ Original pre-Qtooley baseline preserved locally:
 - `cfw3212-stock-ui-jtools-overlay`
 - `backup/original-pre-qtooley-20260323`
 
-Desktop backup folder already in use:
+Desktop snapshot root already in use:
 
-- `C:\Users\jbake\Desktop\stock-ui-at_latest`
+- `C:\Users\jbake\Desktop\qtooley-recovery-snapshots`
 
 Recommended rhythm:
 
 1. Make local changes under [router-files/stock-ui-at](/c:/at_terminal/repo-public/router-files/stock-ui-at)
 2. Review diff carefully before any live sync
 3. Create a local git commit in [repo-public](/c:/at_terminal/repo-public) for the checkpoint
-4. Refresh the desktop backup copy in `C:\Users\jbake\Desktop\stock-ui-at_latest` so it reflects the latest known-good package
+4. Refresh the rolling Windows snapshots so they reflect the latest known-good package
 5. Only then sync the selected files or package contents to the router
 
 If the change is risky, make the desktop backup refresh happen before live testing, not after.
@@ -585,20 +641,18 @@ git commit -m "Checkpoint stock-ui-at before live sync"
 
 If the change also touched other intended project files, add them explicitly too.
 
-### 3. Refresh the Desktop backup copy
+### 3. Refresh the rolling Windows snapshots
 
-This keeps the known-good package copy in:
+This keeps the last-known-good package copies in:
 
-- `C:\Users\jbake\Desktop\stock-ui-at_latest`
+- `C:\at_terminal\repo-public\recovery-snapshots\stock-ui-last-good`
+- `C:\Users\jbake\Desktop\qtooley-recovery-snapshots`
 
 Example PowerShell refresh:
 
 ```powershell
-Remove-Item 'C:\Users\jbake\Desktop\stock-ui-at_latest' -Recurse -Force
-Copy-Item 'C:\at_terminal\repo-public\router-files\stock-ui-at' 'C:\Users\jbake\Desktop\stock-ui-at_latest' -Recurse
+powershell -ExecutionPolicy Bypass -File C:\at_terminal\repo-public\scripts\update_last_good_stock_ui_snapshot.ps1 -Commit <hash> -Label <label>
 ```
-
-Only do the remove step if you are sure the source package is the new known-good checkpoint you want preserved.
 
 ### 4. Sync selected files or the package to the router
 
@@ -620,13 +674,13 @@ Also verified live:
 Example package sync pattern:
 
 ```powershell
-tar -cf - -C 'C:\at_terminal\repo-public\router-files\stock-ui-at' . | ssh root@192.168.1.1 "cd /usrdata/at-stock-ui && tar -xf -"
+tar -cf - -C 'C:\at_terminal\repo-public\router-files\stock-ui-at' . | ssh root@<router-ip> "cd /usrdata/at-stock-ui && tar -xf -"
 ```
 
 Example direct file copy pattern:
 
 ```powershell
-scp -O 'C:\at_terminal\repo-public\router-files\stock-ui-at\www\js\some_page.js' root@192.168.1.1:/usrdata/at-stock-ui/www/js/some_page.js
+scp -O 'C:\at_terminal\repo-public\router-files\stock-ui-at\www\js\some_page.js' root@<router-ip>:/usrdata/at-stock-ui/www/js/some_page.js
 ```
 
 If you are only syncing selected files, keep the same principle:
@@ -676,6 +730,20 @@ After you edit **static** files (`www/css`, `www/js`, `www/theme/js`, HTML), ass
 **`genHeader.js` is two layers**
 
 - Dark mode loads `jtools_dark_mode.css?...` from **inside** `genHeader.js`. When you change that CSS, bump the URL **in genHeader.js** and bump the **`genHeader.js` `src=`** query on **every** Jtools page that includes it. Leaving `genHeader.js?1.1.79.0` while changing injected CSS is a common “stale theme” trap.
+
+**Device 01 stock is not the canonical visual stock baseline**
+
+- Device 01 can be returned to stock behavior for rollback/install-uninstall validation, but its stock appearance should not be treated as the cleanest Casa visual reference.
+- Prior work intentionally widened shared stock dark-mode behavior through:
+  - `www/theme/js/genHeader.js`
+  - `www/css/jtools_dark_mode.css`
+  - browser `localStorage["jtoolsThemeMode"]`
+- That rollout affected shared stock-page theming through an allowlist in `genHeader.js`, not only Jtools-owned pages.
+- Current rule:
+  - keep dark-mode improvements where they are wanted in the overlay UI
+  - keep the `genHeader.js` dark-mode allowlist scoped to Qtooley-owned overlay pages only
+  - do **not** use Device 01 stock appearance as proof of what pristine stock should look like
+  - use Device 02 protected stock pulls as the stronger visual stock baseline for comparisons
 
 **Lua / Turbo (not cache)**
 
@@ -739,6 +807,26 @@ If you are a new AI session working on this project:
 - protect LAN, login, and SSH access
 - keep install/uninstall friendliness in mind
 
+## Agent Handoff Workflow
+
+Current preferred multi-agent workflow for this project:
+
+- Codex is the backbone for integration, risk control, deployment flow, rollback awareness, and end-to-end tracing
+- Claude is preferred for higher-risk architecture work, shared bootstrap/theme/menu wiring, backend/API reshaping, and dependency untangling
+- Composer is preferred for narrower and cheaper tasks such as small CSS polish, isolated page tweaks, token bumps, copy edits, and low-risk responsive cleanup
+
+Practical handoff rule:
+
+- if a task touches shared stock files, page bootstrap flow, menu/auth wiring, uninstall behavior, or backend contracts, prefer Claude or Codex
+- if a task is isolated to one page and mostly visual/polish work, Composer is usually the better cost choice
+- after any offloaded work, Codex should re-check integration assumptions before live deploy
+
+Current user direction:
+
+- preserve a clear uninstall path back to stock
+- keep changes documented when stock UI overlay behavior or workflow changes
+- call out when a task is a good candidate to pass to Claude or Composer
+
 ## Short Prompt Snippet You Can Reuse
 
 Use this at the start of a new AI chat:
@@ -758,3 +846,27 @@ This file was consolidated from the current project docs and notes, especially:
 - [CFW3212_jtools_overlay_wiring_SMS_lesson.txt](/c:/at_terminal/notes/CFW3212_jtools_overlay_wiring_SMS_lesson.txt)
 
 If anything in this file conflicts with a newer detailed note, update this file so it stays the top-level truth.
+
+## Installer Status Checkpoint
+
+Date: 2026-03-30
+
+- Current installer/uninstaller work is real and reusable, but not yet the final “public release done” state.
+- Working pieces already validated on Device 01:
+  - Windows-over-SSH install flow
+  - update/reinstall flow
+  - overlay-only uninstall
+  - full uninstall with optional Ookla / Tailscale cleanup
+  - first-install baseline capture
+  - bundled offline Ookla path
+- Important current router state:
+  - `jtools-stock-ui.timer` and `.service` are part of the package
+  - a persistence failure was caught after reboot because the timer existed but was not enabled on Device 01
+  - installer now needs to fail loudly if `jtools-stock-ui.timer` is not actually `enabled`
+- Current known follow-up items before calling it a polished public first release:
+  - finish UI cleanup/regression fixes from recent polish work
+  - keep installer/uninstaller notes current while UI work continues
+  - revisit the stock-side dark-mode cleanup boundary later so install-time overlay behavior and uninstall-time stock expectations stay honest
+- Practical handoff rule:
+  - do not assume installer/uninstaller is “done done”
+  - treat it as working infrastructure that should be resumed after the current UI polish pass
