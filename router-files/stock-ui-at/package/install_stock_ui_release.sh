@@ -10,6 +10,7 @@ TARGET_UNITS="/etc/systemd/system"
 INSTALLER_STATE_DIR="$TARGET_BASE/installer-state"
 BASELINE_INFO="$INSTALLER_STATE_DIR/installer-baseline-info.txt"
 INSTALL_BASELINE_DIR="$INSTALLER_STATE_DIR/install-baseline"
+FORCE_RECAPTURE_BASELINE="${FORCE_RECAPTURE_BASELINE:-0}"
 UNIT_SRC="$PACKAGE_ROOT/etc/systemd/system"
 DEFAULT_BUNDLED_OOKLA="$TARGET_BASE/bundles/ookla/ookla-speedtest-1.2.0-linux-armhf.tgz"
 INSTALL_BUNDLED_OOKLA="${INSTALL_BUNDLED_OOKLA:-1}"
@@ -52,6 +53,12 @@ has_existing_overlay_payload() {
 capture_baseline_once() {
     local free_kb required_kb snapshot_path existing_payload captured_baseline
 
+    if [ "$FORCE_RECAPTURE_BASELINE" = "1" ]; then
+        log "WARNING: forcing install baseline recapture. Use this only as a last resort on a known-good stock box."
+        rm -rf "$INSTALL_BASELINE_DIR"
+        rm -f "$BASELINE_INFO"
+    fi
+
     if [ -f "$BASELINE_INFO" ] && has_install_baseline; then
         log "Installer baseline already recorded."
         return 0
@@ -91,6 +98,7 @@ capture_baseline_once() {
         echo "existing_overlay_payload=$existing_payload"
         echo "install_baseline_dir=$INSTALL_BASELINE_DIR"
         echo "install_baseline_captured=$captured_baseline"
+        echo "force_recapture_baseline=$FORCE_RECAPTURE_BASELINE"
         echo "baseline_payload_snapshot=${snapshot_path:-}"
         echo "free_kb_at_install=${free_kb:-unknown}"
     } > "$BASELINE_INFO"

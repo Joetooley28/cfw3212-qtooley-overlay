@@ -868,6 +868,7 @@ Date: 2026-03-30
   - keep installer/uninstaller notes current while UI work continues
   - revisit the stock-side dark-mode cleanup boundary later so install-time overlay behavior and uninstall-time stock expectations stay honest
   - keep uninstall verification aligned with the real shared-file override set as stock-side dark-mode ownership evolves
+- installer baseline recapture should stay a last-resort explicit action, not a default update behavior
 - Practical handoff rule:
   - do not assume installer/uninstaller is “done done”
   - treat it as working infrastructure that should be resumed after the current UI polish pass

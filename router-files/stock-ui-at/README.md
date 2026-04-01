@@ -124,6 +124,8 @@ Release ZIP notes:
 - the release ZIP includes the stock UI package plus the Windows install/uninstall wrappers
 - the release ZIP intentionally excludes `stock-snapshots`; install-time rollback now comes from the one-time router baseline instead
 - on first install, that baseline is captured from the router's live `/www` and `/usr/share/lua/5.1/webif` trees before any Qtooley live overlay mounts are active
+- a non-default last-resort install mode can force a one-time baseline recapture when the saved uninstall baseline is missing or known-bad
+- that recapture mode should only be used on a router that is currently presenting the stock UI state you want uninstall to restore later
 - uninstall currently assumes protected stock files were not modified in place and verifies the install-time baseline after the overlay is unmounted
 - the shared stock verification set currently covers:
   - `/www/js/generatedMenuEntries.js`
