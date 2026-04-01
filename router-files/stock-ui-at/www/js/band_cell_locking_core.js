@@ -6,27 +6,51 @@
             { value: "AUTO", label: "Auto" },
             { value: "LTE", label: "LTE only" },
             { value: "NR5G", label: "NR5G only" },
-            { value: "LTE:NR5G", label: "NSA" },
-            { value: "WCDMA", label: "WCDMA only" }
+            { value: "LTE:NR5G", label: "LTE + NR5G" }
         ],
         ratAcqOrders: [
             { value: "NR5G:LTE", label: "NR5G > LTE" },
-            { value: "LTE:NR5G", label: "LTE > NR5G" },
-            { value: "NR5G:LTE:WCDMA", label: "NR5G > LTE > WCDMA" },
-            { value: "LTE:NR5G:WCDMA", label: "LTE > NR5G > WCDMA" },
-            { value: "WCDMA:LTE:NR5G", label: "WCDMA > LTE > NR5G" },
-            { value: "LTE:WCDMA:NR5G", label: "LTE > WCDMA > NR5G" },
-            { value: "NR5G:WCDMA:LTE", label: "NR5G > WCDMA > LTE" },
-            { value: "WCDMA:NR5G:LTE", label: "WCDMA > NR5G > LTE" },
-            { value: "LTE:WCDMA", label: "LTE > WCDMA" },
-            { value: "WCDMA:LTE", label: "WCDMA > LTE" },
-            { value: "NR5G:WCDMA", label: "NR5G > WCDMA" },
-            { value: "WCDMA:NR5G", label: "WCDMA > NR5G" }
+            { value: "LTE:NR5G", label: "LTE > NR5G" }
         ],
         lte: ["2", "4", "5", "7", "12", "13", "14", "17", "25", "26", "29", "30", "38", "41", "42", "43", "48", "66", "71"],
         nsa: ["2", "5", "7", "12", "13", "14", "25", "26", "29", "30", "38", "41", "48", "66", "70", "71", "77", "78"],
         sa: ["2", "5", "7", "12", "13", "14", "25", "26", "29", "30", "38", "41", "48", "66", "70", "71", "77", "78"]
     };
+
+    var RAT_PRESETS = [
+        {
+            key: "allow_both_5g_first",
+            label: "Allow All",
+            title: "Allow LTE, NSA, and SA, prefer 5G first",
+            mode_pref: "LTE:NR5G",
+            rat_acq_order: "NR5G:LTE",
+            nr5g_disable_mode: "0"
+        },
+        {
+            key: "nsa_only",
+            label: "NSA Only",
+            title: "LTE + NR allowed, SA blocked, prefer 5G first",
+            mode_pref: "LTE:NR5G",
+            rat_acq_order: "NR5G:LTE",
+            nr5g_disable_mode: "1"
+        },
+        {
+            key: "sa_only",
+            label: "SA Only",
+            title: "NR only, NSA blocked, prefer 5G first",
+            mode_pref: "NR5G",
+            rat_acq_order: "NR5G:LTE",
+            nr5g_disable_mode: "2"
+        },
+        {
+            key: "lte_only",
+            label: "LTE Only",
+            title: "LTE only, LTE-first order, neutral 5G policy",
+            mode_pref: "LTE",
+            rat_acq_order: "LTE:NR5G",
+            nr5g_disable_mode: "0"
+        }
+    ];
 
     var SECTION_META = {
         lte: {
@@ -92,11 +116,47 @@
     function buildStateSummary(state) {
         return [
             "Live modem state:",
-            "RAT " + (state.mode_pref || "AUTO"),
+            "Mode " + describeRatMode(state.mode_pref || "AUTO"),
+            "Order " + describeRatAcqOrder(state.rat_acq_order || ""),
+            "5G policy " + describeNr5gPolicy(state.nr5g_disable_mode || "0"),
             "LTE " + ((state.lte_band_list && state.lte_band_list.length) || 0),
             "NSA " + ((state.nsa_nr5g_band_list && state.nsa_nr5g_band_list.length) || 0),
             "SA " + ((state.nr5g_band_list && state.nr5g_band_list.length) || 0)
         ].join(" | ");
+    }
+
+    function describeRatMode(value) {
+        var raw = String(value || "AUTO");
+        for (var i = 0; i < SUPPORTED.ratModes.length; i += 1) {
+            if (SUPPORTED.ratModes[i].value === raw) {
+                return SUPPORTED.ratModes[i].label;
+            }
+        }
+        return raw;
+    }
+
+    function describeRatAcqOrder(value) {
+        var raw = String(value || "");
+        if (!raw) {
+            return "Unavailable";
+        }
+        for (var i = 0; i < SUPPORTED.ratAcqOrders.length; i += 1) {
+            if (SUPPORTED.ratAcqOrders[i].value === raw) {
+                return SUPPORTED.ratAcqOrders[i].label;
+            }
+        }
+        return raw.replace(/:/g, " > ");
+    }
+
+    function describeNr5gPolicy(value) {
+        var raw = String(value || "0");
+        if (raw === "1") {
+            return "NSA only (SA blocked)";
+        }
+        if (raw === "2") {
+            return "SA only (NSA blocked)";
+        }
+        return "Allow both SA and NSA";
     }
 
     function indicatorIdForSection(sectionKey) {
@@ -160,17 +220,31 @@
         }).join("");
     }
 
+    function getAllowedAcqOrders(mode) {
+        return SUPPORTED.ratAcqOrders.slice();
+    }
+
+    function buildRatPresetButtons() {
+        return RAT_PRESETS.map(function (preset) {
+            return [
+                "<button type='button' class='qt-btn qt-btn-secondary rat-preset-button' data-rat-preset='", escapeHtml(preset.key), "' title='", escapeHtml(preset.title), "'>",
+                escapeHtml(preset.label),
+                "</button>"
+            ].join("");
+        }).join("");
+    }
+
     function buildRatSectionHtml() {
         return [
             "<details class='band-lock-section rat-section qt-details' id='rat-section'>",
             "<summary class='qt-details-summary'><span class='qt-details-arrow'></span> RAT Control</summary>",
             "<div class='band-lock-section-body qt-details-body'>",
 
-            "<div class='rat-control-row'>",
-            "<label for='rat-mode-select'>Mode preference</label>",
-            "<select id='rat-mode-select'>", buildModeOptions(), "</select>",
-            "<button id='rat-mode-apply' class='band-lock-apply-button qt-btn qt-btn-danger' type='button'>Apply</button>",
-            "<span id='band-lock-rat-indicator' class='band-lock-indicator band-lock-indicator-idle'></span>",
+            "<div class='rat-preset-row'>",
+            "<span class='rat-preset-label'>Quick presets</span>",
+            "<div class='rat-preset-buttons'>", buildRatPresetButtons(), "</div>",
+            "<button type='button' id='rat-defaults-button' class='qt-btn qt-btn-secondary rat-defaults-button' title='Set allow all and prefer 5G first, LTE second'>Defaults</button>",
+            "<span id='rat-preset-indicator' class='band-lock-indicator band-lock-indicator-idle'></span>",
             "</div>",
 
             "<div class='rat-control-row'>",
@@ -180,15 +254,31 @@
             "<span id='rat-acq-order-indicator' class='band-lock-indicator band-lock-indicator-idle'></span>",
             "</div>",
 
+            "<details class='rat-advanced-section'>",
+            "<summary class='rat-advanced-summary'>Advanced RAT settings</summary>",
+
             "<div class='rat-control-row'>",
-            "<label for='rat-nr5g-disable-select'>5G disable</label>",
+            "<label for='rat-mode-select'>Mode preference</label>",
+            "<select id='rat-mode-select'>", buildModeOptions(), "</select>",
+            "<button id='rat-mode-apply' class='band-lock-apply-button qt-btn qt-btn-danger' type='button'>Apply</button>",
+            "<span id='band-lock-rat-indicator' class='band-lock-indicator band-lock-indicator-idle'></span>",
+            "</div>",
+
+            "<div class='rat-control-row'>",
+            "<label for='rat-nr5g-disable-select'>SA / NSA policy</label>",
             "<select id='rat-nr5g-disable-select'>",
-            "<option value='0'>Enabled</option>",
-            "<option value='1'>Disabled</option>",
+            "<option value='0'>Allow both SA and NSA</option>",
+            "<option value='1'>NSA only (disable SA)</option>",
+            "<option value='2'>SA only (disable NSA)</option>",
             "</select>",
             "<button id='rat-nr5g-disable-apply' class='band-lock-apply-button qt-btn qt-btn-danger' type='button'>Apply</button>",
             "<span id='rat-nr5g-disable-indicator' class='band-lock-indicator band-lock-indicator-idle'></span>",
             "</div>",
+
+            "<p class='at-panel-note rat-advanced-note'>Presets apply all three settings together. Use these advanced controls only when you want to override the preset behavior manually.</p>",
+            "</details>",
+
+            "<p class='at-panel-note'>Quick presets handle the common combinations. Acquisition order stays available here so you can choose whether the modem tries 5G or LTE first.</p>",
 
             "</div>",
             "</details>"
@@ -215,14 +305,16 @@
         return [
             "<div class='at-panel-content'>",
             "<h3 class='qt-card-header'>Band &amp; Cell Locking</h3>",
-            "<p class='at-panel-note'>Reads and writes preferences through QNWPREFCFG and QNWLOCK. RAT mode, acquisition order, 5G disable, and band masks are saved and reapplied after reboot. Cell locking remains non-persistent. Refresh is manual on purpose so this page does not constantly compete with the stock status UI for modem queries.</p>",
+            "<p class='at-panel-note'>Reads and writes preferences through QNWPREFCFG and QNWLOCK. RAT mode preference, acquisition order, and SA / NSA policy are separate modem settings. Cell locking remains non-persistent. Refresh is manual on purpose so this page does not constantly compete with the stock status UI for modem queries.</p>",
             "<div id='band-lock-status' class='band-lock-status band-lock-status-info'>Ready.</div>",
             "<div class='band-lock-top-actions'>",
             "<button id='band-lock-refresh' class='qt-btn qt-btn-primary' type='button'>Refresh</button>",
             "</div>",
             buildSectionDetails("Current modem state", [
                 "<div class='band-lock-current-grid'>",
-                "<div class='band-lock-current-card'><h3>Current RAT</h3><div id='band-lock-current-rat' class='band-lock-current-value'></div></div>",
+                "<div class='band-lock-current-card'><h3>Mode preference</h3><div id='band-lock-current-rat' class='band-lock-current-value'></div></div>",
+                "<div class='band-lock-current-card'><h3>Acquisition order</h3><div id='band-lock-current-order' class='band-lock-current-value'></div></div>",
+                "<div class='band-lock-current-card'><h3>5G policy</h3><div id='band-lock-current-policy' class='band-lock-current-value'></div></div>",
                 "<div class='band-lock-current-card'><h3>Current LTE</h3><div id='band-lock-current-lte' class='band-lock-current-value'></div></div>",
                 "<div class='band-lock-current-card'><h3>Current NSA</h3><div id='band-lock-current-nsa' class='band-lock-current-value'></div></div>",
                 "<div class='band-lock-current-card'><h3>Current SA</h3><div id='band-lock-current-sa' class='band-lock-current-value'></div></div>",
@@ -382,8 +474,13 @@
 
     window.JtoolsBandLockingCore = {
         SECTION_META: SECTION_META,
+        RAT_PRESETS: RAT_PRESETS,
         escapeHtml: escapeHtml,
         formatRawBlock: formatRawBlock,
+        describeRatMode: describeRatMode,
+        describeRatAcqOrder: describeRatAcqOrder,
+        describeNr5gPolicy: describeNr5gPolicy,
+        getAllowedAcqOrders: getAllowedAcqOrders,
         describeBandList: describeBandList,
         buildStateSummary: buildStateSummary,
         indicatorIdForSection: indicatorIdForSection,

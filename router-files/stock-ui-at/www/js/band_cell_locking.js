@@ -82,8 +82,33 @@
     }
 
     function clearIndicators() {
-        ["band-lock-rat-indicator", "rat-acq-order-indicator", "rat-nr5g-disable-indicator", "band-lock-lte-indicator", "band-lock-nsa-indicator", "band-lock-sa-indicator"].forEach(function (id) {
+        ["band-lock-rat-indicator", "rat-acq-order-indicator", "rat-nr5g-disable-indicator", "rat-preset-indicator", "band-lock-lte-indicator", "band-lock-nsa-indicator", "band-lock-sa-indicator"].forEach(function (id) {
             setIndicator(id, "idle", "");
+        });
+    }
+
+    function setRatSelectors(mode, order, policy) {
+        var modeSelect = document.getElementById("rat-mode-select");
+        var orderSelect = document.getElementById("rat-acq-order-select");
+        var policySelect = document.getElementById("rat-nr5g-disable-select");
+
+        if (modeSelect && mode) {
+            modeSelect.value = mode;
+        }
+        if (orderSelect && order) {
+            orderSelect.value = order;
+        }
+        if (policySelect && policy != null) {
+            policySelect.value = policy;
+        }
+    }
+
+    function postRatSetting(url, data) {
+        return $.ajax({
+            url: url,
+            type: "POST",
+            dataType: "json",
+            data: data
         });
     }
 
@@ -110,19 +135,23 @@
     }
 
     function renderFromState(state) {
+        var saved = state.saved_settings || {};
+        var desiredMode = saved.mode_pref || state.mode_pref || "AUTO";
+        var desiredOrder = saved.rat_acq_order || state.rat_acq_order || "";
+        var desiredPolicy = saved.nr5g_disable_mode || state.nr5g_disable_mode || "0";
         var modeSelect = document.getElementById("rat-mode-select");
         if (modeSelect) {
-            modeSelect.value = state.mode_pref || "AUTO";
+            modeSelect.value = desiredMode;
         }
 
         var acqSelect = document.getElementById("rat-acq-order-select");
-        if (acqSelect && state.rat_acq_order) {
-            acqSelect.value = state.rat_acq_order;
+        if (acqSelect && desiredOrder) {
+            acqSelect.value = desiredOrder;
         }
 
         var nr5gDisSelect = document.getElementById("rat-nr5g-disable-select");
         if (nr5gDisSelect) {
-            nr5gDisSelect.value = state.nr5g_disable_mode || "0";
+            nr5gDisSelect.value = desiredPolicy;
         }
 
         var serving = document.getElementById("band-lock-servingcell");
@@ -144,7 +173,9 @@
         setCheckedBands("nsa", state.nsa_nr5g_band_list || []);
         setCheckedBands("sa", state.nr5g_band_list || []);
 
-        setText("band-lock-current-rat", state.mode_pref || "AUTO");
+        setText("band-lock-current-rat", core.describeRatMode(state.mode_pref || "AUTO"));
+        setText("band-lock-current-order", core.describeRatAcqOrder(state.rat_acq_order || ""));
+        setText("band-lock-current-policy", core.describeNr5gPolicy(state.nr5g_disable_mode || "0"));
         setText("band-lock-current-lte", core.describeBandList("lte", state.lte_band_list || []));
         setText("band-lock-current-nsa", core.describeBandList("nsa", state.nsa_nr5g_band_list || []));
         setText("band-lock-current-sa", core.describeBandList("sa", state.nr5g_band_list || []));
@@ -203,11 +234,11 @@
             }
         }).done(function (response) {
             if (response && response.ok) {
-                setIndicator("band-lock-rat-indicator", "ok", "Readback: " + (response.applied_mode || mode));
+                setIndicator("band-lock-rat-indicator", "ok", "Readback: " + core.describeRatMode(response.applied_mode || mode));
                 fetchState({
                     loadingText: "RAT mode written. Reading back live modem state...",
                     successText: function (liveState) {
-                        return "RAT mode applied. Modem now reports " + (liveState.mode_pref || "AUTO") + ".";
+                        return "Mode preference applied. Modem now reports " + core.describeRatMode(liveState.mode_pref || "AUTO") + ". Acquisition order is " + core.describeRatAcqOrder(liveState.rat_acq_order || "") + ".";
                     }
                 });
             } else {
@@ -244,11 +275,15 @@
             }
         }).done(function (response) {
             if (response && response.ok) {
-                setIndicator("rat-acq-order-indicator", "ok", "Readback: " + (response.applied_order || order));
+                setIndicator("rat-acq-order-indicator", "ok", "Readback: " + core.describeRatAcqOrder(response.applied_order || order));
                 fetchState({
                     loadingText: "Acquisition order written. Reading back live modem state...",
                     successText: function (liveState) {
-                        return "RAT acquisition order applied: " + (liveState.rat_acq_order || order) + ".";
+                        var liveOrder = liveState.rat_acq_order || order;
+                        if (liveOrder !== order) {
+                            return "RAT acquisition order normalized by the modem to " + core.describeRatAcqOrder(liveOrder) + " because the current mode preference only allows " + core.describeRatMode(liveState.mode_pref || "AUTO") + ".";
+                        }
+                        return "RAT acquisition order applied: " + core.describeRatAcqOrder(liveOrder) + ".";
                     }
                 });
             } else {
@@ -269,8 +304,7 @@
 
         setBusy(true);
         setIndicator("rat-nr5g-disable-indicator", "pending", "Writing...");
-        var label = val === "1" ? "Disabling" : "Enabling";
-        setStatus("info", label + " 5G...");
+        setStatus("info", "Applying 5G policy " + core.describeNr5gPolicy(val) + "...");
 
         $.ajax({
             url: "/band_locking_api/nr5g_disable",
@@ -282,22 +316,100 @@
             }
         }).done(function (response) {
             if (response && response.ok) {
-                var readback = response.applied_value === "1" ? "Disabled" : "Enabled";
+                var readback = core.describeNr5gPolicy(response.applied_value || val);
                 setIndicator("rat-nr5g-disable-indicator", "ok", "Readback: " + readback);
                 fetchState({
-                    loadingText: "5G disable mode written. Reading back live modem state...",
-                    successText: function () {
-                        return "5G " + (val === "1" ? "disabled" : "enabled") + " successfully.";
+                    loadingText: "5G policy written. Reading back live modem state...",
+                    successText: function (liveState) {
+                        return "5G policy applied: " + core.describeNr5gPolicy(liveState.nr5g_disable_mode || val) + ".";
                     }
                 });
             } else {
-                setStatus("error", (response && response.error) || "Failed to apply 5G disable mode.");
+                setStatus("error", (response && response.error) || "Failed to apply 5G policy.");
                 setIndicator("rat-nr5g-disable-indicator", "error", "Failed");
                 setBusy(false);
             }
         }).fail(function (xhr) {
-            setStatus("error", extractXhrError(xhr, "5G disable mode apply failed."));
+            setStatus("error", extractXhrError(xhr, "5G policy apply failed."));
             setIndicator("rat-nr5g-disable-indicator", "error", "Error");
+            setBusy(false);
+        });
+    }
+
+    function applyRatPreset(presetKey) {
+        var preset = null;
+        var i;
+        for (i = 0; i < core.RAT_PRESETS.length; i += 1) {
+            if (core.RAT_PRESETS[i].key === presetKey) {
+                preset = core.RAT_PRESETS[i];
+                break;
+            }
+        }
+
+        if (!preset) {
+            setStatus("error", "Unknown RAT preset.");
+            return;
+        }
+
+        setRatSelectors(preset.mode_pref, preset.rat_acq_order, preset.nr5g_disable_mode);
+        clearIndicators();
+        setBusy(true);
+        setIndicator("rat-preset-indicator", "pending", "Applying " + preset.label + "...");
+        setStatus("info", "Applying preset " + preset.label + "...");
+
+        postRatSetting("/band_locking_api/mode", {
+            csrfToken: csrfToken,
+            mode: preset.mode_pref
+        }).done(function (modeResp) {
+            if (!modeResp || !modeResp.ok) {
+                setStatus("error", (modeResp && modeResp.error) || "Failed to apply preset mode.");
+                setIndicator("rat-preset-indicator", "error", "Failed");
+                setBusy(false);
+                return;
+            }
+
+            postRatSetting("/band_locking_api/rat_acq_order", {
+                csrfToken: csrfToken,
+                order: preset.rat_acq_order
+            }).done(function (orderResp) {
+                if (!orderResp || !orderResp.ok) {
+                    setStatus("error", (orderResp && orderResp.error) || "Failed to apply preset order.");
+                    setIndicator("rat-preset-indicator", "error", "Failed");
+                    setBusy(false);
+                    return;
+                }
+
+                postRatSetting("/band_locking_api/nr5g_disable", {
+                    csrfToken: csrfToken,
+                    value: preset.nr5g_disable_mode
+                }).done(function (policyResp) {
+                    if (!policyResp || !policyResp.ok) {
+                        setStatus("error", (policyResp && policyResp.error) || "Failed to apply preset 5G policy.");
+                        setIndicator("rat-preset-indicator", "error", "Failed");
+                        setBusy(false);
+                        return;
+                    }
+
+                    setIndicator("rat-preset-indicator", "ok", "Applied: " + preset.label);
+                    fetchState({
+                        loadingText: "Preset written. Reading back live modem state...",
+                        successText: function (liveState) {
+                            return "Preset applied: " + preset.label + ". Mode " + core.describeRatMode(liveState.mode_pref || preset.mode_pref) + ", order " + core.describeRatAcqOrder(liveState.rat_acq_order || preset.rat_acq_order) + ", policy " + core.describeNr5gPolicy(liveState.nr5g_disable_mode || preset.nr5g_disable_mode) + ".";
+                        }
+                    });
+                }).fail(function (xhr) {
+                    setStatus("error", extractXhrError(xhr, "Preset 5G policy apply failed."));
+                    setIndicator("rat-preset-indicator", "error", "Error");
+                    setBusy(false);
+                });
+            }).fail(function (xhr) {
+                setStatus("error", extractXhrError(xhr, "Preset order apply failed."));
+                setIndicator("rat-preset-indicator", "error", "Error");
+                setBusy(false);
+            });
+        }).fail(function (xhr) {
+            setStatus("error", extractXhrError(xhr, "Preset mode apply failed."));
+            setIndicator("rat-preset-indicator", "error", "Error");
             setBusy(false);
         });
     }
@@ -411,6 +523,19 @@
             nr5gDisApply.addEventListener("click", function () {
                 setIndicator("rat-nr5g-disable-indicator", "pending", "Clicked");
                 applyNr5gDisable();
+            });
+        }
+
+        Array.prototype.forEach.call(document.querySelectorAll("[data-rat-preset]"), function (node) {
+            node.addEventListener("click", function () {
+                applyRatPreset(node.getAttribute("data-rat-preset"));
+            });
+        });
+
+        var defaultsBtn = document.getElementById("rat-defaults-button");
+        if (defaultsBtn) {
+            defaultsBtn.addEventListener("click", function () {
+                applyRatPreset("allow_both_5g_first");
             });
         }
 

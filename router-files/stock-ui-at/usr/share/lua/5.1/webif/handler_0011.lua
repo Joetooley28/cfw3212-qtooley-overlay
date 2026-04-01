@@ -56,7 +56,8 @@ local RAT_ACQ_ORDER_VALUES = {
 
 local NR5G_DISABLE_MODE_VALUES = {
     ["0"] = true,
-    ["1"] = true
+    ["1"] = true,
+    ["2"] = true
 }
 
 local BAND_VALUES = {
