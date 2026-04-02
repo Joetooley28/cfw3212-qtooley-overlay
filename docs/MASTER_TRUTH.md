@@ -873,3 +873,34 @@ Date: 2026-03-30
 - Practical handoff rule:
   - do not assume installer/uninstaller is “done done”
   - treat it as working infrastructure that should be resumed after the current UI polish pass
+
+## Installer Validation Checkpoint
+
+Date: 2026-04-02
+
+- Device 01 (`192.168.10.1`) was intentionally turned into a documented synthetic stock-like baseline for installer testing.
+- That synthetic baseline was verified after uninstall by checking:
+  - no `/usrdata/at-stock-ui`
+  - no live `/usrdata/at-stock-ui/live` bind mounts in `/proc/self/mountinfo`
+  - no bundled Ookla binary left behind
+  - no Tailscale paths left behind
+  - no Qtooley dark-mode/shared-stock refs left in live stock files
+  - live shared stock files matching the expected stock-like hash set for:
+    - `/www/theme/js/genHeader.js`
+    - `/www/js/generatedMenuEntries.js`
+    - `/usr/share/lua/5.1/webif/top_menu_entries.lua`
+    - `/usr/share/lua/5.1/webif/userGroupAuth.lua`
+- Install was then re-tested from that synthetic baseline with:
+  - bundled Ookla included by default
+  - explicit one-time `FORCE_RECAPTURE_BASELINE=1` so uninstall would target this newer synthetic baseline
+- Tailscale was installed afterward and the full uninstall path was re-tested.
+- Full uninstall successfully removed:
+  - Qtooley overlay payload
+  - `jtools-stock-ui.service`
+  - `jtools-stock-ui.timer`
+  - bundled Ookla
+  - Tailscale
+- After that full uninstall, Device 01 again returned to the verified synthetic stock-like baseline and stock backup/restore UI behavior was confirmed working by producing a downloadable backup archive from the stock UI.
+- Practical meaning:
+  - current uninstall promise is “return to the install-time pre-Qtooley state captured from that router,” not universal factory stock
+  - Device 01 now has a trusted synthetic baseline for single-box installer testing

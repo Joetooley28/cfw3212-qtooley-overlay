@@ -69,3 +69,20 @@ Safety
 - Device 01 is the development box
 - Device 02 is the cleaner compatibility-validation box
 - Device 03 should stay protected unless you have a specific reason to touch it
+
+Validation checkpoint
+- On 2026-04-02, Device 01 was used to verify the current end-to-end flow:
+  - install from a documented synthetic stock-like baseline
+  - bundled Ookla included with the base install
+  - optional Tailscale install afterward
+  - full uninstall removing Qtooley, bundled Ookla, and Tailscale
+- After full uninstall, Device 01 was verified back on the synthetic stock-like baseline with:
+  - no `/usrdata/at-stock-ui`
+  - no active overlay binds
+  - no leftover bundled Ookla binary
+  - no leftover Tailscale paths
+  - no Qtooley dark-mode/shared-stock refs in the live stock shell
+- Stock UI backup/restore was also spot-checked after uninstall by successfully downloading a stock backup archive from the stock UI.
+- User-facing meaning:
+  - uninstall returns the router to the install-time pre-Qtooley state captured from that router
+  - this is stronger than “remove the overlay” and more accurate than claiming universal factory-stock restoration

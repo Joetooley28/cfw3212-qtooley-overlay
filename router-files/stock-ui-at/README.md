@@ -138,6 +138,31 @@ Release ZIP notes:
   - `usrdata\at-stock-ui\bundles\ookla\ookla-speedtest-1.2.0-linux-armhf.tgz`
 - if that archive is present in the ZIP, the install path can place Ookla without the router downloading it
 
+## Installer Validation Checkpoint
+
+Date: 2026-04-02
+
+- Device 01 was reset into a documented synthetic stock-like baseline and then used as the current first-install/uninstall test box.
+- Verified install path:
+  - Qtooley installs cleanly from that synthetic baseline
+  - bundled Ookla installs as part of the base Qtooley flow
+  - the installer can explicitly recapture that synthetic baseline as the uninstall target when used as a last-resort operator action
+- Verified uninstall path:
+  - `Remove Qtooley and bundled Ookla`
+  - `Remove Qtooley, bundled Ookla, and Tailscale`
+- Verified post-uninstall conditions on Device 01:
+  - no `/usrdata/at-stock-ui`
+  - no `jtools-stock-ui.service`
+  - no `jtools-stock-ui.timer`
+  - no live overlay bind mounts
+  - no bundled Ookla binary
+  - no Tailscale runtime paths after full uninstall
+  - no Qtooley dark-mode/shared-stock refs left in the live stock shell
+- Stock UI backup/restore behavior was spot-checked after uninstall by successfully generating a downloadable stock backup archive from the stock UI.
+- Current product truth:
+  - uninstall restores the router to the install-time pre-Qtooley state captured from that router
+  - on Device 01, that install-time state is the documented synthetic stock-like baseline, not a claim of universal factory stock
+
 ## Safe Recovery Workflow
 
 Before any shared-stock change, capture a router-side overlay snapshot first:
