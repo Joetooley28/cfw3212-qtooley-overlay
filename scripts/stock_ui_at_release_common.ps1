@@ -126,7 +126,7 @@ function Push-PackageViaSsh {
     $parent = [System.IO.Path]::GetDirectoryName($RemoteStageRoot).Replace("\", "/")
 
     Invoke-SshCommand -Target $Target -Command "rm -rf '$RemoteStageRoot' && mkdir -p '$parent' && mkdir -p '$RemoteStageRoot'"
-    & cmd /c "tar -cf - -C ""$PackageRoot"" . | ssh $Target ""cd '$RemoteStageRoot' && tar -xf -""" | Out-Host
+    & tar -cf - -C $PackageRoot . | & ssh $Target "cd '$RemoteStageRoot' && tar -xf -" | Out-Host
     if ($LASTEXITCODE -ne 0) {
         throw "Tar-over-SSH package push failed."
     }
