@@ -10,13 +10,13 @@ $remoteScriptPath = "$remoteStageRoot/package/uninstall_stock_ui_release.sh"
 
 Write-Host "Qtooley stock UI uninstall"
 $transport = Select-Transport
-$mode = Read-MenuChoice -Prompt "Choose uninstall mode: 1) Remove Qtooley, keep optional extras 2) Remove Qtooley and optional extras" -Allowed @("1", "2")
+$mode = Read-MenuChoice -Prompt "Choose uninstall mode: 1) Remove Qtooley only 2) Remove Qtooley plus optional tool extras (Ookla and Tailscale)" -Allowed @("1", "2")
 $removeOptional = if ($mode -eq "2") { $true } else { $false }
 
 if ($removeOptional) {
-    Write-Host "Full uninstall will also remove optional runtimes such as bundled Ookla and installed Tailscale."
+    Write-Host "This mode removes Qtooley and also removes optional tool extras such as bundled Ookla and installed Tailscale."
 } else {
-    Write-Host "This mode removes Qtooley from the router but leaves optional extras such as Ookla and Tailscale in place."
+    Write-Host "This mode removes Qtooley only and leaves optional tool extras such as Ookla and Tailscale in place."
 }
 
 if (-not (Read-YesNo -Prompt "Proceed with uninstall?" -DefaultYes $false)) {

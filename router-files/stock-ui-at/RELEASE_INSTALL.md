@@ -31,8 +31,8 @@ Normal uninstall
    - `powershell -ExecutionPolicy Bypass -File .\uninstall_stock_ui_at.ps1`
 3. Choose `2` for `SSH`.
 4. Choose uninstall mode:
-   - `1` remove Qtooley, keep optional extras such as Ookla and Tailscale
-   - `2` remove Qtooley and optional extras such as Ookla and Tailscale
+   - `1` remove Qtooley only
+   - `2` remove Qtooley plus optional tool extras such as Ookla and Tailscale
 
 Notes
 - on first install, the installer captures a compact baseline from the router's live stock trees for `/www` and `/usr/share/lua/5.1/webif`
