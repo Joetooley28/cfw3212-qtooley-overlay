@@ -25,14 +25,18 @@ Normal install
 5. Enter the router IP, username, and then the password when `ssh` prompts.
 6. Answer the simple `y/n` prompts.
 
+Bundled Ookla behavior
+- the normal install path now installs the bundled Ookla CLI automatically when the archive is present in the package
+- if that archive is missing, the installer leaves Ookla unchanged and reports that state
+
 Normal uninstall
 1. Open PowerShell in the extracted folder.
 2. Run:
    - `powershell -ExecutionPolicy Bypass -File .\uninstall_stock_ui_at.ps1`
 3. Choose `2` for `SSH`.
 4. Choose uninstall mode:
-   - `1` remove Qtooley only
-   - `2` remove Qtooley plus optional tool extras such as Ookla and Tailscale
+   - `1` remove Qtooley and bundled Ookla
+   - `2` remove Qtooley, bundled Ookla, and Tailscale
 
 Notes
 - on first install, the installer captures a compact baseline from the router's live stock trees for `/www` and `/usr/share/lua/5.1/webif`
@@ -46,7 +50,9 @@ Notes
   - `/www/theme/js/genHeader.js`
   - `/usr/share/lua/5.1/webif/top_menu_entries.lua`
   - `/usr/share/lua/5.1/webif/userGroupAuth.lua`
-- full uninstall also removes optional runtimes when selected
+- bundled Ookla is treated as part of the base Qtooley install/uninstall flow
+- Tailscale remains the optional extra
+- if Tailscale is kept during uninstall, it remains usable only from the CLI after the Qtooley UI is removed
 
 Offline Ookla bundle
 - if this ZIP includes:

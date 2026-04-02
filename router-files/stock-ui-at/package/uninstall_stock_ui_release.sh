@@ -7,7 +7,7 @@ PACKAGE_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
 TARGET_BASE="/usrdata/at-stock-ui"
 TARGET_UNITS="/etc/systemd/system"
 INSTALL_BASELINE_DIR="$TARGET_BASE/installer-state/install-baseline"
-REMOVE_OPTIONAL_RUNTIMES="${REMOVE_OPTIONAL_RUNTIMES:-0}"
+REMOVE_TAILSCALE="${REMOVE_TAILSCALE:-0}"
 REMOVE_PAYLOAD="${REMOVE_PAYLOAD:-1}"
 
 log() {
@@ -45,9 +45,17 @@ cleanup_extra_overlay_state() {
     rm -f "$TARGET_BASE/ttl_config.json"
 }
 
-remove_optional_runtimes_if_requested() {
-    if [ "$REMOVE_OPTIONAL_RUNTIMES" != "1" ]; then
-        log "Optional runtime removal skipped."
+remove_bundled_ookla() {
+    if [ -x "$TARGET_BASE/remove_ookla_speedtest_cli.sh" ]; then
+        /bin/sh "$TARGET_BASE/remove_ookla_speedtest_cli.sh" || true
+    else
+        rm -f "$TARGET_BASE/bin/speedtest" "$TARGET_BASE/bin/ookla_speedtest.url"
+    fi
+}
+
+remove_tailscale_if_requested() {
+    if [ "$REMOVE_TAILSCALE" != "1" ]; then
+        log "Tailscale removal skipped."
         return 0
     fi
 
@@ -62,11 +70,6 @@ remove_optional_runtimes_if_requested() {
         rm -f /usrdata/root/bin/tailscale
     fi
 
-    if [ -x "$TARGET_BASE/remove_ookla_speedtest_cli.sh" ]; then
-        /bin/sh "$TARGET_BASE/remove_ookla_speedtest_cli.sh" || true
-    else
-        rm -f "$TARGET_BASE/bin/speedtest" "$TARGET_BASE/bin/ookla_speedtest.url"
-    fi
 }
 
 remove_units() {
@@ -98,7 +101,8 @@ fi
 
 verify_install_baseline_if_present
 cleanup_extra_overlay_state
-remove_optional_runtimes_if_requested
+remove_bundled_ookla
+remove_tailscale_if_requested
 remove_units
 
 if [ "$REMOVE_PAYLOAD" = "1" ]; then

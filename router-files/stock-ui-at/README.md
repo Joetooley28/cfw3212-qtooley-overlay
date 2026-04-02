@@ -126,6 +126,8 @@ Release ZIP notes:
 - on first install, that baseline is captured from the router's live `/www` and `/usr/share/lua/5.1/webif` trees before any Qtooley live overlay mounts are active
 - a non-default last-resort install mode can force a one-time baseline recapture when the saved uninstall baseline is missing or known-bad
 - that recapture mode should only be used on a router that is currently presenting the stock UI state you want uninstall to restore later
+- bundled Ookla is part of the normal Qtooley install/uninstall flow when the archive is present
+- Tailscale remains the optional extra; if it is kept during uninstall, it remains usable only from the CLI after the Qtooley UI is removed
 - uninstall currently assumes protected stock files were not modified in place and verifies the install-time baseline after the overlay is unmounted
 - the shared stock verification set currently covers:
   - `/www/js/generatedMenuEntries.js`

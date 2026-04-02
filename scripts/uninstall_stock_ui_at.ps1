@@ -10,13 +10,14 @@ $remoteScriptPath = "$remoteStageRoot/package/uninstall_stock_ui_release.sh"
 
 Write-Host "Qtooley stock UI uninstall"
 $transport = Select-Transport
-$mode = Read-MenuChoice -Prompt "Choose uninstall mode: 1) Remove Qtooley only 2) Remove Qtooley plus optional tool extras (Ookla and Tailscale)" -Allowed @("1", "2")
-$removeOptional = if ($mode -eq "2") { $true } else { $false }
+$mode = Read-MenuChoice -Prompt "Choose uninstall mode: 1) Remove Qtooley and bundled Ookla 2) Remove Qtooley, bundled Ookla, and Tailscale" -Allowed @("1", "2")
+$removeTailscale = if ($mode -eq "2") { $true } else { $false }
 
-if ($removeOptional) {
-    Write-Host "This mode removes Qtooley and also removes optional tool extras such as bundled Ookla and installed Tailscale."
+if ($removeTailscale) {
+    Write-Host "This mode removes Qtooley, bundled Ookla, and Tailscale."
 } else {
-    Write-Host "This mode removes Qtooley only and leaves optional tool extras such as Ookla and Tailscale in place."
+    Write-Host "This mode removes Qtooley and bundled Ookla, but leaves Tailscale installed."
+    Write-Host "If you keep Tailscale, it will remain usable only from the CLI after the Qtooley UI is removed."
 }
 
 if (-not (Read-YesNo -Prompt "Proceed with uninstall?" -DefaultYes $false)) {
@@ -26,10 +27,10 @@ if (-not (Read-YesNo -Prompt "Proceed with uninstall?" -DefaultYes $false)) {
 
 if ($transport.Name -eq "adb") {
     Push-PackageViaAdb -PackageRoot $packageRoot -RemoteStageRoot $remoteStageRoot
-    Invoke-AdbShell "chmod 755 '$remoteScriptPath' && REMOVE_OPTIONAL_RUNTIMES=$([int]$removeOptional) REMOVE_PAYLOAD=1 /bin/sh '$remoteScriptPath'"
+    Invoke-AdbShell "chmod 755 '$remoteScriptPath' && REMOVE_TAILSCALE=$([int]$removeTailscale) REMOVE_PAYLOAD=1 /bin/sh '$remoteScriptPath'"
 } else {
     Push-PackageViaSsh -PackageRoot $packageRoot -Target $transport.Target -RemoteStageRoot $remoteStageRoot
-    Invoke-SshCommand -Target $transport.Target -Command "chmod 755 '$remoteScriptPath' && REMOVE_OPTIONAL_RUNTIMES=$([int]$removeOptional) REMOVE_PAYLOAD=1 /bin/sh '$remoteScriptPath'"
+    Invoke-SshCommand -Target $transport.Target -Command "chmod 755 '$remoteScriptPath' && REMOVE_TAILSCALE=$([int]$removeTailscale) REMOVE_PAYLOAD=1 /bin/sh '$remoteScriptPath'"
 }
 
 Write-Host "Uninstall finished."
