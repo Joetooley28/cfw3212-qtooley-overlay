@@ -84,17 +84,23 @@ Verification note:
 
 ## Screenshots
 
-![Qtooley General Info](docs/images/qtooley/general-info.jpg)
-
-Key pages in the current overlay:
-
-### Quick Overview
-
 ![Quick Overview](docs/images/qtooley/quick-overview.jpg)
 
 ### General Info
 
 ![General Info](docs/images/qtooley/general-info.jpg)
+
+### AT Terminal
+
+![AT terminal](docs/images/qtooley/at-terminal.jpg)
+
+### SMS
+
+![SMS](docs/images/qtooley/sms.jpg)
+
+### Screensaver Settings
+
+![Screensaver Settings](docs/images/qtooley/screensaver-settings.jpg)
 
 ### RAT / Band / Cell Locking
 
@@ -108,9 +114,13 @@ Key pages in the current overlay:
 
 ![Tailscale](docs/images/qtooley/tailscale.jpg)
 
+### TTL Helper
+
+![TTL helper](docs/images/qtooley/ttl-helper.jpg)
+
 ## Project Tracks
 
-There are two related tracks in this project history:
+There are two related tracks in this project history, but only one of them should be the normal starting point:
 
 1. `main`
 
@@ -118,7 +128,7 @@ This branch is the current Qtooley stock UI overlay and should be treated as the
 
 2. `standalone-at-terminal`
 
-This is the legacy standalone LAN AT terminal branch.
+This should be the older legacy standalone LAN AT terminal branch.
 
 Important:
 
@@ -127,7 +137,11 @@ Important:
 - both use the same shared lock concept around modem access
 - do not casually install and run both as if they were isolated products
 
-If both are published, the stock UI overlay should be the recommended path and the standalone branch should be clearly marked as legacy / fallback / reference.
+If both are published:
+
+- `main` should be the default and recommended path
+- `standalone-at-terminal` should be clearly marked as legacy / old / fallback
+- the legacy branch should tell new users to use the main overlay branch instead
 
 ## Repo Layout
 
@@ -162,11 +176,3 @@ Useful supporting docs:
 
 - repo version: `v0.3.0-qtooley-2026-03-24`
 - current local checkpoint branch: `qtooley-current`
-
-## Publishing Notes
-
-Before pushing to GitHub:
-
-- keep this branch as the main project landing page
-- create a separate legacy branch for the standalone AT terminal
-- add a branch-specific legacy README there warning users not to blindly install both tracks together

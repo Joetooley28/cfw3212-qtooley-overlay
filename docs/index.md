@@ -73,8 +73,6 @@ Current proven model:
 
 ## Screenshots
 
-![Qtooley General Info](images/qtooley/general-info.jpg)
-
 ### Quick Overview
 
 ![Quick Overview](images/qtooley/quick-overview.jpg)
@@ -82,6 +80,18 @@ Current proven model:
 ### General Info
 
 ![General Info](images/qtooley/general-info.jpg)
+
+### AT Terminal
+
+![AT terminal](images/qtooley/at-terminal.jpg)
+
+### SMS
+
+![SMS](images/qtooley/sms.jpg)
+
+### Screensaver Settings
+
+![Screensaver Settings](images/qtooley/screensaver-settings.jpg)
 
 ### RAT / Band / Cell Locking
 
@@ -95,12 +105,16 @@ Current proven model:
 
 ![Tailscale](images/qtooley/tailscale.jpg)
 
+### TTL Helper
+
+![TTL helper](images/qtooley/ttl-helper.jpg)
+
 ## Project Tracks
 
 There are two related tracks in this project history:
 
-- `main`: current Qtooley stock UI overlay, primary project
-- `standalone-at-terminal`: legacy standalone LAN AT terminal, fallback/reference branch
+- `main`: current Qtooley stock UI overlay, primary and recommended project
+- `standalone-at-terminal`: older standalone LAN AT terminal, legacy fallback/reference branch
 
 Important warning:
 
@@ -108,6 +122,7 @@ Important warning:
 - both rely on the same platform-native AT path model
 - both use the same shared lock concept around modem access
 - do not casually install and run both as if they were isolated products
+- if you are new to the project, use the main overlay branch rather than the old standalone branch
 
 Current legacy branch README draft:
 
