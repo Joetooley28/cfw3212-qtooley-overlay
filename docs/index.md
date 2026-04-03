@@ -73,12 +73,27 @@ Current proven model:
 
 ## Screenshots
 
-- `[Placeholder: hero screenshot]`
-- `[Placeholder: Quick Overview screenshot]`
-- `[Placeholder: General Info screenshot]`
-- `[Placeholder: RAT / band / cell locking screenshot]`
-- `[Placeholder: Ookla Speedtest screenshot]`
-- `[Placeholder: Tailscale screenshot]`
+![Qtooley General Info](images/qtooley/general-info.jpg)
+
+### Quick Overview
+
+![Quick Overview](images/qtooley/quick-overview.jpg)
+
+### General Info
+
+![General Info](images/qtooley/general-info.jpg)
+
+### RAT / Band / Cell Locking
+
+![RAT / band / cell locking](images/qtooley/rat-band.jpg)
+
+### Ookla Speedtest
+
+![Ookla Speedtest](images/qtooley/speedtest.jpg)
+
+### Tailscale
+
+![Tailscale](images/qtooley/tailscale.jpg)
 
 ## Project Tracks
 

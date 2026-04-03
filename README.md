@@ -84,13 +84,29 @@ Verification note:
 
 ## Screenshots
 
-Public screenshot placeholders for now:
+![Qtooley General Info](docs/images/qtooley/general-info.jpg)
 
-- `[Placeholder: Quick Overview screenshot]`
-- `[Placeholder: General Info screenshot]`
-- `[Placeholder: RAT / band / cell locking screenshot]`
-- `[Placeholder: Ookla Speedtest screenshot]`
-- `[Placeholder: Tailscale screenshot]`
+Key pages in the current overlay:
+
+### Quick Overview
+
+![Quick Overview](docs/images/qtooley/quick-overview.jpg)
+
+### General Info
+
+![General Info](docs/images/qtooley/general-info.jpg)
+
+### RAT / Band / Cell Locking
+
+![RAT / band / cell locking](docs/images/qtooley/rat-band.jpg)
+
+### Ookla Speedtest
+
+![Ookla Speedtest](docs/images/qtooley/speedtest.jpg)
+
+### Tailscale
+
+![Tailscale](docs/images/qtooley/tailscale.jpg)
 
 ## Project Tracks
 
