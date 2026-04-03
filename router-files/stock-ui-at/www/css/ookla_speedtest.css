@@ -298,13 +298,13 @@ body.jtools-page-ookla-speedtest #htmlGoesHere {
 }
 
 .ookla-ca-caption {
-    color: #56708e;
+    color: var(--qt-text-label, #c7d0d9);
     font-size: 13px;
     line-height: 1.45;
 }
 
 .ookla-ca-combo {
-    color: #1c3654;
+    color: var(--qt-text-bright, #f0f2f5);
     font-size: 18px;
     font-weight: 700;
     line-height: 1.3;
@@ -745,7 +745,7 @@ body.jtools-page-ookla-speedtest #htmlGoesHere {
 }
 
 .ookla-summary-line {
-    color: #284565;
+    color: var(--qt-text, #d7dde4);
     font-size: 15px;
     line-height: 1.5;
 }
@@ -773,7 +773,7 @@ body.jtools-page-ookla-speedtest #htmlGoesHere {
 .ookla-history-speed,
 .ookla-history-time,
 .ookla-history-meta {
-    color: #24415f;
+    color: var(--qt-text, #d7dde4);
 }
 
 .ookla-history-speed {
@@ -782,11 +782,13 @@ body.jtools-page-ookla-speedtest #htmlGoesHere {
 
 .ookla-history-time {
     font-size: 12px;
+    opacity: 0.82;
 }
 
 .ookla-history-meta {
     font-size: 13px;
     margin-bottom: 10px;
+    opacity: 0.88;
 }
 
 .ookla-history-actions {

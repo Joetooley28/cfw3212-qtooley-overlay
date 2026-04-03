@@ -2,43 +2,29 @@
 
 Qtooley is a stock UI overlay for the Casa Systems `CFW-3212` with a Quectel `RG520N-NA`.
 
-This branch is the main project direction: a top-level authenticated Qtooley tab inside the stock Casa Turbo web UI, with custom pages for modem visibility, control, and diagnostics.
+This is the main project direction: a top-level authenticated Qtooley tab inside the stock Casa Turbo web UI, with custom pages for modem visibility, control, and diagnostics.
 
 It is not a generic web app and it is not a generic USB modem project.
 
-## Contents
-
-- [What This Project Is](#what-this-project-is)
-- [Device Scope](#device-scope)
-- [Main Features](#main-features)
-- [Project Tracks](#project-tracks)
-- [Safety Notes](#safety-notes)
-- [How The Overlay Works](#how-the-overlay-works)
-- [Repo Layout](#repo-layout)
-- [Current Pages](#current-pages)
-- [Important Docs](#important-docs)
-- [Install Model](#install-model)
-- [Current Version](#current-version)
-
 ## What This Project Is
 
-This repo contains the current Qtooley stock UI overlay work for the `CFW-3212`.
+Qtooley adds custom tools into the stock router UI while preserving the proven login flow, the stock page shell, and the current overlay persistence model.
 
-The overlay adds Qtooley pages into the stock Casa interface while preserving:
+The current feature set includes:
 
-- LAN access
-- stock login flow
-- stock page rendering
-- SSH reachability
-- standalone AT access discipline through the shared modem lock
+- Quick Overview
+- General Info
+- AT terminal
+- RAT / band / cell locking
+- Ookla Speedtest
+- TTL helper
+- optional Tailscale UI after base install
 
-The current preferred direction is the stock UI overlay, not the older standalone-only web terminal.
-
-Legacy standalone AT terminal files are still preserved in the local workspace under [legacy-standalone-at](/c:/at_terminal/legacy-standalone-at), but they are reference material rather than the main repo story.
+The preferred direction is the stock UI overlay, not the older standalone-only AT terminal branch.
 
 ## Device Scope
 
-Tested / documented project target:
+Tested and documented target:
 
 - router: Casa Systems `CFW-3212`
 - modem: Quectel `RG520N-NA`
@@ -52,17 +38,59 @@ Important platform truths:
 - shared AT lock path is `/tmp/at-http.lock`
 - the stock UI overlay uses live-tree bind mounts onto `/www` and `/usr/share/lua/5.1/webif`
 
-## Main Features
+## Install Flow
 
-- authenticated Qtooley tab inside the stock Casa UI
-- Quick Overview page with screensaver path
-- General Info dashboard
-- AT terminal page
-- RAT / band / cell locking page
-- Ookla Speedtest page
-- TTL helper page
-- shared Qtooley color-key system across custom pages
-- shared dark/light theming path through stock header integration
+The public install path is a versioned Windows ZIP release for a rooted, SSH-reachable router:
+
+1. download the latest release ZIP
+2. run the PowerShell installer from a normal Windows PC
+3. connect over SSH with the router IP, username, and password
+4. let the installer place the Qtooley overlay and bundled Ookla base components
+5. if you want Tailscale, install it afterward from the Qtooley UI as the optional extra
+
+Important prerequisites:
+
+- the router must already be rooted
+- SSH must already be enabled and reachable
+- password prompt is supported; SSH keys are optional
+
+More install detail:
+
+- [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
+
+## Why This Overlay Exists
+
+The overlay is designed around the real behavior of this router and the real failure modes already seen during development:
+
+- preserve LAN access
+- preserve the stock login page and stock UI rendering
+- preserve SSH reachability
+- keep the proven stock UI overlay model under `/usrdata/at-stock-ui`
+- avoid redesigning the project around generic USB modem assumptions
+
+Current proven overlay model:
+
+- keep payload under `/usrdata/at-stock-ui`
+- build live trees under `/usrdata/at-stock-ui/live`
+- bind-mount `live/www` onto `/www`
+- bind-mount `live/usr/share/lua/5.1/webif` onto `/usr/share/lua/5.1/webif`
+- restart `turbontc.service`
+- reapply late after boot with `jtools-stock-ui.service` and `jtools-stock-ui.timer`
+
+Verification note:
+
+- plain `mount` output is misleading on this device
+- use `/proc/self/mountinfo`
+
+## Screenshots
+
+Public screenshot placeholders for now:
+
+- `[Placeholder: Quick Overview screenshot]`
+- `[Placeholder: General Info screenshot]`
+- `[Placeholder: RAT / band / cell locking screenshot]`
+- `[Placeholder: Ookla Speedtest screenshot]`
+- `[Placeholder: Tailscale screenshot]`
 
 ## Project Tracks
 
@@ -74,7 +102,7 @@ This branch is the current Qtooley stock UI overlay and should be treated as the
 
 2. `standalone-at-terminal`
 
-This will be the legacy standalone LAN AT terminal branch.
+This is the legacy standalone LAN AT terminal branch.
 
 Important:
 
@@ -83,50 +111,11 @@ Important:
 - both use the same shared lock concept around modem access
 - do not casually install and run both as if they were isolated products
 
-If both are kept published, the stock UI overlay should be the recommended path and the standalone branch should be clearly marked as legacy / fallback / reference.
-
-## Safety Notes
-
-Be careful not to break:
-
-- LAN access
-- the stock web login page
-- SSH
-- stock Casa Turbo rendering
-- shared page bootstrap files
-
-High-risk areas include:
-
-- `handler_0011.lua`
-- `genHeader.js`
-- menu injection
-- auth wiring
-- shared stock JS/CSS includes
-- overlay mount/apply logic
-
-Use the smallest safe change.
-
-## How The Overlay Works
-
-Current proven model:
-
-- keep payload under `/usrdata/at-stock-ui`
-- build live trees under `/usrdata/at-stock-ui/live`
-- bind-mount `live/www` onto `/www`
-- bind-mount `live/usr/share/lua/5.1/webif` onto `/usr/share/lua/5.1/webif`
-- restart `turbontc.service`
-- reapply late after boot with:
-  - `jtools-stock-ui.service`
-  - `jtools-stock-ui.timer`
-
-Verification note:
-
-- plain `mount` output is misleading on this device
-- use `/proc/self/mountinfo`
+If both are published, the stock UI overlay should be the recommended path and the standalone branch should be clearly marked as legacy / fallback / reference.
 
 ## Repo Layout
 
-Main stock UI overlay package:
+Main stock UI overlay package root:
 
 - [router-files/stock-ui-at](/c:/at_terminal/repo-public/router-files/stock-ui-at)
 
@@ -137,30 +126,15 @@ Important areas:
 - [router-files/stock-ui-at/usrdata/at-stock-ui](/c:/at_terminal/repo-public/router-files/stock-ui-at/usrdata/at-stock-ui)
 - [docs](/c:/at_terminal/repo-public/docs)
 
-Local-only workspace support folders kept outside the repo root:
-
-- [legacy-standalone-at](/c:/at_terminal/legacy-standalone-at)
-- [tools](/c:/at_terminal/tools)
-- [screenshots](/c:/at_terminal/screenshots)
-- [archive](/c:/at_terminal/archive)
-
-## Current Pages
-
-- Quick Overview
-- General Info
-- AT terminal
-- RAT / band / cell locking
-- Ookla Speedtest
-- TTL helper
-
 ## Important Docs
 
-Start here:
+Recommended starting points:
 
 - [Master Truth](docs/MASTER_TRUTH.md)
+- [Stock UI Package README](router-files/stock-ui-at/README.md)
+- [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
 - [Stock UI Integration Note](/c:/at_terminal/notes/CFW3212_stock_ui_AT_integration_note.txt)
 - [Speedtest Page Plan](/c:/at_terminal/notes/CFW3212_ookla_speedtest_page_plan.txt)
-- [Stock UI Package README](router-files/stock-ui-at/README.md)
 
 Useful supporting docs:
 
@@ -168,31 +142,12 @@ Useful supporting docs:
 - [platform-notes.md](docs/platform-notes.md)
 - [validator-policy.md](docs/validator-policy.md)
 
-## Install Model
-
-This repo is currently organized around local-first development and router-side overlay deployment.
-
-The current expected flow is:
-
-- make changes locally
-- verify package structure under `router-files/stock-ui-at`
-- sync only the intended files to the router
-- reapply the overlay
-- verify the live bind mounts and actual in-browser behavior
-
-Current user-facing installer direction:
-
-- versioned Windows ZIP release
-- install / uninstall over SSH from a normal Windows PC
-- password prompt is supported; SSH keys are optional, not required
-- router must already be rooted and SSH-reachable before using the ZIP
-
 ## Current Version
 
 - repo version: `v0.3.0-qtooley-2026-03-24`
 - current local checkpoint branch: `qtooley-current`
 
-## Publish Notes
+## Publishing Notes
 
 Before pushing to GitHub:
 

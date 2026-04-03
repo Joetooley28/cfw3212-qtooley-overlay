@@ -3,3 +3,10 @@ router-files/stock-ui-at_backup_*/
 recovery-snapshots/
 router-files/stock-ui-at/SNAPSHOT_NOTE.txt
 router-files/stock-ui-at/usrdata/at-stock-ui/bundles/ookla/
+
+# Raw router/device capture artifacts (keep local unless intentionally scrubbed)
+**/router_metadata.txt
+**/rdb_dump.txt
+**/low_level_metadata.txt
+**/authorized_keys
+**/exports/settings_backup_unpack/
