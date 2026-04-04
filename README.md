@@ -6,6 +6,18 @@ This is the main project direction: a top-level authenticated Qtooley tab inside
 
 It is not a generic web app and it is not a generic USB modem project.
 
+## Contents
+
+- [What This Project Is](#what-this-project-is)
+- [Device Scope](#device-scope)
+- [Install Flow](#install-flow)
+- [Why This Overlay Exists](#why-this-overlay-exists)
+- [Screenshots](#screenshots)
+- [Project Tracks](#project-tracks)
+- [Repo Layout](#repo-layout)
+- [Important Docs](#important-docs)
+- [Current Version](#current-version)
+
 ## What This Project Is
 
 Qtooley adds custom tools into the stock router UI while preserving the proven login flow, the stock page shell, and the current overlay persistence model.
@@ -126,7 +138,7 @@ There are two related tracks in this project history, but only one of them shoul
 
 This branch is the current Qtooley stock UI overlay and should be treated as the primary project.
 
-2. `standalone-at-terminal`
+2. `standalone-at-terminal-old`
 
 This should be the older legacy standalone LAN AT terminal branch.
 
@@ -140,7 +152,7 @@ Important:
 If both are published:
 
 - `main` should be the default and recommended path
-- `standalone-at-terminal` should be clearly marked as legacy / old / fallback
+- `standalone-at-terminal-old` should be clearly marked as legacy / old / fallback
 - the legacy branch should tell new users to use the main overlay branch instead
 
 ## Repo Layout

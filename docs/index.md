@@ -6,6 +6,17 @@ This is the public landing page for the current project direction: a top-level a
 
 It is not a generic web app and it is not a generic USB modem project.
 
+## Contents
+
+- [Download](#download)
+- [What You Get](#what-you-get)
+- [Install Flow](#install-flow)
+- [Device Scope](#device-scope)
+- [Why This Project Is Different](#why-this-project-is-different)
+- [Screenshots](#screenshots)
+- [Project Tracks](#project-tracks)
+- [Docs](#docs)
+
 ## Download
 
 - Latest release ZIP: `[Placeholder: release link]`
@@ -114,7 +125,7 @@ Current proven model:
 There are two related tracks in this project history:
 
 - `main`: current Qtooley stock UI overlay, primary and recommended project
-- `standalone-at-terminal`: older standalone LAN AT terminal, legacy fallback/reference branch
+- `standalone-at-terminal-old`: older standalone LAN AT terminal, legacy fallback/reference branch
 
 Important warning:
 
