@@ -91,13 +91,14 @@ WinSCP:
 - upload both tar files into `/tmp`
 
 5. SSH into the router as `root`.
-6. Remove the active Qtooley live overlay if it is still present:
+6. Run the router-side recovery commands line by line inside that SSH shell.
+7. Remove the active Qtooley live overlay if it is still present:
 
 ```sh
 /bin/sh /usrdata/at-stock-ui/remove_stock_ui_overlay.sh || true
 ```
 
-7. Stage a stock-style live tree from the fallback package:
+8. Stage a stock-style live tree from the fallback package:
 
 ```sh
 RECOVERY_ROOT=/usrdata/stock-ui-fallback/live
@@ -107,7 +108,7 @@ tar -xf /tmp/stock_www.tar -C "$RECOVERY_ROOT"
 tar -xf /tmp/stock_webif.tar -C "$RECOVERY_ROOT"
 ```
 
-8. Bind the fallback stock web trees onto the live web paths:
+9. Bind the fallback stock web trees onto the live web paths:
 
 ```sh
 mount --bind "$RECOVERY_ROOT/www" /www
@@ -115,7 +116,7 @@ mount --bind "$RECOVERY_ROOT/usr/share/lua/5.1/webif" /usr/share/lua/5.1/webif
 systemctl restart turbontc.service
 ```
 
-9. Reload the router UI in the browser.
+10. Reload the router UI in the browser.
 
 Optional verification:
 
