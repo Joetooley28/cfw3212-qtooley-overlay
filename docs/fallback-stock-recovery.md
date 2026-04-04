@@ -4,10 +4,27 @@
 
 This is the public emergency recovery path for cases where the normal install-time Qtooley baseline is missing or known-bad.
 
+Use this only if normal uninstall or manual overlay removal does not leave you with a working stock-style Casa web UI.
+
 Preferred recovery order:
 
 1. use the router's own first-install baseline under `/usrdata/at-stock-ui/installer-state/install-baseline`
 2. use the fallback stock web package only if that baseline is unavailable or unusable
+
+## How You Know You Need This
+
+Typical signs:
+
+- uninstall reports that the install baseline is not present
+- uninstall finishes, but the stock-style Casa web UI does not come back correctly
+- the Qtooley overlay has been removed or partially removed and the router web UI is still broken
+- you need a quick stock-style web shell for troubleshooting before doing anything else
+
+Important behavior:
+
+- the current uninstall script does not hard-fail just because the baseline is missing
+- if the baseline is missing, uninstall logs that condition and falls back to relying on the live stock trees after the overlay is unmounted
+- that means you may only realize you need this method after uninstall completes and the web UI is still not where you want it
 
 ## Fallback Package
 
@@ -82,6 +99,18 @@ Optional verification:
 ```sh
 grep -E ' /www | /usr/share/lua/5.1/webif ' /proc/self/mountinfo
 ```
+
+## Should You Run Uninstall Again After This
+
+Usually, no.
+
+Recommended order:
+
+1. run normal uninstall first
+2. if uninstall completes but the stock-style web UI is still missing or broken, use this fallback method
+3. once the stock-style UI is back, decide whether you want to leave that fallback overlay in place temporarily or remove it after troubleshooting
+
+This fallback package is mainly for getting the stock-style Casa web shell back, not for retrying the same uninstall loop over and over.
 
 ## Removing The Fallback Overlay
 

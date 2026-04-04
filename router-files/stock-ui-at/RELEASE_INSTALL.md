@@ -4,6 +4,7 @@ Important recovery note
 - on first install, the installer captures a compact baseline snapshot from that router's live stock `/www` and `/usr/share/lua/5.1/webif` trees before any Qtooley live overlay mounts are active
 - that router-specific baseline is the preferred uninstall and recovery path
 - if the saved baseline is missing or known-bad, a separate fallback stock web package is available for emergency recovery
+- use the fallback package only if uninstall/manual overlay removal does not leave you with a working stock-style Casa web UI
 - the current public fallback stock web package is from a clean post-reset `CFW-3212` stock candidate on firmware `USC_1.1.99.0`
 - fallback recovery guide: `..\..\docs\fallback-stock-recovery.md`
 
