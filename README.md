@@ -21,7 +21,6 @@ It is not a generic web app and it is not a generic USB modem project.
 - [Platform Notes](#platform-notes)
 - [Screenshots](#screenshots)
 - [Project Tracks](#project-tracks)
-- [Repo Layout](#repo-layout)
 - [Important Docs](#important-docs)
 - [Current Version](#current-version)
 
@@ -141,46 +140,19 @@ Verification note:
 
 ## Project Tracks
 
-There are two related tracks in this project history, but only one of them should be the normal starting point:
+There are three branch roles in the current project layout:
 
-1. `main`
+- `main`: current Qtooley stock UI overlay release, primary and recommended branch
+- `working-branch`: current overlay development branch
+- `standalone-at-terminal-old`: older standalone LAN AT terminal, legacy fallback/reference branch
 
-This branch is the current Qtooley overlay release branch and should be treated as the primary project.
-
-2. `working-branch`
-
-This branch is the ongoing working branch for current overlay development.
-
-3. `standalone-at-terminal-old`
-
-This should be the older legacy standalone LAN AT terminal branch.
-
-Important:
+Important warning:
 
 - both tracks share backend assumptions and modem access discipline
 - both rely on the same platform-native AT path model
 - both use the same shared lock concept around modem access
 - do not casually install and run both as if they were isolated products
-
-If both are published:
-
-- `main` should be the default and recommended path for the current Qtooley overlay release
-- `working-branch` should be the active development branch for current overlay work
-- `standalone-at-terminal-old` should be clearly marked as legacy / old / fallback
-- the legacy branch should tell new users to use the main overlay branch instead
-
-## Repo Layout
-
-Main stock UI overlay package root:
-
-- [router-files/stock-ui-at](/c:/at_terminal/repo-public/router-files/stock-ui-at)
-
-Important areas:
-
-- [router-files/stock-ui-at/www](/c:/at_terminal/repo-public/router-files/stock-ui-at/www)
-- [router-files/stock-ui-at/usr/share/lua/5.1/webif](/c:/at_terminal/repo-public/router-files/stock-ui-at/usr/share/lua/5.1/webif)
-- [router-files/stock-ui-at/usrdata/at-stock-ui](/c:/at_terminal/repo-public/router-files/stock-ui-at/usrdata/at-stock-ui)
-- [docs](/c:/at_terminal/repo-public/docs)
+- if you are new to the project, use `main` rather than `working-branch` or the old standalone branch
 
 ## Important Docs
 
