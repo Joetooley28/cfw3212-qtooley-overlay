@@ -10,6 +10,7 @@ Source:
 
 Included files:
 
+- `stock-ui-fallback-USC_1.1.99.0.zip`
 - `stock_www.tar`
 - `stock_webif.tar`
 - `SHA256SUMS.txt`

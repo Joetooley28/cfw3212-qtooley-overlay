@@ -35,6 +35,7 @@ The current public fallback stock web package is from a clean post-reset `CFW-32
 
 Package path in this repo:
 
+- [`recovery/stock-ui-fallback/USC_1.1.99.0/stock-ui-fallback-USC_1.1.99.0.zip`](/C:/at_terminal/repo-public/recovery/stock-ui-fallback/USC_1.1.99.0/stock-ui-fallback-USC_1.1.99.0.zip)
 - [`recovery/stock-ui-fallback/USC_1.1.99.0/README.md`](/C:/at_terminal/repo-public/recovery/stock-ui-fallback/USC_1.1.99.0/README.md)
 - [`recovery/stock-ui-fallback/USC_1.1.99.0/stock_www.tar`](/C:/at_terminal/repo-public/recovery/stock-ui-fallback/USC_1.1.99.0/stock_www.tar)
 - [`recovery/stock-ui-fallback/USC_1.1.99.0/stock_webif.tar`](/C:/at_terminal/repo-public/recovery/stock-ui-fallback/USC_1.1.99.0/stock_webif.tar)
@@ -49,17 +50,26 @@ Package path in this repo:
 
 ## Recovery Steps
 
-1. Download or open these two files from the repo:
+1. Download the fallback ZIP from the repo:
+   - `recovery/stock-ui-fallback/USC_1.1.99.0/stock-ui-fallback-USC_1.1.99.0.zip`
+2. Extract it on your Windows PC.
+3. From the extracted folder, locate these two files:
    - `recovery/stock-ui-fallback/USC_1.1.99.0/stock_www.tar`
    - `recovery/stock-ui-fallback/USC_1.1.99.0/stock_webif.tar`
-2. Copy both files to the router, for example into `/tmp`.
+4. Copy both files to the router, for example into `/tmp`.
 
-Windows PowerShell with `scp`:
+Windows PowerShell with `scp -O`:
 
 ```powershell
-scp .\stock_www.tar root@192.168.1.1:/tmp/stock_www.tar
-scp .\stock_webif.tar root@192.168.1.1:/tmp/stock_webif.tar
+scp -O .\stock_www.tar root@192.168.1.1:/tmp/stock_www.tar
+scp -O .\stock_webif.tar root@192.168.1.1:/tmp/stock_webif.tar
 ```
+
+Important transfer note:
+
+- modern `scp` prefers an SFTP-based path that this router does not support
+- use `scp -O` with a capital `O` to force the legacy SCP protocol
+- for larger package-style transfers, tar-over-SSH streaming also works well on this platform
 
 WinSCP:
 
@@ -67,14 +77,14 @@ WinSCP:
 - log in as `root`
 - upload both tar files into `/tmp`
 
-3. SSH into the router as `root`.
-4. Remove the active Qtooley live overlay if it is still present:
+5. SSH into the router as `root`.
+6. Remove the active Qtooley live overlay if it is still present:
 
 ```sh
 /bin/sh /usrdata/at-stock-ui/remove_stock_ui_overlay.sh || true
 ```
 
-5. Stage a stock-style live tree from the fallback package:
+7. Stage a stock-style live tree from the fallback package:
 
 ```sh
 RECOVERY_ROOT=/usrdata/stock-ui-fallback/live
@@ -84,7 +94,7 @@ tar -xf /tmp/stock_www.tar -C "$RECOVERY_ROOT"
 tar -xf /tmp/stock_webif.tar -C "$RECOVERY_ROOT"
 ```
 
-6. Bind the fallback stock web trees onto the live web paths:
+8. Bind the fallback stock web trees onto the live web paths:
 
 ```sh
 mount --bind "$RECOVERY_ROOT/www" /www
@@ -92,7 +102,7 @@ mount --bind "$RECOVERY_ROOT/usr/share/lua/5.1/webif" /usr/share/lua/5.1/webif
 systemctl restart turbontc.service
 ```
 
-7. Reload the router UI in the browser.
+9. Reload the router UI in the browser.
 
 Optional verification:
 
