@@ -77,6 +77,13 @@ More install detail:
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
 - [Emergency Stock Web Recovery](docs/fallback-stock-recovery.md)
 
+Quick install choice:
+
+- use the release ZIP when the router does not already have working internet, or when you want the Windows-assisted install/update/uninstall path over SSH
+- use the direct GitHub router command when the router already has working internet and you want to install or update from an SSH shell on the router itself
+- direct GitHub install/update command:
+  - `sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/update_from_github_release.sh)"`
+
 ## Platform Notes
 
 The overlay is designed around the real behavior of this router and the real failure modes already seen during development:

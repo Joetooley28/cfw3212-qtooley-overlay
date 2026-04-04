@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.3.2-qtooley-2026-04-04
+
+Release usability follow-up for the Qtooley stock UI overlay.
+
+Included:
+- direct GitHub uninstall helper to match the router-native install/update path
+- clearer README and release guide wording for when to use the ZIP vs direct GitHub commands
+- direct uninstall command documentation, including optional Tailscale removal
+
+Key behavior:
+- internet-connected routers can now install, update, and uninstall from SSH using the same release-package flow
+- uninstall still runs through the packaged uninstall core and keeps the first-install baseline verification model intact
+- release docs now point users more clearly to the Windows ZIP as the primary download asset
+
 ## v0.3.1-qtooley-2026-04-04
 
 Release packaging and install-path update for the Qtooley stock UI overlay.
