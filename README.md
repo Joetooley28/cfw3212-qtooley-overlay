@@ -136,9 +136,13 @@ There are two related tracks in this project history, but only one of them shoul
 
 1. `main`
 
-This branch is the current Qtooley stock UI overlay and should be treated as the primary project.
+This branch is the current Qtooley overlay release branch and should be treated as the primary project.
 
-2. `standalone-at-terminal-old`
+2. `working-branch`
+
+This branch is the ongoing working branch for current overlay development.
+
+3. `standalone-at-terminal-old`
 
 This should be the older legacy standalone LAN AT terminal branch.
 
@@ -151,7 +155,8 @@ Important:
 
 If both are published:
 
-- `main` should be the default and recommended path
+- `main` should be the default and recommended path for the current Qtooley overlay release
+- `working-branch` should be the active development branch for current overlay work
 - `standalone-at-terminal-old` should be clearly marked as legacy / old / fallback
 - the legacy branch should tell new users to use the main overlay branch instead
 
@@ -187,4 +192,4 @@ Useful supporting docs:
 ## Current Version
 
 - repo version: `v0.3.0-qtooley-2026-03-24`
-- current local checkpoint branch: `qtooley-current`
+- current working branch: `working-branch`

@@ -122,9 +122,10 @@ Current proven model:
 
 ## Project Tracks
 
-There are two related tracks in this project history:
+There are three branch roles in the current project layout:
 
-- `main`: current Qtooley stock UI overlay, primary and recommended project
+- `main`: current Qtooley stock UI overlay release, primary and recommended branch
+- `working-branch`: current overlay development branch
 - `standalone-at-terminal-old`: older standalone LAN AT terminal, legacy fallback/reference branch
 
 Important warning:
@@ -133,7 +134,7 @@ Important warning:
 - both rely on the same platform-native AT path model
 - both use the same shared lock concept around modem access
 - do not casually install and run both as if they were isolated products
-- if you are new to the project, use the main overlay branch rather than the old standalone branch
+- if you are new to the project, use `main` rather than `working-branch` or the old standalone branch
 
 Current legacy branch README draft:
 
