@@ -6,6 +6,15 @@ Run the normal Qtooley uninstall first.
 
 Use this emergency recovery method only if uninstall finishes and the stock-style Casa web shell still does not come back correctly.
 
+## Before Emergency Recovery
+
+Before using this method:
+
+- hard-refresh the router page in your browser
+- try a private or incognito browser window
+- try a different browser
+- if you still see the Qtooley tab or the stock-style Casa web shell still does not come back after uninstall, then use this emergency recovery method
+
 ## What This Is
 
 This is the public emergency recovery path for cases where the normal install-time Qtooley baseline is missing or known-bad.
