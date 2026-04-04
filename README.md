@@ -6,8 +6,14 @@ This is the main project direction: a top-level authenticated Qtooley tab inside
 
 It is not a generic web app and it is not a generic USB modem project.
 
+## Download
+
+- [Latest Release](https://github.com/Joetooley28/cfw3212-at-terminal/releases/latest)
+- [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
+
 ## Contents
 
+- [Download](#download)
 - [What This Project Is](#what-this-project-is)
 - [Device Scope](#device-scope)
 - [Install Flow](#install-flow)
@@ -68,6 +74,7 @@ Important prerequisites:
 
 More install detail:
 
+- [Latest Release](https://github.com/Joetooley28/cfw3212-at-terminal/releases/latest)
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
 
 ## Why This Overlay Exists
@@ -175,19 +182,11 @@ Important areas:
 
 ## Important Docs
 
-Recommended starting points:
+Public starting points:
 
-- [Master Truth](docs/MASTER_TRUTH.md)
 - [Stock UI Package README](router-files/stock-ui-at/README.md)
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
-- [Stock UI Integration Note](/c:/at_terminal/notes/CFW3212_stock_ui_AT_integration_note.txt)
-- [Speedtest Page Plan](/c:/at_terminal/notes/CFW3212_ookla_speedtest_page_plan.txt)
-
-Useful supporting docs:
-
-- [adb-and-ssh-persistence.md](docs/adb-and-ssh-persistence.md)
 - [platform-notes.md](docs/platform-notes.md)
-- [validator-policy.md](docs/validator-policy.md)
 
 ## Current Version
 

@@ -10,3 +10,8 @@ router-files/stock-ui-at/usrdata/at-stock-ui/bundles/ookla/
 **/low_level_metadata.txt
 **/authorized_keys
 **/exports/settings_backup_unpack/
+
+# Internal publish/build planning notes (keep local, not public repo content)
+docs/github-publish-plan.md
+docs/standalone-at-terminal-readme-draft.md
+docs/publish-safety-checklist.md

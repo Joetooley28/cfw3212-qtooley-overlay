@@ -1,7 +1,7 @@
 Qtooley stock UI ZIP install for Windows
 
 What this ZIP is for
-- install or update the Qtooley stock UI overlay on a rooted Casa Systems / DZS `CFW-3212`
+- install or update the Qtooley stock UI overlay on a rooted Casa Systems `CFW-3212`
 - uninstall the overlay later, either overlay-only or full uninstall
 - work from a normal Windows PC over SSH with a password prompt
 
@@ -58,7 +58,7 @@ Offline Ookla bundle
 - if this ZIP includes:
   - `router-files\stock-ui-at\usrdata\at-stock-ui\bundles\ookla\ookla-speedtest-1.2.0-linux-armhf.tgz`
   the installer can place Ookla without the router downloading it
-- if that archive is missing, the installer leaves Ookla unchanged and you can install it later from the UI or by running the helper on the router
+- if that archive is missing, the installer leaves Ookla unchanged and you can install it later by using the router-side helper if needed
 
 Release ZIP trimming
 - the GitHub ZIP intentionally does not include the old `stock-snapshots` reference folder
@@ -66,17 +66,14 @@ Release ZIP trimming
 
 Safety
 - if something goes wrong, use the router-side recovery snapshots under `/usrdata/at-stock-ui/recovery-snapshots`
-- Device 01 is the development box
-- Device 02 is the cleaner compatibility-validation box
-- Device 03 should stay protected unless you have a specific reason to touch it
 
 Validation checkpoint
-- On 2026-04-02, Device 01 was used to verify the current end-to-end flow:
+- On 2026-04-02, the current end-to-end flow was verified on a documented synthetic stock-like baseline:
   - install from a documented synthetic stock-like baseline
   - bundled Ookla included with the base install
   - optional Tailscale install afterward
   - full uninstall removing Qtooley, bundled Ookla, and Tailscale
-- After full uninstall, Device 01 was verified back on the synthetic stock-like baseline with:
+- After full uninstall, the router was verified back on the synthetic stock-like baseline with:
   - no `/usrdata/at-stock-ui`
   - no active overlay binds
   - no leftover bundled Ookla binary

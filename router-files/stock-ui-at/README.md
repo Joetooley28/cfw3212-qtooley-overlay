@@ -142,7 +142,6 @@ Release ZIP notes:
 
 Date: 2026-04-02
 
-- Device 01 was reset into a documented synthetic stock-like baseline and then used as the current first-install/uninstall test box.
 - Verified install path:
   - Qtooley installs cleanly from that synthetic baseline
   - bundled Ookla installs as part of the base Qtooley flow
@@ -150,7 +149,7 @@ Date: 2026-04-02
 - Verified uninstall path:
   - `Remove Qtooley and bundled Ookla`
   - `Remove Qtooley, bundled Ookla, and Tailscale`
-- Verified post-uninstall conditions on Device 01:
+- Verified post-uninstall conditions:
   - no `/usrdata/at-stock-ui`
   - no `jtools-stock-ui.service`
   - no `jtools-stock-ui.timer`
@@ -161,7 +160,7 @@ Date: 2026-04-02
 - Stock UI backup/restore behavior was spot-checked after uninstall by successfully generating a downloadable stock backup archive from the stock UI.
 - Current product truth:
   - uninstall restores the router to the install-time pre-Qtooley state captured from that router
-  - on Device 01, that install-time state is the documented synthetic stock-like baseline, not a claim of universal factory stock
+  - in the validated test flow, that install-time state was the documented synthetic stock-like baseline, not a claim of universal factory stock
 
 ## Safe Recovery Workflow
 

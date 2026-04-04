@@ -19,7 +19,7 @@ It is not a generic web app and it is not a generic USB modem project.
 
 ## Download
 
-- Latest release ZIP: `[Placeholder: release link]`
+- [Latest Release](https://github.com/Joetooley28/cfw3212-at-terminal/releases/latest)
 - Install guide: [RELEASE_INSTALL.md](../router-files/stock-ui-at/RELEASE_INSTALL.md)
 - Main repo README: [README.md](../README.md)
 
@@ -136,15 +136,8 @@ Important warning:
 - do not casually install and run both as if they were isolated products
 - if you are new to the project, use `main` rather than `working-branch` or the old standalone branch
 
-Current legacy branch README draft:
-
-- [standalone-at-terminal-readme-draft.md](standalone-at-terminal-readme-draft.md)
-
 ## Docs
 
-- [Master Truth](MASTER_TRUTH.md)
 - [Stock UI Package README](../router-files/stock-ui-at/README.md)
 - [Release Install Guide](../router-files/stock-ui-at/RELEASE_INSTALL.md)
-- [Publish Safety Checklist](publish-safety-checklist.md)
-- [adb-and-ssh-persistence.md](adb-and-ssh-persistence.md)
 - [platform-notes.md](platform-notes.md)
