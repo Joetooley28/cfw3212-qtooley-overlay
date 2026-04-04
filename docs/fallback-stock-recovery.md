@@ -6,6 +6,13 @@ This is the public emergency recovery path for cases where the normal install-ti
 
 Use this only if normal uninstall or manual overlay removal does not leave you with a working stock-style Casa web UI.
 
+This package contains only the stock web tree files for:
+
+- `/www`
+- `/usr/share/lua/5.1/webif`
+
+It is not a full stock firmware image, not a full device backup, and not a complete factory restore package.
+
 Preferred recovery order:
 
 1. use the router's own first-install baseline under `/usrdata/at-stock-ui/installer-state/install-baseline`
@@ -19,6 +26,12 @@ Typical signs:
 - uninstall finishes, but the stock-style Casa web UI does not come back correctly
 - the Qtooley overlay has been removed or partially removed and the router web UI is still broken
 - you need a quick stock-style web shell for troubleshooting before doing anything else
+
+Important note about the Qtooley tab:
+
+- if you still clearly see the Qtooley tab, the Qtooley overlay may still be active or your browser may still be showing cached UI
+- do not treat this fallback package as the normal way to remove Qtooley
+- try normal uninstall first, then hard-refresh the browser before deciding you need this method
 
 Important behavior:
 
@@ -45,6 +58,7 @@ Package path in this repo:
 
 - this is a fallback stock web UI reference package, not a guarantee of exact per-device factory restoration
 - this restores stock-style web content for `/www` and `/usr/share/lua/5.1/webif`
+- this is only those stock web tree files, not a full stock image or full-firmware restore
 - this does not restore every device-specific writable-state area
 - use it only on the same hardware family and only if you understand it is a last-resort recovery path
 
