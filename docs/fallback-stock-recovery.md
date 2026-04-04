@@ -18,9 +18,7 @@ Before using this method:
 
 ## What This Is
 
-This is the public emergency recovery path for cases where the normal install-time Qtooley baseline is missing or known-bad.
-
-Use this only if normal uninstall or manual overlay removal does not leave you with a working stock-style Casa web UI.
+This is the public emergency recovery path for cases where the normal install-time Qtooley baseline is missing or known-bad, or uninstall completes but the stock-style Casa web shell still does not come back correctly.
 
 This package contains only the stock Casa web shell files for:
 
@@ -38,24 +36,22 @@ Preferred recovery order:
 
 ## How You Know You Need This
 
-Typical signs:
-
-- uninstall reports that the install baseline is not present
-- uninstall finishes, but the stock-style Casa web shell does not come back correctly
-- the Qtooley overlay has been removed or partially removed and the router web UI is still broken
-- you need a quick stock-style Casa web shell for troubleshooting before doing anything else
-
-Important note about the Qtooley tab:
-
-- if you still clearly see the Qtooley tab, the Qtooley overlay may still be active or your browser may still be showing cached UI
-- do not treat this fallback package as the normal way to remove Qtooley
-- try normal uninstall first, then hard-refresh the browser before deciding you need this method
-
 Important behavior:
 
 - the current uninstall script does not hard-fail just because the baseline is missing
 - if the baseline is missing, uninstall logs that condition and falls back to relying on the live stock trees after the overlay is unmounted
 - that means you may only realize you need this method after uninstall completes and the web UI is still not where you want it
+
+Typical signs:
+
+- uninstall reports that the install baseline is not present
+- uninstall finishes, but the stock-style Casa web shell does not come back correctly
+- the Qtooley overlay has been removed or partially removed and the router web UI is still broken
+
+Important note about the Qtooley tab:
+
+- if you still clearly see the Qtooley tab, the Qtooley overlay may still be active or your browser may still be showing cached UI
+- do not treat this emergency package as the normal way to remove Qtooley
 
 ## Fallback Package
 
@@ -139,12 +135,6 @@ Optional verification:
 ```sh
 grep -E ' /www | /usr/share/lua/5.1/webif ' /proc/self/mountinfo
 ```
-
-## When To Use This
-
-- the normal uninstall baseline under `/usrdata/at-stock-ui/installer-state/install-baseline` is missing
-- the baseline files are damaged
-- you need a quick way to get the stock-style Casa web shell back for troubleshooting
 
 ## Important Final Note
 
