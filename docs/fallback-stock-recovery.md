@@ -13,6 +13,7 @@ Before using this method:
 - hard-refresh the router page in your browser
 - try a private or incognito browser window
 - try a different browser
+- if the stock-style Casa web shell still does not come back, run the normal Qtooley uninstall one more time
 - if you still see the Qtooley tab or the stock-style Casa web shell still does not come back after uninstall, then use this emergency recovery method
 
 ## What This Is
