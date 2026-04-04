@@ -165,4 +165,4 @@ Public starting points:
 ## Current Version
 
 - repo version: `v0.3.0-qtooley-2026-03-24`
-- current working branch: `working-branch`
+- latest packaged release: [GitHub Releases](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
