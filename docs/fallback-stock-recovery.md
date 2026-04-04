@@ -151,3 +151,15 @@ systemctl restart turbontc.service
 - the normal uninstall baseline under `/usrdata/at-stock-ui/installer-state/install-baseline` is missing
 - the baseline files are damaged
 - you need a quick way to get the stock-style Casa web shell back for troubleshooting
+
+## Important Final Note
+
+This fallback method restores the stock-style Casa web shell only.
+
+It does not by itself perform a full Qtooley uninstall and does not by itself guarantee removal of:
+
+- the saved Qtooley payload under `/usrdata/at-stock-ui`
+- bundled Ookla
+- Tailscale
+
+In the normal recovery flow, run uninstall first and use this fallback method only if the stock-style Casa web shell does not come back correctly afterward.
