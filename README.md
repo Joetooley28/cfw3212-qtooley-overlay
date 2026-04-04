@@ -1,4 +1,4 @@
-# CFW-3212 Standalone AT Terminal
+# CFW-3212 Standalone AT Terminal (Old)
 
 This branch preserves the older standalone LAN AT terminal for the Casa Systems `CFW-3212` with a Quectel `RG520N-NA`.
 
@@ -7,7 +7,7 @@ This is the old project track. If you are new to the project, use the Qtooley st
 ## Recommended Branch
 
 - `main` = current `CFW-3212 Qtooley Overlay`
-- `standalone-at-terminal` = older standalone AT terminal branch
+- `standalone-at-terminal-old` = older standalone AT terminal branch
 
 The stock UI overlay on `main` is the primary and recommended project direction.
 
