@@ -8,7 +8,7 @@ It is not a generic web app and it is not a generic USB modem project.
 
 ## Download
 
-- [Latest Release](https://github.com/Joetooley28/cfw3212-at-terminal/releases/latest)
+- [Latest Release](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
 
 ## Contents
@@ -74,7 +74,7 @@ Important prerequisites:
 
 More install detail:
 
-- [Latest Release](https://github.com/Joetooley28/cfw3212-at-terminal/releases/latest)
+- [Latest Release](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
 
 ## Platform Notes
@@ -184,8 +184,8 @@ Important areas:
 
 Public starting points:
 
-- [Stock UI Package README](router-files/stock-ui-at/README.md)
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
+- [Fallback Stock Recovery](docs/fallback-stock-recovery.md)
 - [platform-notes.md](docs/platform-notes.md)
 
 ## Current Version
