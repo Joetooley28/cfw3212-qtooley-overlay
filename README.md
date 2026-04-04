@@ -10,7 +10,7 @@ It is not a generic web app and it is not a generic USB modem project.
 
 - [Latest Release](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
-- [Fallback Stock Recovery](docs/fallback-stock-recovery.md)
+- [Emergency Stock Web Recovery](docs/fallback-stock-recovery.md)
 
 ## Contents
 
@@ -77,7 +77,7 @@ More install detail:
 
 - [Latest Release](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
-- [Fallback Stock Recovery](docs/fallback-stock-recovery.md)
+- [Emergency Stock Web Recovery](docs/fallback-stock-recovery.md)
 
 ## Platform Notes
 
@@ -187,7 +187,7 @@ Important areas:
 Public starting points:
 
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
-- [Fallback Stock Recovery](docs/fallback-stock-recovery.md)
+- [Emergency Stock Web Recovery](docs/fallback-stock-recovery.md)
 - [platform-notes.md](docs/platform-notes.md)
 
 ## Current Version

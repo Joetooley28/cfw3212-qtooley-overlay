@@ -1,4 +1,4 @@
-# Fallback Stock Recovery
+# Emergency Stock Web Recovery
 
 ## What This Is
 
@@ -122,28 +122,6 @@ Optional verification:
 
 ```sh
 grep -E ' /www | /usr/share/lua/5.1/webif ' /proc/self/mountinfo
-```
-
-## Should You Run Uninstall Again After This
-
-Usually, no.
-
-Recommended order:
-
-1. run normal uninstall first
-2. if uninstall completes but the stock-style web UI is still missing or broken, use this fallback method
-3. once the stock-style Casa web shell is back, decide whether you want to leave that fallback overlay in place temporarily or remove it after troubleshooting
-
-This fallback package is mainly for getting the stock-style Casa web shell back, not for retrying the same uninstall loop over and over.
-
-## Removing The Fallback Overlay
-
-If you only need the fallback package temporarily, remove the bind mounts with:
-
-```sh
-umount /usr/share/lua/5.1/webif 2>/dev/null || umount -l /usr/share/lua/5.1/webif 2>/dev/null || true
-umount /www 2>/dev/null || umount -l /www 2>/dev/null || true
-systemctl restart turbontc.service
 ```
 
 ## When To Use This
