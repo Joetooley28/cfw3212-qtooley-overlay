@@ -17,7 +17,7 @@ It is not a generic web app and it is not a generic USB modem project.
 - [What This Project Is](#what-this-project-is)
 - [Device Scope](#device-scope)
 - [Install Flow](#install-flow)
-- [Why This Overlay Exists](#why-this-overlay-exists)
+- [Platform Notes](#platform-notes)
 - [Screenshots](#screenshots)
 - [Project Tracks](#project-tracks)
 - [Repo Layout](#repo-layout)
@@ -77,7 +77,7 @@ More install detail:
 - [Latest Release](https://github.com/Joetooley28/cfw3212-at-terminal/releases/latest)
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
 
-## Why This Overlay Exists
+## Platform Notes
 
 The overlay is designed around the real behavior of this router and the real failure modes already seen during development:
 
