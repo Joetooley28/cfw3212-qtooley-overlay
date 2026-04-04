@@ -31,8 +31,8 @@ Current backend order:
 
 ## Browser Access
 
-Current intended browser access is:
+Current intended browser access is through the stock Casa web UI with the Qtooley tab added by the overlay.
 
-- `http://192.168.1.1:8088/`
+Important browser note:
 
-The AT terminal is separate from stock Casa Turbo and does not replace stock web services.
+- if uninstall finishes but you still see Qtooley, try a hard refresh, a private/incognito window, or a different browser before assuming recovery is needed
