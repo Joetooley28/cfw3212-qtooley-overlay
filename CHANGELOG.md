@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.3.1-qtooley-2026-04-04
+
+Release packaging and install-path update for the Qtooley stock UI overlay.
+
+Included:
+- router-native GitHub install/update entrypoint for connected routers
+- router-friendly release tarball output alongside the Windows installer ZIP
+- SHA256 release files for the router package
+- release docs updated to cover the direct-from-GitHub router install path
+
+Key behavior:
+- normal GitHub-driven install/update reuses the same router-side install core as the Windows ZIP flow
+- first-install uninstall baseline capture remains one-time by default and is not recaptured during normal updates
+- explicit version/date tracking now starts from the GitHub release flow
+
 ## v0.3.0-qtooley-2026-03-24
 
 Current Qtooley stock UI checkpoint on branch `qtooley-current`.

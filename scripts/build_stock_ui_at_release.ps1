@@ -30,6 +30,11 @@ function Get-VersionText {
 $version = Get-VersionText -RepoPath $RepoRoot -Requested $ReleaseVersion
 $stageRoot = Join-Path $env:TEMP ("stock-ui-at-release-" + (Get-Date -Format "yyyyMMdd_HHmmss"))
 $releaseRoot = Join-Path $stageRoot ("stock-ui-at-installer-" + $version)
+$routerStageRoot = Join-Path $stageRoot "router-package"
+$routerPackageName = "stock-ui-at-router-package-" + $version + ".tar.gz"
+$routerPackageLatestName = "stock-ui-at-router-package-latest.tar.gz"
+$routerShaName = "stock-ui-at-router-package-" + $version + ".sha256"
+$routerShaLatestName = "stock-ui-at-router-package-latest.sha256"
 $packageRoot = Join-Path $RepoRoot "router-files\stock-ui-at"
 $scriptsRoot = Join-Path $RepoRoot "scripts"
 
@@ -62,7 +67,35 @@ try {
     }
 
     Compress-Archive -Path (Join-Path $releaseRoot "*") -DestinationPath $zipPath
+
+    New-Item -ItemType Directory -Force -Path $routerStageRoot | Out-Null
+    Copy-Item -Recurse -Force $packageRoot (Join-Path $routerStageRoot "stock-ui-at")
+
+    $routerPackagePath = Join-Path $OutputRoot $routerPackageName
+    $routerPackageLatestPath = Join-Path $OutputRoot $routerPackageLatestName
+    $routerShaPath = Join-Path $OutputRoot $routerShaName
+    $routerShaLatestPath = Join-Path $OutputRoot $routerShaLatestName
+
+    @($routerPackagePath, $routerPackageLatestPath, $routerShaPath, $routerShaLatestPath) | ForEach-Object {
+        if (Test-Path $_) {
+            Remove-Item -Force $_
+        }
+    }
+
+    & tar -czf $routerPackagePath -C $routerStageRoot "stock-ui-at"
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to create router package tarball."
+    }
+
+    Copy-Item -Force $routerPackagePath $routerPackageLatestPath
+
+    $routerHash = (Get-FileHash -Algorithm SHA256 $routerPackagePath).Hash.ToLowerInvariant()
+    Set-Content -Path $routerShaPath -Value ("{0}  {1}" -f $routerHash, (Split-Path $routerPackagePath -Leaf))
+    Set-Content -Path $routerShaLatestPath -Value ("{0}  {1}" -f $routerHash, (Split-Path $routerPackageLatestPath -Leaf))
+
     Write-Output "Release ZIP created: $zipPath"
+    Write-Output "Router package created: $routerPackagePath"
+    Write-Output "Router package latest alias: $routerPackageLatestPath"
     Write-Output "Stage folder: $releaseRoot"
 } finally {
     if (Test-Path $stageRoot) {

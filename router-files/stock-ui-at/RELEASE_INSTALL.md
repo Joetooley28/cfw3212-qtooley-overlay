@@ -14,6 +14,15 @@ What this ZIP is for
 - uninstall the overlay later, either overlay-only or full uninstall
 - work from a normal Windows PC over SSH with a password prompt
 
+Router-native GitHub install / update
+- for routers that already have working internet access, you can also install or update directly from the router over SSH by running:
+  - `sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/update_from_github_release.sh)"`
+- if the router has `curl` instead of `wget`, use:
+  - `sh -c "$(curl -fsSL https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/update_from_github_release.sh)"`
+- that GitHub path downloads the latest router release package, verifies the SHA256 when possible, stages it under `/tmp`, and then runs the same packaged router-side install/update core used by the Windows ZIP flow
+- after Qtooley is already installed, the same updater remains available on the router at:
+  - `/usrdata/at-stock-ui/update_from_github_release.sh`
+
 What this ZIP is not for
 - it does not root the router
 - it does not enable SSH for you
@@ -50,6 +59,7 @@ Normal uninstall
 Notes
 - on first install, the installer captures a compact baseline from the router's live stock trees for `/www` and `/usr/share/lua/5.1/webif`
 - that baseline is captured only once, before Qtooley live overlay mounts are active, and then reused across updates so uninstall can verify the box is back on its install-time stock files after the overlay is unmounted
+- the router-native GitHub install/update path uses the same install core and the same first-install baseline rules as the Windows ZIP flow
 - there is also a non-default last-resort installer mode, `FORCE_RECAPTURE_BASELINE=1`, for cases where the saved uninstall baseline is missing or known-bad
 - that recapture mode should only be used on a router that is currently showing the stock UI state you want uninstall to restore later
 - the install flow refreshes `/usrdata/at-stock-ui`, refreshes the late-start units, and runs the overlay apply immediately
