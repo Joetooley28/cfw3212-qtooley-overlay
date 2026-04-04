@@ -22,7 +22,6 @@ It is not a generic web app and it is not a generic USB modem project.
 - [Screenshots](#screenshots)
 - [Project Tracks](#project-tracks)
 - [Important Docs](#important-docs)
-- [Current Version](#current-version)
 
 ## What This Project Is
 
@@ -162,7 +161,3 @@ Public starting points:
 - [Emergency Stock Web Recovery](docs/fallback-stock-recovery.md)
 - [platform-notes.md](docs/platform-notes.md)
 
-## Current Version
-
-- repo version: `v0.3.0-qtooley-2026-03-24`
-- latest packaged release: [GitHub Releases](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
