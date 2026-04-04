@@ -32,15 +32,32 @@ Package path in this repo:
 
 ## Recovery Steps
 
-1. Copy `stock_www.tar` and `stock_webif.tar` to the router, for example into `/tmp`.
-2. SSH into the router as `root`.
-3. Remove the active Qtooley live overlay if it is still present:
+1. Download or open these two files from the repo:
+   - `recovery/stock-ui-fallback/USC_1.1.99.0/stock_www.tar`
+   - `recovery/stock-ui-fallback/USC_1.1.99.0/stock_webif.tar`
+2. Copy both files to the router, for example into `/tmp`.
+
+Windows PowerShell with `scp`:
+
+```powershell
+scp .\stock_www.tar root@192.168.1.1:/tmp/stock_www.tar
+scp .\stock_webif.tar root@192.168.1.1:/tmp/stock_webif.tar
+```
+
+WinSCP:
+
+- connect to the router with `SCP` or `SFTP`
+- log in as `root`
+- upload both tar files into `/tmp`
+
+3. SSH into the router as `root`.
+4. Remove the active Qtooley live overlay if it is still present:
 
 ```sh
 /bin/sh /usrdata/at-stock-ui/remove_stock_ui_overlay.sh || true
 ```
 
-4. Stage a stock-style live tree from the fallback package:
+5. Stage a stock-style live tree from the fallback package:
 
 ```sh
 RECOVERY_ROOT=/usrdata/stock-ui-fallback/live
@@ -50,7 +67,7 @@ tar -xf /tmp/stock_www.tar -C "$RECOVERY_ROOT"
 tar -xf /tmp/stock_webif.tar -C "$RECOVERY_ROOT"
 ```
 
-5. Bind the fallback stock web trees onto the live web paths:
+6. Bind the fallback stock web trees onto the live web paths:
 
 ```sh
 mount --bind "$RECOVERY_ROOT/www" /www
@@ -58,7 +75,13 @@ mount --bind "$RECOVERY_ROOT/usr/share/lua/5.1/webif" /usr/share/lua/5.1/webif
 systemctl restart turbontc.service
 ```
 
-6. Reload the router UI in the browser.
+7. Reload the router UI in the browser.
+
+Optional verification:
+
+```sh
+grep -E ' /www | /usr/share/lua/5.1/webif ' /proc/self/mountinfo
+```
 
 ## Removing The Fallback Overlay
 
