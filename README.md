@@ -17,10 +17,9 @@ It is not a generic web app and it is not a generic USB modem project.
 - [What This Project Is](#what-this-project-is)
 - [Device Scope](#device-scope)
 - [Install Flow](#install-flow)
-- [Why This Overlay Exists](#why-this-overlay-exists)
+- [Platform Notes](#platform-notes)
 - [Screenshots](#screenshots)
 - [Project Tracks](#project-tracks)
-- [Repo Layout](#repo-layout)
 - [Important Docs](#important-docs)
 - [Current Version](#current-version)
 
@@ -77,7 +76,7 @@ More install detail:
 - [Latest Release](https://github.com/Joetooley28/cfw3212-at-terminal/releases/latest)
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
 
-## Why This Overlay Exists
+## Platform Notes
 
 The overlay is designed around the real behavior of this router and the real failure modes already seen during development:
 
@@ -139,19 +138,14 @@ Verification note:
 
 ## Project Tracks
 
-There are two related tracks in this project history, but only one of them should be the normal starting point:
+There are three branch roles in the current project layout:
 
-1. `main`
-
-This branch is the current Qtooley overlay release branch and should be treated as the primary project.
-
-2. `working-branch`
-
-This branch is the ongoing working branch for current overlay development.
-
-3. `standalone-at-terminal-old`
-
-This should be the older legacy standalone LAN AT terminal branch.
+- `main`
+  This branch is the current Qtooley overlay release branch and should be treated as the primary project.
+- `working-branch`
+  This branch is the ongoing working branch for current overlay development.
+- `standalone-at-terminal-old`
+  This is the older legacy standalone LAN AT terminal branch.
 
 Important:
 
@@ -167,24 +161,10 @@ If both are published:
 - `standalone-at-terminal-old` should be clearly marked as legacy / old / fallback
 - the legacy branch should tell new users to use the main overlay branch instead
 
-## Repo Layout
-
-Main stock UI overlay package root:
-
-- [router-files/stock-ui-at](/c:/at_terminal/repo-public/router-files/stock-ui-at)
-
-Important areas:
-
-- [router-files/stock-ui-at/www](/c:/at_terminal/repo-public/router-files/stock-ui-at/www)
-- [router-files/stock-ui-at/usr/share/lua/5.1/webif](/c:/at_terminal/repo-public/router-files/stock-ui-at/usr/share/lua/5.1/webif)
-- [router-files/stock-ui-at/usrdata/at-stock-ui](/c:/at_terminal/repo-public/router-files/stock-ui-at/usrdata/at-stock-ui)
-- [docs](/c:/at_terminal/repo-public/docs)
-
 ## Important Docs
 
 Public starting points:
 
-- [Stock UI Package README](router-files/stock-ui-at/README.md)
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
 - [platform-notes.md](docs/platform-notes.md)
 

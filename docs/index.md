@@ -12,7 +12,7 @@ It is not a generic web app and it is not a generic USB modem project.
 - [What You Get](#what-you-get)
 - [Install Flow](#install-flow)
 - [Device Scope](#device-scope)
-- [Why This Project Is Different](#why-this-project-is-different)
+- [Platform Notes](#platform-notes)
 - [Screenshots](#screenshots)
 - [Project Tracks](#project-tracks)
 - [Docs](#docs)
@@ -63,7 +63,7 @@ Important platform truths:
 - shared AT lock path is `/tmp/at-http.lock`
 - the proven persistence model is the stock UI overlay under `/usrdata/at-stock-ui`
 
-## Why This Project Is Different
+## Platform Notes
 
 The overlay is designed around the real behavior of this router:
 
@@ -138,6 +138,5 @@ Important warning:
 
 ## Docs
 
-- [Stock UI Package README](../router-files/stock-ui-at/README.md)
 - [Release Install Guide](../router-files/stock-ui-at/RELEASE_INSTALL.md)
 - [platform-notes.md](platform-notes.md)
