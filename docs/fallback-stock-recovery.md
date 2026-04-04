@@ -6,10 +6,12 @@ This is the public emergency recovery path for cases where the normal install-ti
 
 Use this only if normal uninstall or manual overlay removal does not leave you with a working stock-style Casa web UI.
 
-This package contains only the stock web tree files for:
+This package contains only the stock Casa web shell files for:
 
 - `/www`
 - `/usr/share/lua/5.1/webif`
+
+These are the web tree areas that Qtooley overlays onto during normal operation.
 
 It is not a full stock firmware image, not a full device backup, and not a complete factory restore package.
 
@@ -23,9 +25,9 @@ Preferred recovery order:
 Typical signs:
 
 - uninstall reports that the install baseline is not present
-- uninstall finishes, but the stock-style Casa web UI does not come back correctly
+- uninstall finishes, but the stock-style Casa web shell does not come back correctly
 - the Qtooley overlay has been removed or partially removed and the router web UI is still broken
-- you need a quick stock-style web shell for troubleshooting before doing anything else
+- you need a quick stock-style Casa web shell for troubleshooting before doing anything else
 
 Important note about the Qtooley tab:
 
@@ -57,8 +59,8 @@ Package path in this repo:
 ## Important Limits
 
 - this is a fallback stock web UI reference package, not a guarantee of exact per-device factory restoration
-- this restores stock-style web content for `/www` and `/usr/share/lua/5.1/webif`
-- this is only those stock web tree files, not a full stock image or full-firmware restore
+- this restores only the stock-style Casa web shell content for `/www` and `/usr/share/lua/5.1/webif`
+- this is only the web tree content that Qtooley overlays onto, not a full stock image or full-firmware restore
 - this does not restore every device-specific writable-state area
 - use it only on the same hardware family and only if you understand it is a last-resort recovery path
 
@@ -132,7 +134,7 @@ Recommended order:
 
 1. run normal uninstall first
 2. if uninstall completes but the stock-style web UI is still missing or broken, use this fallback method
-3. once the stock-style UI is back, decide whether you want to leave that fallback overlay in place temporarily or remove it after troubleshooting
+3. once the stock-style Casa web shell is back, decide whether you want to leave that fallback overlay in place temporarily or remove it after troubleshooting
 
 This fallback package is mainly for getting the stock-style Casa web shell back, not for retrying the same uninstall loop over and over.
 
