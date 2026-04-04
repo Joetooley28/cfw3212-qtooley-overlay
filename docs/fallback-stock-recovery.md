@@ -1,5 +1,11 @@
 # Emergency Stock Web Recovery
 
+## Start Here
+
+Run the normal Qtooley uninstall first.
+
+Use this emergency recovery method only if uninstall finishes and the stock-style Casa web shell still does not come back correctly.
+
 ## What This Is
 
 This is the public emergency recovery path for cases where the normal install-time Qtooley baseline is missing or known-bad.

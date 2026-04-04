@@ -1,6 +1,7 @@
 Qtooley stock UI ZIP install for Windows
 
 Important recovery note
+- run the normal Qtooley uninstall first
 - on first install, the installer captures a compact baseline snapshot from that router's live stock `/www` and `/usr/share/lua/5.1/webif` trees before any Qtooley live overlay mounts are active
 - that router-specific baseline is the preferred uninstall and recovery path
 - if the saved baseline is missing or known-bad, a separate fallback stock web package is available for emergency recovery
