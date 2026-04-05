@@ -8,8 +8,9 @@ It is not a generic web app and it is not a generic USB modem project.
 
 ## Download
 
-- [Latest Release](https://github.com/Joetooley28/cfw3212-at-terminal/releases/latest)
+- [Latest Release](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
+- [Emergency Stock Web Recovery](docs/fallback-stock-recovery.md)
 
 ## Contents
 
@@ -21,7 +22,6 @@ It is not a generic web app and it is not a generic USB modem project.
 - [Screenshots](#screenshots)
 - [Project Tracks](#project-tracks)
 - [Important Docs](#important-docs)
-- [Current Version](#current-version)
 
 ## What This Project Is
 
@@ -73,8 +73,19 @@ Important prerequisites:
 
 More install detail:
 
-- [Latest Release](https://github.com/Joetooley28/cfw3212-at-terminal/releases/latest)
+- [Latest Release](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
+- [Emergency Stock Web Recovery](docs/fallback-stock-recovery.md)
+
+Quick install choice:
+
+- use the release ZIP when the router does not already have working internet, or when you want the Windows-assisted install/update/uninstall path over SSH
+- use the direct GitHub router command when the router already has working internet and you want to install or update from an SSH shell on the router itself
+- direct GitHub install/update command:
+  - `sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/update_from_github_release.sh)"`
+- direct GitHub uninstall command:
+  - `sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/uninstall_from_github_release.sh)"`
+- the direct GitHub uninstaller prompts for the Tailscale keep/remove choice, similar to the Windows uninstall flow
 
 ## Platform Notes
 
@@ -140,35 +151,23 @@ Verification note:
 
 There are three branch roles in the current project layout:
 
-- `main`
-  This branch is the current Qtooley overlay release branch and should be treated as the primary project.
-- `working-branch`
-  This branch is the ongoing working branch for current overlay development.
-- `standalone-at-terminal-old`
-  This is the older legacy standalone LAN AT terminal branch.
+- `main`: current Qtooley stock UI overlay release, primary and recommended branch
+- `working-branch`: current overlay development branch
+- `standalone-at-terminal-old`: older standalone LAN AT terminal, legacy fallback/reference branch
 
-Important:
+Important warning:
 
 - both tracks share backend assumptions and modem access discipline
 - both rely on the same platform-native AT path model
 - both use the same shared lock concept around modem access
 - do not casually install and run both as if they were isolated products
-
-If both are published:
-
-- `main` should be the default and recommended path for the current Qtooley overlay release
-- `working-branch` should be the active development branch for current overlay work
-- `standalone-at-terminal-old` should be clearly marked as legacy / old / fallback
-- the legacy branch should tell new users to use the main overlay branch instead
+- if you are new to the project, use `main` rather than `working-branch` or the old standalone branch
 
 ## Important Docs
 
 Public starting points:
 
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
+- [Emergency Stock Web Recovery](docs/fallback-stock-recovery.md)
 - [platform-notes.md](docs/platform-notes.md)
 
-## Current Version
-
-- repo version: `v0.3.0-qtooley-2026-03-24`
-- current working branch: `working-branch`
