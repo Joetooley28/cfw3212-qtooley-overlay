@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.3.3-qtooley-2026-04-04
+
+Public release cleanup for the Qtooley stock UI overlay.
+
+Included:
+- direct GitHub install/update/uninstall now bootstrap from the published release ZIP instead of separate router-package assets
+- release packaging now returns to a single public Windows ZIP asset model
+- release/install wording now leads with the `router has internet` versus `router does not` choice
+
+Key behavior:
+- the router-side GitHub helpers discover the newest versioned release ZIP from GitHub release metadata and then run the same packaged install/uninstall core
+- this keeps the public release assets cleaner while preserving the shared install/update/uninstall flow
+- the public release page can now emphasize one downloadable ZIP plus copy/paste SSH commands
+
 ## v0.3.2-qtooley-2026-04-04
 
 Release usability follow-up for the Qtooley stock UI overlay.

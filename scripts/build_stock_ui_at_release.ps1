@@ -57,18 +57,13 @@ try {
 
     New-Item -ItemType Directory -Force -Path $OutputRoot | Out-Null
     $zipPath = Join-Path $OutputRoot ("stock-ui-at-installer-" + $version + ".zip")
-    $latestZipPath = Join-Path $OutputRoot "stock-ui-at-installer-latest.zip"
-    @($zipPath, $latestZipPath) | ForEach-Object {
-        if (Test-Path $_) {
-            Remove-Item -Force $_
-        }
+    if (Test-Path $zipPath) {
+        Remove-Item -Force $zipPath
     }
 
     Compress-Archive -Path (Join-Path $releaseRoot "*") -DestinationPath $zipPath
-    Copy-Item -Force $zipPath $latestZipPath
 
     Write-Output "Release ZIP created: $zipPath"
-    Write-Output "Release ZIP latest alias: $latestZipPath"
     Write-Output "Stage folder: $releaseRoot"
 } finally {
     if (Test-Path $stageRoot) {

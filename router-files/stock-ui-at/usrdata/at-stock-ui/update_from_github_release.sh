@@ -5,9 +5,9 @@ set -eu
 REPO_OWNER="${REPO_OWNER:-Joetooley28}"
 REPO_NAME="${REPO_NAME:-cfw3212-qtooley-overlay}"
 RELEASE_CHANNEL="${RELEASE_CHANNEL:-latest}"
-ASSET_NAME="${ASSET_NAME:-stock-ui-at-installer-latest.zip}"
+ASSET_PATTERN="${ASSET_PATTERN:-stock-ui-at-installer-.*\\.zip}"
 TMP_ROOT="${TMPDIR:-/tmp}/qtooley-github-release.$$"
-ARCHIVE_PATH="$TMP_ROOT/$ASSET_NAME"
+ARCHIVE_PATH="$TMP_ROOT/release.zip"
 EXTRACT_ROOT="$TMP_ROOT/extracted"
 INSTALL_SCRIPT=""
 
@@ -70,6 +70,23 @@ find_install_script() {
     find "$EXTRACT_ROOT" -path '*/router-files/stock-ui-at/package/install_stock_ui_release.sh' -print -quit 2>/dev/null || true
 }
 
+fetch_text() {
+    url="$1"
+
+    if need_cmd curl; then
+        curl -fsSL "$url"
+        return 0
+    fi
+
+    if need_cmd wget; then
+        wget -qO- "$url"
+        return 0
+    fi
+
+    echo "Neither curl nor wget is available." >&2
+    exit 1
+}
+
 fetch_to_file() {
     url="$1"
     dest="$2"
@@ -94,12 +111,36 @@ resolve_release_url() {
         return 0
     fi
 
-    if [ "$RELEASE_CHANNEL" = "latest" ]; then
-        echo "https://github.com/$REPO_OWNER/$REPO_NAME/releases/latest/download/$ASSET_NAME"
+    if [ -n "${API_RELEASE_URL:-}" ]; then
+        api_url="$API_RELEASE_URL"
+    elif [ "$RELEASE_CHANNEL" = "latest" ]; then
+        api_url="https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/latest"
+    else
+        api_url="https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/tags/$RELEASE_CHANNEL"
+    fi
+
+    release_json="$(fetch_text "$api_url")"
+    release_url="$(printf '%s\n' "$release_json" | sed -n "s/.*\"browser_download_url\": \"\\([^\"]*stock-ui-at-installer-[^\"]*\\.zip\\)\".*/\\1/p" | head -n 1)"
+
+    if [ -z "$release_url" ]; then
+        echo "Unable to locate a release ZIP asset in GitHub release metadata." >&2
+        exit 1
+    fi
+
+    case "$release_url" in
+        *stock-ui-at-installer-*.zip)
+            echo "$release_url"
+            return 0
+            ;;
+    esac
+
+    if printf '%s\n' "$release_url" | grep -Eq "$ASSET_PATTERN"; then
+        echo "$release_url"
         return 0
     fi
 
-    echo "https://github.com/$REPO_OWNER/$REPO_NAME/releases/download/$RELEASE_CHANNEL/$ASSET_NAME"
+    echo "Release ZIP asset did not match expected naming pattern." >&2
+    exit 1
 }
 
 mkdir -p "$TMP_ROOT" "$EXTRACT_ROOT"
