@@ -20,7 +20,7 @@ This is not a generic web app and it is not a generic USB modem project.
 - Quick Overview
 - General Info
 - AT terminal
-- Settings page with screensaver controls and release/update status
+- Settings page with screensaver controls, release/update status, and a router-side `Update now` action
 - RAT / band / cell locking
 - Ookla Speedtest
 - TTL helper

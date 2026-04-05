@@ -8,12 +8,14 @@ Included:
 - public GitHub docs reorganized to lead with the install-path choice and highest-signal project truths
 - release install guide clarified around first-install baseline behavior, space planning, and the `upgrade.star` cleanup warning
 - Windows ZIP path clearly labeled as the no-internet install and uninstall method
+- Settings page can now launch the router-side GitHub updater directly with an `Update now` action
 - public release metadata refreshed to align with the current release label
 
 Key behavior:
 - public readers now see the `No router internet yet` versus `Router already has internet` split earlier
 - the installer still preserves the one-time first-install stock baseline model
 - direct GitHub router install, update, and uninstall still point to the same packaged release flow
+- routers that already have internet can now start the GitHub release update directly from the Settings page
 - bundled Ookla remains part of the expected public release ZIP flow
 
 ## v0.3.3-qtooley-2026-04-04
