@@ -12,6 +12,9 @@ Space guidance
 - Tailscale is a separate optional runtime under `/usrdata/tailscale` and should be treated as a noticeably larger `/usrdata` user than the core Qtooley files or the one-time stock baseline
 - practical recommendation: before first install, try to have at least `15 MB` to `20 MB` free on `/usrdata` for Qtooley plus the saved stock baseline, and leave additional headroom beyond that if you plan to add optional runtimes later
 - if you already have other packages, caches, or old runtime files under `/usrdata`, do a cleanup first instead of trying to install with only a few MB left
+- important cleanup note from project testing: on one used unit, reduced free space was traced to a staged firmware file named `upgrade.star` under `/cache/upgrade.star` and `/usrdata/cache/upgrade.star`
+- in that logged case, `upgrade.star` was about `108.8 MB` and explained most of the space pressure; before deleting a file like that, try to save an off-box copy and record its SHA-256 hash because it may be a very useful stock firmware artifact later
+- project note for that find: `notes/CFW3212_box3_upgrade_star_find.md`
 
 Important recovery note
 - run the normal Qtooley uninstall first
