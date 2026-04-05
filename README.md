@@ -4,32 +4,17 @@
 
 Qtooley is a stock UI overlay for the Casa Systems `CFW-3212` with a Quectel `RG520N-NA`.
 
-This is the main project direction: a top-level authenticated Qtooley tab inside the stock Casa Turbo web UI, with custom pages for modem visibility, control, and diagnostics.
+It adds a top-level authenticated `Qtooley` tab inside the stock Casa Turbo web UI for modem visibility, control, and diagnostics.
 
-It is not a generic web app and it is not a generic USB modem project.
+This is not a generic web app and it is not a generic USB modem project.
 
-## Download
+## Start Here
 
 - [Latest Release](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
 - [Emergency Stock Web Recovery](docs/fallback-stock-recovery.md)
 
-## Contents
-
-- [Download](#download)
-- [What This Project Is](#what-this-project-is)
-- [Device Scope](#device-scope)
-- [Install Flow](#install-flow)
-- [Platform Notes](#platform-notes)
-- [Screenshots](#screenshots)
-- [Project Tracks](#project-tracks)
-- [Important Docs](#important-docs)
-
-## What This Project Is
-
-Qtooley adds custom tools into the stock router UI while preserving the proven login flow, the stock page shell, and the current overlay persistence model.
-
-The current feature set includes:
+## What You Get
 
 - Quick Overview
 - General Info
@@ -42,9 +27,35 @@ The current feature set includes:
 
 Dark mode note:
 
-- the shared dark mode toggle applies across themed stock UI pages and Qtooley pages, so the UI keeps one consistent light or dark presentation instead of separate theme modes per section
+- the shared dark mode toggle applies across themed stock UI pages and Qtooley pages
 
-The preferred direction is the stock UI overlay, not the older standalone-only AT terminal branch.
+## Choose Your Install Path
+
+Use the Windows release ZIP when:
+
+- the router does not already have working internet
+- you want the normal Windows-assisted install, update, or uninstall flow over SSH
+
+Use the direct GitHub router command when:
+
+- the router already has working internet
+- you want to install, update, or uninstall from an SSH shell on the router itself
+
+Direct GitHub install or update:
+
+- `sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/update_from_github_release.sh)"`
+
+Direct GitHub uninstall:
+
+- `sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/uninstall_from_github_release.sh)"`
+
+## Before You Install
+
+- the router must already be rooted
+- SSH must already be enabled and reachable
+- the normal public release asset is the Windows ZIP
+- bundled Ookla is expected in public release ZIPs
+- Tailscale is optional and is installed later from the Qtooley UI
 
 ## Device Scope
 
@@ -59,49 +70,17 @@ Important platform truths:
 
 - `/usrdata` is the writable persistent area
 - the proven AT backend path is `/dev/smd7`
-- shared AT lock path is `/tmp/at-http.lock`
-- the stock UI overlay uses live-tree bind mounts onto `/www` and `/usr/share/lua/5.1/webif`
-
-## Install Flow
-
-The public install path is a versioned Windows ZIP release for a rooted, SSH-reachable router:
-
-1. download the latest release ZIP
-2. run the PowerShell installer from a normal Windows PC
-3. connect over SSH with the router IP, username, and password
-4. let the installer place the Qtooley overlay and bundled Ookla base components
-5. if you want Tailscale, install it afterward from the Qtooley UI as the optional extra
-
-Important prerequisites:
-
-- the router must already be rooted
-- SSH must already be enabled and reachable
-- password prompt is supported; SSH keys are optional
-
-More install detail:
-
-- [Latest Release](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
-- [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
-- [Emergency Stock Web Recovery](docs/fallback-stock-recovery.md)
-
-Quick install choice:
-
-- use the release ZIP when the router does not already have working internet, or when you want the Windows-assisted install/update/uninstall path over SSH
-- use the direct GitHub router command when the router already has working internet and you want to install or update from an SSH shell on the router itself
-- direct GitHub install/update command:
-  - `sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/update_from_github_release.sh)"`
-- direct GitHub uninstall command:
-  - `sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/uninstall_from_github_release.sh)"`
-- the direct GitHub uninstaller prompts for the Tailscale keep/remove choice, similar to the Windows uninstall flow
+- the shared AT lock path is `/tmp/at-http.lock`
+- the proven persistence model is the stock UI overlay under `/usrdata/at-stock-ui`
 
 ## Platform Notes
 
-The overlay is designed around the real behavior of this router and the real failure modes already seen during development:
+The overlay is built around the real behavior of this router:
 
 - preserve LAN access
-- preserve the stock login page and stock UI rendering
+- preserve the stock login page and stock UI shell
 - preserve SSH reachability
-- keep the proven stock UI overlay model under `/usrdata/at-stock-ui`
+- keep the proven `/usrdata/at-stock-ui` overlay model
 - avoid redesigning the project around generic USB modem assumptions
 
 Current proven overlay model:
@@ -117,6 +96,16 @@ Verification note:
 
 - plain `mount` output is misleading on this device
 - use `/proc/self/mountinfo`
+
+## Project Tracks
+
+There are three branch roles in the current project layout:
+
+- `main`: public-facing release and docs branch
+- `working-branch`: active source and development branch
+- `standalone-at-terminal-old`: legacy older branch
+
+If you are new to the project, use `main`.
 
 ## Screenshots
 
@@ -154,27 +143,8 @@ Verification note:
 
 ![TTL helper](docs/images/qtooley/ttl-helper.jpg)
 
-## Project Tracks
-
-There are three branch roles in the current project layout:
-
-- `main`: current Qtooley stock UI overlay release, primary and recommended branch
-- `working-branch`: current overlay development branch
-- `standalone-at-terminal-old`: older standalone LAN AT terminal, legacy fallback/reference branch
-
-Important warning:
-
-- both tracks share backend assumptions and modem access discipline
-- both rely on the same platform-native AT path model
-- both use the same shared lock concept around modem access
-- do not casually install and run both as if they were isolated products
-- if you are new to the project, use `main` rather than `working-branch` or the old standalone branch
-
-## Important Docs
-
-Public starting points:
+## More Docs
 
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
 - [Emergency Stock Web Recovery](docs/fallback-stock-recovery.md)
-- [platform-notes.md](docs/platform-notes.md)
-
+- [Platform Notes](docs/platform-notes.md)
