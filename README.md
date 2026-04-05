@@ -40,6 +40,10 @@ The current feature set includes:
 - TTL helper
 - optional Tailscale UI after base install
 
+Dark mode note:
+
+- the shared dark mode toggle applies across themed stock UI pages and Qtooley pages, so the UI keeps one consistent light or dark presentation instead of separate theme modes per section
+
 The preferred direction is the stock UI overlay, not the older standalone-only AT terminal branch.
 
 ## Device Scope
@@ -89,11 +93,6 @@ Quick install choice:
 - direct GitHub uninstall command:
   - `sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/uninstall_from_github_release.sh)"`
 - the direct GitHub uninstaller prompts for the Tailscale keep/remove choice, similar to the Windows uninstall flow
-
-Shared cache-busting note:
-
-- Qtooley pages use shared menu/header assets, so cache/version tokens are treated as release data
-- when shared files like `generatedMenuEntries.js` or `genHeader.js` change, the matching query-string tokens are bumped across the Jtools page set so browser cache does not pin one tab to older shared UI code
 
 ## Platform Notes
 

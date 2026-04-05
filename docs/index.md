@@ -37,6 +37,10 @@ It is not a generic web app and it is not a generic USB modem project.
 - TTL helper
 - optional Tailscale UI after base install
 
+Dark mode note:
+
+- the shared dark mode toggle applies across themed stock UI pages and Qtooley pages, so the UI keeps one consistent light or dark presentation instead of separate theme modes per section
+
 ## Install Flow
 
 1. Download the latest Windows release ZIP.
