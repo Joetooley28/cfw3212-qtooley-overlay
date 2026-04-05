@@ -3,6 +3,10 @@ Qtooley stock UI ZIP install for Windows
 First-install snapshot note
 - on first install, the installer captures a compact router-specific stock baseline from the live stock `/www` and `/usr/share/lua/5.1/webif` trees before any Qtooley overlay mounts are active
 - that first-install baseline is then reused across normal updates so uninstall can verify the router is back on its install-time stock web files after the overlay is removed
+- install treats the router as `already baselined` only when these saved files exist under `/usrdata/at-stock-ui/installer-state/install-baseline`:
+  - `install_www.tar`
+  - `install_webif.tar`
+- baseline metadata is also recorded in `/usrdata/at-stock-ui/installer-state/installer-baseline-info.txt`
 - do not use the last-resort `FORCE_RECAPTURE_BASELINE=1` path unless the saved baseline is missing or known-bad and the router is already showing the stock state you want uninstall to restore later
 
 Space guidance
