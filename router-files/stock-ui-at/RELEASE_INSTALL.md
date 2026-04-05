@@ -1,5 +1,10 @@
 Qtooley stock UI ZIP install for Windows
 
+Testing status
+- public install and uninstall flow is still being validated
+- treat the current release path as not fully public-ready yet
+- cell locking is still under development and is not working yet
+
 First-install snapshot note
 - on first install, the installer captures a compact router-specific stock baseline from the live stock `/www` and `/usr/share/lua/5.1/webif` trees before any Qtooley overlay mounts are active
 - that first-install baseline is then reused across normal updates so uninstall can verify the router is back on its install-time stock web files after the overlay is removed
