@@ -34,10 +34,15 @@ normalize_shell_scripts() {
 extract_zip() {
     archive="$1"
     dest="$2"
+    unzip_status=0
 
     if need_cmd unzip; then
-        unzip -oq "$archive" -d "$dest" >/dev/null
-        return 0
+        unzip -oq "$archive" -d "$dest" >/dev/null 2>&1 || unzip_status=$?
+        case "$unzip_status" in
+            0|1)
+                return 0
+                ;;
+        esac
     fi
 
     if need_cmd busybox; then
