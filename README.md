@@ -1,7 +1,5 @@
 # CFW-3212 Qtooley Overlay
 
-> Testing status: public install and uninstall flow is still being validated. Treat the current release path as not fully public-ready yet.
->
 > Feature status: cell locking is still under development and is not working yet.
 
 Qtooley is a stock UI overlay for the Casa Systems `CFW-3212` with a Quectel `RG520N-NA`.
@@ -36,6 +34,7 @@ The current feature set includes:
 - Quick Overview
 - General Info
 - AT terminal
+- Settings page with screensaver controls and release/update status
 - RAT / band / cell locking
 - Ookla Speedtest
 - TTL helper
@@ -91,6 +90,11 @@ Quick install choice:
   - `sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/uninstall_from_github_release.sh)"`
 - the direct GitHub uninstaller prompts for the Tailscale keep/remove choice, similar to the Windows uninstall flow
 
+Shared cache-busting note:
+
+- Qtooley pages use shared menu/header assets, so cache/version tokens are treated as release data
+- when shared files like `generatedMenuEntries.js` or `genHeader.js` change, the matching query-string tokens are bumped across the Jtools page set so browser cache does not pin one tab to older shared UI code
+
 ## Platform Notes
 
 The overlay is designed around the real behavior of this router and the real failure modes already seen during development:
@@ -131,9 +135,9 @@ Verification note:
 
 ![SMS](docs/images/qtooley/sms.jpg)
 
-### Screensaver Settings
+### Settings
 
-![Screensaver Settings](docs/images/qtooley/screensaver-settings.jpg)
+![Settings](docs/images/qtooley/screensaver-settings.jpg)
 
 ### RAT / Band / Cell Locking
 
