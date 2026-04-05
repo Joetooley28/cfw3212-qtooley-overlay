@@ -1,7 +1,7 @@
 Jtools stock UI package
-Release date: 2026-04-04
-Release label: v0.3.3-qtooley-2026-04-04
-Checkpoint commit: a3d9414
+Release date: 2026-04-05
+Release label: v0.3.4-qtooley-2026-04-05
+Checkpoint commit: 37dd6c3
 
 Current proven model
 - Keep payload in /usrdata/at-stock-ui

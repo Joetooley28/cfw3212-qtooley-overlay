@@ -17,7 +17,7 @@ First-install snapshot note
 Space guidance
 - the Qtooley release download itself is small: the current Windows ZIP is about `0.4 MB` and the router package asset is about `0.3 MB` compressed
 - on the stock candidate captures saved in the project notes, the stock baseline tar pair was about `3.9 MB` for `stock_www.tar` plus about `0.13 MB` for `stock_webif.tar`, so the saved first-install baseline is roughly a `4 MB` `/usrdata` consumer by itself
-- bundled Ookla, when included in the release ZIP, adds a few more MB beyond the base Qtooley payload
+- bundled Ookla is expected to be present in public release ZIPs and adds a few more MB beyond the base Qtooley payload
 - Tailscale is a separate optional runtime under `/usrdata/tailscale` and should be treated as a noticeably larger `/usrdata` user than the core Qtooley files or the one-time stock baseline
 - practical recommendation: before first install, try to have at least `15 MB` to `20 MB` free on `/usrdata` for Qtooley plus the saved stock baseline, and leave additional headroom beyond that if you plan to add optional runtimes later
 - if you already have other packages, caches, or old runtime files under `/usrdata`, do a cleanup first instead of trying to install with only a few MB left
@@ -91,7 +91,7 @@ Normal install
 6. Answer the simple `y/n` prompts.
 
 Bundled Ookla behavior
-- the normal install path now installs the bundled Ookla CLI automatically when the archive is present in the package
+- the normal install path installs the bundled Ookla CLI automatically from the release package
 - if that archive is missing, the installer leaves Ookla unchanged and reports that state
 
 Normal uninstall
