@@ -25,6 +25,27 @@ Before you start
 - you need the router IP, SSH username, and SSH password
 - Windows needs the built-in `ssh` client available
 
+Important install behavior
+- on first install, the installer captures a compact router-specific stock baseline from the live stock `/www` and `/usr/share/lua/5.1/webif` trees before any Qtooley overlay mounts are active
+- that first-install baseline is then reused across normal updates so uninstall can verify the router is back on its install-time stock web files after the overlay is removed
+- install treats the router as already baselined only when these saved files exist under `/usrdata/at-stock-ui/installer-state/install-baseline`:
+  - `install_www.tar`
+  - `install_webif.tar`
+- baseline metadata is also recorded in `/usrdata/at-stock-ui/installer-state/installer-baseline-info.txt`
+- do not use `FORCE_RECAPTURE_BASELINE=1` unless the saved baseline is missing or known-bad and the router is already showing the stock state you want uninstall to restore later
+
+Space note
+- first install stores a router-specific stock baseline under `/usrdata` in addition to the base Qtooley payload
+- bundled Ookla adds a few more MB
+- Tailscale is a separate optional runtime under `/usrdata/tailscale` and uses noticeably more space than the core Qtooley files alone
+- practical recommendation: try to have at least `15 MB` to `20 MB` free on `/usrdata` before first install, and leave more headroom if you plan to add optional runtimes later
+- if space is tight, clean up old files first instead of trying to install with only a few MB left
+
+Important cleanup note
+- on one used unit, most of the missing space turned out to be a staged firmware file named `upgrade.star` under `/cache/upgrade.star` and `/usrdata/cache/upgrade.star`
+- in that logged case, `upgrade.star` was about `108.8 MB`
+- before deleting a file like that, save an off-box copy first and record its SHA-256 hash if you can, because it may be a useful stock firmware artifact later
+
 Normal Windows install
 1. Download and extract the latest release ZIP.
 2. Open PowerShell in the extracted folder.
@@ -60,15 +81,6 @@ Direct GitHub uninstall from the router
   - remove Tailscale too:
     `REMOVE_TAILSCALE=1 /bin/sh /usrdata/at-stock-ui/uninstall_from_github_release.sh`
 
-Important install behavior
-- on first install, the installer captures a compact router-specific stock baseline from the live stock `/www` and `/usr/share/lua/5.1/webif` trees before any Qtooley overlay mounts are active
-- that first-install baseline is then reused across normal updates so uninstall can verify the router is back on its install-time stock web files after the overlay is removed
-- install treats the router as already baselined only when these saved files exist under `/usrdata/at-stock-ui/installer-state/install-baseline`:
-  - `install_www.tar`
-  - `install_webif.tar`
-- baseline metadata is also recorded in `/usrdata/at-stock-ui/installer-state/installer-baseline-info.txt`
-- do not use `FORCE_RECAPTURE_BASELINE=1` unless the saved baseline is missing or known-bad and the router is already showing the stock state you want uninstall to restore later
-
 Important uninstall behavior
 - uninstall removes the live overlay mounts and verifies key shared stock files against the saved first-install baseline when that baseline is available
 - the current verification set includes:
@@ -85,13 +97,6 @@ Bundled Ookla behavior
 - if the archive is missing, the installer leaves Ookla unchanged and reports that state
 - expected bundle path inside the ZIP:
   - `router-files\stock-ui-at\usrdata\at-stock-ui\bundles\ookla\ookla-speedtest-1.2.0-linux-armhf.tgz`
-
-Space guidance
-- the release ZIP itself is small, but first install also stores a router-specific stock baseline under `/usrdata`
-- bundled Ookla adds a few more MB
-- Tailscale is a separate optional runtime under `/usrdata/tailscale` and uses noticeably more space than the core Qtooley files alone
-- practical recommendation: try to have at least `15 MB` to `20 MB` free on `/usrdata` before first install, and leave more headroom if you plan to add optional runtimes later
-- if space is tight, clean up old files first instead of trying to install with only a few MB left
 
 Recovery note
 - run the normal Qtooley uninstall first
