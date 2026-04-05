@@ -105,6 +105,8 @@ function Apply-ReleaseCacheTokens {
         [string]$Version
     )
 
+    # Shared stock/Qtooley assets are aggressively browser-cached on-box, so
+    # release packaging stamps fresh query tokens across the Jtools page set.
     $token = Get-ReleaseToken -Version $Version
     $htmlFiles = Get-ChildItem (Join-Path $ReleasePackageRoot "www") -Filter *.html -File -Recurse
     $pageUrlFiles = @(
