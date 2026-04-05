@@ -1,6 +1,6 @@
 # CFW-3212 Qtooley Overlay
 
-> Feature status: cell locking is still under development and is not working yet.
+> TESTING ONLY: this branch is not ready for public release yet. Cell locking is still under development and not working yet.
 
 Qtooley is a stock UI overlay for the Casa Systems `CFW-3212` with a Quectel `RG520N-NA`.
 

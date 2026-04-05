@@ -181,7 +181,7 @@
 
         if (!cssLoaded) {
             remaining++;
-            loadCSS("/css/screensaver_overlay.css?jtools-ss-v20260328a", function () {
+            loadCSS("/css/screensaver_overlay.css?jtools-ss-v20260405a", function () {
                 cssLoaded = true;
                 done();
             });
@@ -190,14 +190,14 @@
         if (!scriptsLoaded) {
             remaining++;
             if (!window.JtoolsScreensaverCore) {
-                loadScript("/js/screensaver_core.js?jtools-ss-v20260328a", function () {
-                    loadScript("/js/screensaver_renderer.js?jtools-ss-v20260328a", function () {
+                loadScript("/js/screensaver_core.js?jtools-ss-v20260405a", function () {
+                    loadScript("/js/screensaver_renderer.js?jtools-ss-v20260405a", function () {
                         scriptsLoaded = true;
                         done();
                     });
                 });
             } else if (!window.JtoolsScreensaverRenderer) {
-                loadScript("/js/screensaver_renderer.js?jtools-ss-v20260328a", function () {
+                loadScript("/js/screensaver_renderer.js?jtools-ss-v20260405a", function () {
                     scriptsLoaded = true;
                     done();
                 });

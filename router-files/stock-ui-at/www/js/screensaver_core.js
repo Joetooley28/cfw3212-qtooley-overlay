@@ -1,8 +1,9 @@
 /* ================================================================
    Screensaver Core — Standalone signal data library
    No dependency on quick_overview.js or quick_overview_core.js.
-   Fetches signal data from /jtools_general_api/state and
-   manages screensaver settings via /screensaver_api/settings.
+   Fetches signal data from /jtools_general_api/state and falls back
+   to a stock/RDB-only public snapshot before login.
+   Screensaver settings remain behind /screensaver_api/settings auth.
    ================================================================ */
 (function (window) {
     "use strict";
@@ -532,6 +533,10 @@
         };
         xhr.onreadystatechange = function () {
             if (xhr.readyState !== 4) { return; }
+            if (xhr.status === 401 || xhr.status === 403) {
+                fetchPublicData(callback);
+                return;
+            }
             if (xhr.status !== 200) {
                 callback(null, "HTTP " + xhr.status);
                 return;
@@ -548,6 +553,80 @@
             }
         };
         xhr.send();
+    }
+
+    function fetchPublicData(callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/public_screensaver_api/state", true);
+        xhr.timeout = 15000;
+        xhr.ontimeout = function () {
+            callback(null, "timeout");
+        };
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState !== 4) { return; }
+            if (xhr.status !== 200) {
+                callback(null, "HTTP " + xhr.status);
+                return;
+            }
+            try {
+                var resp = JSON.parse(xhr.responseText);
+                if (!resp || !resp.ok) {
+                    callback(null, (resp && resp.error) || "API error");
+                    return;
+                }
+                callback(processPublicResponse(resp), null);
+            } catch (e) {
+                callback(null, e.message);
+            }
+        };
+        xhr.send();
+    }
+
+    function processPublicResponse(resp) {
+        var provider = asText(resp.provider, "N/A");
+        var rat = asText(resp.rat, "N/A");
+        var rsrp = asText(resp.rsrp, "");
+        var rsrq = asText(resp.rsrq, "");
+        var sinr = asText(resp.sinr, "");
+        var cqi = asText(resp.cqi, "");
+        var bandLabel = asText(resp.band_label, "");
+        var carriers = Array.isArray(resp.carriers) ? resp.carriers : [];
+        var grade = calcSignalGrade(rsrp, rsrq, sinr);
+
+        return {
+            provider: provider,
+            rat: rat,
+            ratClass: getRatClass(rat),
+            rsrp: rsrp,
+            rsrq: rsrq,
+            sinr: sinr,
+            rsrpText: formatDb(rsrp, " dBm"),
+            rsrqText: formatDb(rsrq, " dB"),
+            sinrText: formatDb(sinr, " dB"),
+            cqi: cqi,
+            cqiText: asText(cqi, "N/A"),
+            signalClass: getSignalClass(rsrp),
+            rsrqClass: getRsrqClass(rsrq),
+            sinrClass: getSinrClass(sinr),
+            carrierClass: getCarrierClass(provider),
+            grade: grade,
+            gradeClass: getGradeClass(grade),
+            gradeText: grade != null ? grade + "%" : "N/A",
+            pci: asText(resp.pci),
+            cellId: asText(resp.cell_id),
+            arfcn: asText(resp.arfcn),
+            bandLabel: bandLabel,
+            carriers: carriers,
+            bandShort: formatBandShort(carriers),
+            temp: "Log in for full detail",
+            tempClass: "",
+            qnwinfo: { bandLabel: bandLabel },
+            servingcell: {},
+            signalCrosscheck: null,
+            raw: resp,
+            publicNote: asText(resp.public_note, ""),
+            limitedPublicData: resp.limited_public_data === true
+        };
     }
 
     function processResponse(resp) {
@@ -643,6 +722,7 @@
         getTempClass: getTempClass,
         loadSettings: loadSettings,
         getSettings: getSettings,
+        processPublicResponse: processPublicResponse,
         escapeHtml: escapeHtml,
         asText: asText,
         hasValue: hasValue,

@@ -218,9 +218,14 @@ return { authTable = {
     ["screensaver_settings.html"] = {
         readGroups = {root=true,admin=true},
         writeGroups = {root=true,admin=true},
-        skipAuth = true
+        skipAuth = false
     },
     ["ScreensaverApi"] = {
+        readGroups = {root=true,admin=true},
+        writeGroups = {root=true,admin=true},
+        skipAuth = false
+    },
+    ["PublicScreensaverApi"] = {
         readGroups = {root=true,admin=true},
         writeGroups = {root=true,admin=true},
         skipAuth = true

@@ -325,7 +325,7 @@ function genThemeHeader(pageData, userGroups) {
     var injectScreensaverJs = typeof relUrlOfPage !== "undefined" && themedPages[relUrlOfPage];
     if (injectScreensaverJs && !document.querySelector("script[src*='/js/jtools_screensaver.js']")) {
         var ssScript = document.createElement("script");
-        ssScript.src = "/js/jtools_screensaver.js?jtools-qo-v20260331e";
+        ssScript.src = "/js/jtools_screensaver.js?jtools-qo-v20260405a";
         document.head.appendChild(ssScript);
     }
 

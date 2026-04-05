@@ -59,6 +59,7 @@
             "  <div class='ss-ov-device'>CFW-3212 / RG520N-NA</div>",
             "  <div class='ss-ov-provider " + getCarrierColorClass(data.provider) + "'>" + SC.escapeHtml(data.provider) + "</div>",
             "  <span class='ss-rat-badge ss-rat-badge-sm " + data.ratClass + "'>" + SC.escapeHtml(data.rat) + "</span>",
+            data.publicNote ? "  <div class='ss-ov-device' style='margin-top:8px;font-size:12px;color:#8a8f98;'>" + SC.escapeHtml(data.publicNote) + "</div>" : "",
             "  <div class='ss-ov-temp " + data.tempClass + "'>" + SC.escapeHtml(data.temp) + "</div>",
             "  <div class='ss-ov-metrics'>",
             "    <div class='ss-ov-metric-item'>",
