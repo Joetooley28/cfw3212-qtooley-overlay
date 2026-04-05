@@ -46,7 +46,7 @@ Important cleanup note
 - in that logged case, `upgrade.star` was about `108.8 MB`
 - before deleting a file like that, save an off-box copy first and record its SHA-256 hash if you can, because it may be a useful stock firmware artifact later
 
-Normal Windows install
+Normal Windows install (No internet method)
 1. Download and extract the latest release ZIP.
 2. Open PowerShell in the extracted folder.
 3. Run:
@@ -56,7 +56,7 @@ Normal Windows install
 6. Enter the SSH password when `ssh` prompts.
 7. Answer the simple `y/n` prompts.
 
-Normal Windows uninstall
+Normal Windows uninstall (No internet method)
 1. Open PowerShell in the extracted folder.
 2. Run:
    - `powershell -ExecutionPolicy Bypass -File .\uninstall_stock_ui_at.ps1`
