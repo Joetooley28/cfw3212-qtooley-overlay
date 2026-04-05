@@ -5,14 +5,11 @@ set -eu
 REPO_OWNER="${REPO_OWNER:-Joetooley28}"
 REPO_NAME="${REPO_NAME:-cfw3212-qtooley-overlay}"
 RELEASE_CHANNEL="${RELEASE_CHANNEL:-latest}"
-ASSET_NAME="${ASSET_NAME:-stock-ui-at-router-package-latest.tar.gz}"
-SHA256_ASSET_NAME="${SHA256_ASSET_NAME:-stock-ui-at-router-package-latest.sha256}"
+ASSET_PATTERN="${ASSET_PATTERN:-stock-ui-at-installer-.*\\.zip}"
 TMP_ROOT="${TMPDIR:-/tmp}/qtooley-github-release.$$"
-ARCHIVE_PATH="$TMP_ROOT/$ASSET_NAME"
-SHA256_PATH="$TMP_ROOT/$SHA256_ASSET_NAME"
+ARCHIVE_PATH="$TMP_ROOT/release.zip"
 EXTRACT_ROOT="$TMP_ROOT/extracted"
-PACKAGE_ROOT="$EXTRACT_ROOT/stock-ui-at"
-INSTALL_SCRIPT="$PACKAGE_ROOT/package/install_stock_ui_release.sh"
+INSTALL_SCRIPT=""
 
 log() {
     echo "$1"
@@ -26,6 +23,68 @@ trap cleanup EXIT INT TERM
 
 need_cmd() {
     command -v "$1" >/dev/null 2>&1
+}
+
+extract_zip() {
+    archive="$1"
+    dest="$2"
+
+    if need_cmd unzip; then
+        unzip -oq "$archive" -d "$dest" >/dev/null
+        return 0
+    fi
+
+    if need_cmd busybox; then
+        if busybox unzip -oq "$archive" -d "$dest" >/dev/null 2>&1; then
+            return 0
+        fi
+    fi
+
+    if need_cmd bsdtar; then
+        bsdtar -xf "$archive" -C "$dest"
+        return 0
+    fi
+
+    if need_cmd python3; then
+        python3 - "$archive" "$dest" <<'PY'
+import sys, zipfile
+zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])
+PY
+        return 0
+    fi
+
+    if need_cmd python; then
+        python - "$archive" "$dest" <<'PY'
+import sys, zipfile
+zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])
+PY
+        return 0
+    fi
+
+    echo "Unable to extract release ZIP: no unzip-compatible tool is available on the router." >&2
+    echo "Use the Windows ZIP install path from a PC, or add unzip/busybox unzip/python to the router environment." >&2
+    exit 1
+}
+
+find_install_script() {
+    find "$EXTRACT_ROOT" -path '*/router-files/stock-ui-at/package/install_stock_ui_release.sh' -print -quit 2>/dev/null || true
+}
+
+fetch_text() {
+    url="$1"
+
+    if need_cmd curl; then
+        curl -fsSL "$url"
+        return 0
+    fi
+
+    if need_cmd wget; then
+        wget -qO- "$url"
+        return 0
+    fi
+
+    echo "Neither curl nor wget is available." >&2
+    exit 1
 }
 
 fetch_to_file() {
@@ -46,83 +105,58 @@ fetch_to_file() {
     exit 1
 }
 
-verify_archive_if_possible() {
-    checksum_url="$1"
-
-    if ! fetch_to_file "$checksum_url" "$SHA256_PATH"; then
-        log "Checksum download failed; continuing without checksum verification."
-        return 0
-    fi
-
-    if ! need_cmd sha256sum; then
-        log "sha256sum is not available; continuing without checksum verification."
-        return 0
-    fi
-
-    expected_hash="$(awk 'NR==1 {print $1}' "$SHA256_PATH")"
-    if [ -z "$expected_hash" ]; then
-        echo "Checksum file did not contain a SHA256 hash." >&2
-        exit 1
-    fi
-
-    actual_hash="$(sha256sum "$ARCHIVE_PATH" | awk '{print $1}')"
-    if [ "$actual_hash" != "$expected_hash" ]; then
-        echo "SHA256 verification failed for downloaded release package." >&2
-        exit 1
-    fi
-
-    log "Release package SHA256 verified."
-}
-
 resolve_release_url() {
     if [ -n "${RELEASE_URL:-}" ]; then
         echo "$RELEASE_URL"
         return 0
     fi
 
-    if [ "$RELEASE_CHANNEL" = "latest" ]; then
-        echo "https://github.com/$REPO_OWNER/$REPO_NAME/releases/latest/download/$ASSET_NAME"
+    if [ -n "${API_RELEASE_URL:-}" ]; then
+        api_url="$API_RELEASE_URL"
+    elif [ "$RELEASE_CHANNEL" = "latest" ]; then
+        api_url="https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/latest"
+    else
+        api_url="https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/tags/$RELEASE_CHANNEL"
+    fi
+
+    release_json="$(fetch_text "$api_url")"
+    release_url="$(printf '%s\n' "$release_json" | sed -n "s/.*\"browser_download_url\": \"\\([^\"]*stock-ui-at-installer-[^\"]*\\.zip\\)\".*/\\1/p" | head -n 1)"
+
+    if [ -z "$release_url" ]; then
+        echo "Unable to locate a release ZIP asset in GitHub release metadata." >&2
+        exit 1
+    fi
+
+    case "$release_url" in
+        *stock-ui-at-installer-*.zip)
+            echo "$release_url"
+            return 0
+            ;;
+    esac
+
+    if printf '%s\n' "$release_url" | grep -Eq "$ASSET_PATTERN"; then
+        echo "$release_url"
         return 0
     fi
 
-    echo "https://github.com/$REPO_OWNER/$REPO_NAME/releases/download/$RELEASE_CHANNEL/$ASSET_NAME"
-}
-
-resolve_checksum_url() {
-    if [ -n "${SHA256_URL:-}" ]; then
-        echo "$SHA256_URL"
-        return 0
-    fi
-
-    if [ "$RELEASE_CHANNEL" = "latest" ]; then
-        echo "https://github.com/$REPO_OWNER/$REPO_NAME/releases/latest/download/$SHA256_ASSET_NAME"
-        return 0
-    fi
-
-    echo "https://github.com/$REPO_OWNER/$REPO_NAME/releases/download/$RELEASE_CHANNEL/$SHA256_ASSET_NAME"
-}
-
-if ! need_cmd tar; then
-    echo "tar is required for GitHub release install/update." >&2
+    echo "Release ZIP asset did not match expected naming pattern." >&2
     exit 1
-fi
+}
 
 mkdir -p "$TMP_ROOT" "$EXTRACT_ROOT"
 
 RELEASE_URL_RESOLVED="$(resolve_release_url)"
-SHA256_URL_RESOLVED="$(resolve_checksum_url)"
 
-log "Downloading Qtooley release package from GitHub..."
+log "Downloading Qtooley release ZIP from GitHub..."
 fetch_to_file "$RELEASE_URL_RESOLVED" "$ARCHIVE_PATH"
-verify_archive_if_possible "$SHA256_URL_RESOLVED"
+extract_zip "$ARCHIVE_PATH" "$EXTRACT_ROOT"
+INSTALL_SCRIPT="$(find_install_script)"
 
-tar -xzf "$ARCHIVE_PATH" -C "$EXTRACT_ROOT"
-
-if [ ! -x "$INSTALL_SCRIPT" ]; then
+if [ -n "$INSTALL_SCRIPT" ] && [ ! -x "$INSTALL_SCRIPT" ]; then
     chmod 755 "$INSTALL_SCRIPT" 2>/dev/null || true
 fi
 
-if [ ! -f "$INSTALL_SCRIPT" ]; then
+if [ -z "$INSTALL_SCRIPT" ] || [ ! -f "$INSTALL_SCRIPT" ]; then
     echo "Downloaded package is missing install script: $INSTALL_SCRIPT" >&2
     exit 1
 fi
