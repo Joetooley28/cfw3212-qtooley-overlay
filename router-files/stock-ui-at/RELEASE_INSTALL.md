@@ -32,9 +32,14 @@ Direct GitHub uninstall from the router
   - `sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/uninstall_from_github_release.sh)"`
 - if the router has `curl` instead of `wget`, use:
   - `sh -c "$(curl -fsSL https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/uninstall_from_github_release.sh)"`
-- default uninstall behavior removes Qtooley and bundled Ookla, while leaving Tailscale installed
-- to also remove Tailscale, run:
-  - `REMOVE_TAILSCALE=1 /bin/sh /usrdata/at-stock-ui/uninstall_from_github_release.sh`
+- the direct GitHub uninstaller now prompts for the same choice in shell form:
+  - default: remove Qtooley and bundled Ookla, keep Tailscale
+  - optional: also remove Tailscale
+- if you want to skip the prompt and force the choice explicitly, use:
+  - keep Tailscale:
+    `REMOVE_TAILSCALE=0 /bin/sh /usrdata/at-stock-ui/uninstall_from_github_release.sh`
+  - remove Tailscale too:
+    `REMOVE_TAILSCALE=1 /bin/sh /usrdata/at-stock-ui/uninstall_from_github_release.sh`
 - after Qtooley is already installed, the same uninstaller remains available on the router at:
   - `/usrdata/at-stock-ui/uninstall_from_github_release.sh`
 
@@ -70,6 +75,21 @@ Normal uninstall
 4. Choose uninstall mode:
    - `1` remove Qtooley and bundled Ookla
    - `2` remove Qtooley, bundled Ookla, and Tailscale
+
+Installed-router direct uninstall commands
+- from an SSH shell on the router, install/update:
+  - `sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/update_from_github_release.sh)"`
+- curl fallback:
+  - `sh -c "$(curl -fsSL https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/update_from_github_release.sh)"`
+- from an SSH shell on the router, uninstall with prompt:
+  - `sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/uninstall_from_github_release.sh)"`
+- curl fallback:
+  - `sh -c "$(curl -fsSL https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/uninstall_from_github_release.sh)"`
+- if Qtooley is already installed and you want non-interactive uninstall from the router:
+  - keep Tailscale:
+    `REMOVE_TAILSCALE=0 /bin/sh /usrdata/at-stock-ui/uninstall_from_github_release.sh`
+  - remove Tailscale too:
+    `REMOVE_TAILSCALE=1 /bin/sh /usrdata/at-stock-ui/uninstall_from_github_release.sh`
 
 Notes
 - on first install, the installer captures a compact baseline from the router's live stock trees for `/www` and `/usr/share/lua/5.1/webif`

@@ -18,6 +18,40 @@ log() {
     echo "$1"
 }
 
+read_yes_no() {
+    prompt="$1"
+    default_value="$2"
+
+    while true; do
+        if [ "$default_value" = "1" ]; then
+            suffix="[Y/n]"
+        else
+            suffix="[y/N]"
+        fi
+
+        printf "%s %s " "$prompt" "$suffix" >&2
+        IFS= read -r reply || reply=""
+        reply="$(printf "%s" "$reply" | tr '[:upper:]' '[:lower:]')"
+
+        case "$reply" in
+            "")
+                echo "$default_value"
+                return 0
+                ;;
+            y|yes)
+                echo "1"
+                return 0
+                ;;
+            n|no)
+                echo "0"
+                return 0
+                ;;
+        esac
+
+        echo "Enter y or n." >&2
+    done
+}
+
 cleanup() {
     rm -rf "$TMP_ROOT"
 }
@@ -125,6 +159,13 @@ fi
 if [ ! -f "$UNINSTALL_SCRIPT" ]; then
     echo "Downloaded package is missing uninstall script: $UNINSTALL_SCRIPT" >&2
     exit 1
+fi
+
+if [ -z "${REMOVE_TAILSCALE+x}" ]; then
+    log "Choose uninstall mode:"
+    log "- default: remove Qtooley and bundled Ookla, keep Tailscale"
+    log "- optional: also remove Tailscale"
+    REMOVE_TAILSCALE="$(read_yes_no 'Also remove Tailscale?' 0)"
 fi
 
 log "Running packaged Qtooley uninstall..."

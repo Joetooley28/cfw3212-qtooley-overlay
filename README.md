@@ -83,6 +83,9 @@ Quick install choice:
 - use the direct GitHub router command when the router already has working internet and you want to install or update from an SSH shell on the router itself
 - direct GitHub install/update command:
   - `sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/update_from_github_release.sh)"`
+- direct GitHub uninstall command:
+  - `sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/uninstall_from_github_release.sh)"`
+- the direct GitHub uninstaller prompts for the Tailscale keep/remove choice, similar to the Windows uninstall flow
 
 ## Platform Notes
 
