@@ -36,6 +36,7 @@ What this ZIP is for
 - uninstall the overlay later, either overlay-only or full uninstall
 - work from a normal Windows PC over SSH with a password prompt
 - provide the Qtooley `Settings` page that now combines screensaver controls with on-router release/update status
+- keep the shared dark mode behavior aligned across themed stock UI pages and Qtooley pages
 
 Choose your install path first
 - if the router does **not** already have a working internet connection, use the Windows ZIP path from your PC over SSH
@@ -131,7 +132,6 @@ Notes
   - `/www/theme/js/genHeader.js`
   - `/usr/share/lua/5.1/webif/top_menu_entries.lua`
   - `/usr/share/lua/5.1/webif/userGroupAuth.lua`
-- shared cache/version tokens are treated as release data; when shared assets like `generatedMenuEntries.js` or `genHeader.js` change, the matching HTML query-string tokens must be bumped across the Jtools page set so browser cache does not pin one tab to stale shared UI code
 - bundled Ookla is treated as part of the base Qtooley install/uninstall flow
 - Tailscale remains the optional extra
 - if Tailscale is kept during uninstall, it remains usable only from the CLI after the Qtooley UI is removed
