@@ -57,6 +57,13 @@ Direct GitHub uninstall:
 - bundled Ookla is expected in public release ZIPs
 - Tailscale is optional and is installed later from the Qtooley UI
 
+## Known Limits
+
+- cell locking is still under development and is not working yet
+- root access is required
+- SSH access is required
+- Tailscale is optional and not part of the base install
+
 ## Device Scope
 
 Tested and documented target:
@@ -135,13 +142,13 @@ If you are new to the project, use `main`.
 
 ![Ookla Speedtest](docs/images/qtooley/speedtest.jpg)
 
-### Tailscale
-
-![Tailscale](docs/images/qtooley/tailscale.jpg)
-
 ### TTL Helper
 
 ![TTL helper](docs/images/qtooley/ttl-helper.jpg)
+
+### Tailscale
+
+![Tailscale](docs/images/qtooley/tailscale.jpg)
 
 ## More Docs
 

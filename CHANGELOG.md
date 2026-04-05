@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.3.5-qtooley-2026-04-05
+
+Public release documentation and release-flow polish for the Qtooley stock UI overlay.
+
+Included:
+- public GitHub docs reorganized to lead with the install-path choice and highest-signal project truths
+- release install guide clarified around first-install baseline behavior, space planning, and the `upgrade.star` cleanup warning
+- Windows ZIP path clearly labeled as the no-internet install and uninstall method
+- public release metadata refreshed to align with the current release label
+
+Key behavior:
+- public readers now see the `No router internet yet` versus `Router already has internet` split earlier
+- the installer still preserves the one-time first-install stock baseline model
+- direct GitHub router install, update, and uninstall still point to the same packaged release flow
+- bundled Ookla remains part of the expected public release ZIP flow
+
 ## v0.3.3-qtooley-2026-04-04
 
 Public release cleanup for the Qtooley stock UI overlay.
