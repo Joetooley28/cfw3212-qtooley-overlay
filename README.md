@@ -1,5 +1,9 @@
 # CFW-3212 Qtooley Overlay
 
+> Testing status: public install and uninstall flow is still being validated. Treat the current release path as not fully public-ready yet.
+>
+> Feature status: cell locking is still under development and is not working yet.
+
 Qtooley is a stock UI overlay for the Casa Systems `CFW-3212` with a Quectel `RG520N-NA`.
 
 This is the main project direction: a top-level authenticated Qtooley tab inside the stock Casa Turbo web UI, with custom pages for modem visibility, control, and diagnostics.

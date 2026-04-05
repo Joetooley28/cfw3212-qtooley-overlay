@@ -1,5 +1,29 @@
 Qtooley stock UI ZIP install for Windows
 
+Testing status
+- public install and uninstall flow is still being validated
+- treat the current release path as not fully public-ready yet
+- cell locking is still under development and is not working yet
+
+First-install snapshot note
+- on first install, the installer captures a compact router-specific stock baseline from the live stock `/www` and `/usr/share/lua/5.1/webif` trees before any Qtooley overlay mounts are active
+- that first-install baseline is then reused across normal updates so uninstall can verify the router is back on its install-time stock web files after the overlay is removed
+- install treats the router as `already baselined` only when these saved files exist under `/usrdata/at-stock-ui/installer-state/install-baseline`:
+  - `install_www.tar`
+  - `install_webif.tar`
+- baseline metadata is also recorded in `/usrdata/at-stock-ui/installer-state/installer-baseline-info.txt`
+- do not use the last-resort `FORCE_RECAPTURE_BASELINE=1` path unless the saved baseline is missing or known-bad and the router is already showing the stock state you want uninstall to restore later
+
+Space guidance
+- the Qtooley release download itself is small: the current Windows ZIP is about `0.4 MB` and the router package asset is about `0.3 MB` compressed
+- on the stock candidate captures saved in the project notes, the stock baseline tar pair was about `3.9 MB` for `stock_www.tar` plus about `0.13 MB` for `stock_webif.tar`, so the saved first-install baseline is roughly a `4 MB` `/usrdata` consumer by itself
+- bundled Ookla, when included in the release ZIP, adds a few more MB beyond the base Qtooley payload
+- Tailscale is a separate optional runtime under `/usrdata/tailscale` and should be treated as a noticeably larger `/usrdata` user than the core Qtooley files or the one-time stock baseline
+- practical recommendation: before first install, try to have at least `15 MB` to `20 MB` free on `/usrdata` for Qtooley plus the saved stock baseline, and leave additional headroom beyond that if you plan to add optional runtimes later
+- if you already have other packages, caches, or old runtime files under `/usrdata`, do a cleanup first instead of trying to install with only a few MB left
+- important cleanup note from project testing: on one used unit, reduced free space was traced to a staged firmware file named `upgrade.star` under `/cache/upgrade.star` and `/usrdata/cache/upgrade.star`
+- in that logged case, `upgrade.star` was about `108.8 MB` and explained most of the space pressure; before deleting a file like that, try to save an off-box copy and record its SHA-256 hash because it may be a very useful stock firmware artifact later
+- project note for that find: `notes/CFW3212_box3_upgrade_star_find.md`
 Important recovery note
 - run the normal Qtooley uninstall first
 - on first install, the installer captures a compact baseline snapshot from that router's live stock `/www` and `/usr/share/lua/5.1/webif` trees before any Qtooley live overlay mounts are active

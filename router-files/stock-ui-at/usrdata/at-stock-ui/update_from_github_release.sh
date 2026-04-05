@@ -25,6 +25,12 @@ need_cmd() {
     command -v "$1" >/dev/null 2>&1
 }
 
+normalize_shell_scripts() {
+    root="$1"
+
+    find "$root" -type f -name '*.sh' -exec sed -i 's/\r$//' {} + 2>/dev/null || true
+}
+
 extract_zip() {
     archive="$1"
     dest="$2"
@@ -150,6 +156,7 @@ RELEASE_URL_RESOLVED="$(resolve_release_url)"
 log "Downloading Qtooley release ZIP from GitHub..."
 fetch_to_file "$RELEASE_URL_RESOLVED" "$ARCHIVE_PATH"
 extract_zip "$ARCHIVE_PATH" "$EXTRACT_ROOT"
+normalize_shell_scripts "$EXTRACT_ROOT"
 INSTALL_SCRIPT="$(find_install_script)"
 
 if [ -n "$INSTALL_SCRIPT" ] && [ ! -x "$INSTALL_SCRIPT" ]; then
