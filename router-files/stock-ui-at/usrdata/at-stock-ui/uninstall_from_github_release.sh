@@ -5,14 +5,11 @@ set -eu
 REPO_OWNER="${REPO_OWNER:-Joetooley28}"
 REPO_NAME="${REPO_NAME:-cfw3212-qtooley-overlay}"
 RELEASE_CHANNEL="${RELEASE_CHANNEL:-latest}"
-ASSET_NAME="${ASSET_NAME:-stock-ui-at-router-package-latest.tar.gz}"
-SHA256_ASSET_NAME="${SHA256_ASSET_NAME:-stock-ui-at-router-package-latest.sha256}"
+ASSET_NAME="${ASSET_NAME:-stock-ui-at-installer-latest.zip}"
 TMP_ROOT="${TMPDIR:-/tmp}/qtooley-github-uninstall.$$"
 ARCHIVE_PATH="$TMP_ROOT/$ASSET_NAME"
-SHA256_PATH="$TMP_ROOT/$SHA256_ASSET_NAME"
 EXTRACT_ROOT="$TMP_ROOT/extracted"
-PACKAGE_ROOT="$EXTRACT_ROOT/stock-ui-at"
-UNINSTALL_SCRIPT="$PACKAGE_ROOT/package/uninstall_stock_ui_release.sh"
+UNINSTALL_SCRIPT=""
 
 log() {
     echo "$1"
@@ -62,6 +59,51 @@ need_cmd() {
     command -v "$1" >/dev/null 2>&1
 }
 
+extract_zip() {
+    archive="$1"
+    dest="$2"
+
+    if need_cmd unzip; then
+        unzip -oq "$archive" -d "$dest" >/dev/null
+        return 0
+    fi
+
+    if need_cmd busybox; then
+        if busybox unzip -oq "$archive" -d "$dest" >/dev/null 2>&1; then
+            return 0
+        fi
+    fi
+
+    if need_cmd bsdtar; then
+        bsdtar -xf "$archive" -C "$dest"
+        return 0
+    fi
+
+    if need_cmd python3; then
+        python3 - "$archive" "$dest" <<'PY'
+import sys, zipfile
+zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])
+PY
+        return 0
+    fi
+
+    if need_cmd python; then
+        python - "$archive" "$dest" <<'PY'
+import sys, zipfile
+zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])
+PY
+        return 0
+    fi
+
+    echo "Unable to extract release ZIP: no unzip-compatible tool is available on the router." >&2
+    echo "Use the Windows ZIP uninstall path from a PC, or add unzip/busybox unzip/python to the router environment." >&2
+    exit 1
+}
+
+find_uninstall_script() {
+    find "$EXTRACT_ROOT" -path '*/router-files/stock-ui-at/package/uninstall_stock_ui_release.sh' -print -quit 2>/dev/null || true
+}
+
 fetch_to_file() {
     url="$1"
     dest="$2"
@@ -80,34 +122,6 @@ fetch_to_file() {
     exit 1
 }
 
-verify_archive_if_possible() {
-    checksum_url="$1"
-
-    if ! fetch_to_file "$checksum_url" "$SHA256_PATH"; then
-        log "Checksum download failed; continuing without checksum verification."
-        return 0
-    fi
-
-    if ! need_cmd sha256sum; then
-        log "sha256sum is not available; continuing without checksum verification."
-        return 0
-    fi
-
-    expected_hash="$(awk 'NR==1 {print $1}' "$SHA256_PATH")"
-    if [ -z "$expected_hash" ]; then
-        echo "Checksum file did not contain a SHA256 hash." >&2
-        exit 1
-    fi
-
-    actual_hash="$(sha256sum "$ARCHIVE_PATH" | awk '{print $1}')"
-    if [ "$actual_hash" != "$expected_hash" ]; then
-        echo "SHA256 verification failed for downloaded release package." >&2
-        exit 1
-    fi
-
-    log "Release package SHA256 verified."
-}
-
 resolve_release_url() {
     if [ -n "${RELEASE_URL:-}" ]; then
         echo "$RELEASE_URL"
@@ -122,41 +136,20 @@ resolve_release_url() {
     echo "https://github.com/$REPO_OWNER/$REPO_NAME/releases/download/$RELEASE_CHANNEL/$ASSET_NAME"
 }
 
-resolve_checksum_url() {
-    if [ -n "${SHA256_URL:-}" ]; then
-        echo "$SHA256_URL"
-        return 0
-    fi
-
-    if [ "$RELEASE_CHANNEL" = "latest" ]; then
-        echo "https://github.com/$REPO_OWNER/$REPO_NAME/releases/latest/download/$SHA256_ASSET_NAME"
-        return 0
-    fi
-
-    echo "https://github.com/$REPO_OWNER/$REPO_NAME/releases/download/$RELEASE_CHANNEL/$SHA256_ASSET_NAME"
-}
-
-if ! need_cmd tar; then
-    echo "tar is required for GitHub release uninstall." >&2
-    exit 1
-fi
-
 mkdir -p "$TMP_ROOT" "$EXTRACT_ROOT"
 
 RELEASE_URL_RESOLVED="$(resolve_release_url)"
-SHA256_URL_RESOLVED="$(resolve_checksum_url)"
 
-log "Downloading Qtooley release package from GitHub..."
+log "Downloading Qtooley release ZIP from GitHub..."
 fetch_to_file "$RELEASE_URL_RESOLVED" "$ARCHIVE_PATH"
-verify_archive_if_possible "$SHA256_URL_RESOLVED"
+extract_zip "$ARCHIVE_PATH" "$EXTRACT_ROOT"
+UNINSTALL_SCRIPT="$(find_uninstall_script)"
 
-tar -xzf "$ARCHIVE_PATH" -C "$EXTRACT_ROOT"
-
-if [ ! -x "$UNINSTALL_SCRIPT" ]; then
+if [ -n "$UNINSTALL_SCRIPT" ] && [ ! -x "$UNINSTALL_SCRIPT" ]; then
     chmod 755 "$UNINSTALL_SCRIPT" 2>/dev/null || true
 fi
 
-if [ ! -f "$UNINSTALL_SCRIPT" ]; then
+if [ -z "$UNINSTALL_SCRIPT" ] || [ ! -f "$UNINSTALL_SCRIPT" ]; then
     echo "Downloaded package is missing uninstall script: $UNINSTALL_SCRIPT" >&2
     exit 1
 fi

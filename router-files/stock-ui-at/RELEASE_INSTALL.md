@@ -14,16 +14,19 @@ What this ZIP is for
 - uninstall the overlay later, either overlay-only or full uninstall
 - work from a normal Windows PC over SSH with a password prompt
 
-Which path should you use?
-- use the Windows ZIP if the router does not already have a working internet connection, or if you want the proven Windows-assisted install/update/uninstall path from your PC over SSH
-- use the direct GitHub command only if the router already has a working internet connection and you want to install, update, or uninstall directly from the router over SSH
+Choose your install path first
+- if the router does **not** already have a working internet connection, use the Windows ZIP path from your PC over SSH
+- if the router **does** already have a working internet connection, you can either keep using the Windows ZIP path or run the direct GitHub commands from an SSH shell on the router
+- in public release pages, the clean user-facing split should be:
+  - `No router internet yet` -> download the Windows ZIP
+  - `Router already has internet` -> use the direct GitHub command
 
 Direct GitHub install / update from the router
 - for routers that already have working internet access, SSH in and run:
   - `sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/update_from_github_release.sh)"`
 - if the router has `curl` instead of `wget`, use:
   - `sh -c "$(curl -fsSL https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/update_from_github_release.sh)"`
-- that GitHub path downloads the latest router release package, verifies the SHA256 when possible, stages it under `/tmp`, and then runs the same packaged router-side install/update core used by the Windows ZIP flow
+- that GitHub path downloads the same latest release ZIP used for the Windows install path, extracts the packaged stock-ui payload under `/tmp`, and then runs the same packaged router-side install/update core used by the Windows ZIP flow
 - after Qtooley is already installed, the same updater remains available on the router at:
   - `/usrdata/at-stock-ui/update_from_github_release.sh`
 
@@ -95,7 +98,7 @@ Notes
 - on first install, the installer captures a compact baseline from the router's live stock trees for `/www` and `/usr/share/lua/5.1/webif`
 - that baseline is captured only once, before Qtooley live overlay mounts are active, and then reused across updates so uninstall can verify the box is back on its install-time stock files after the overlay is unmounted
 - the router-native GitHub install/update path uses the same install core and the same first-install baseline rules as the Windows ZIP flow
-- the router-native GitHub uninstall path downloads the current router package and runs the same packaged uninstall core used by the Windows ZIP flow
+- the router-native GitHub install/update and uninstall paths now download the latest release ZIP and run the same packaged install/uninstall core used by the Windows ZIP flow
 - there is also a non-default last-resort installer mode, `FORCE_RECAPTURE_BASELINE=1`, for cases where the saved uninstall baseline is missing or known-bad
 - that recapture mode should only be used on a router that is currently showing the stock UI state you want uninstall to restore later
 - the install flow refreshes `/usrdata/at-stock-ui`, refreshes the late-start units, and runs the overlay apply immediately
