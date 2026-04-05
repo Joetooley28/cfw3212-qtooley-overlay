@@ -111,6 +111,13 @@ body.jtools-page-screensaver-settings .sidemenu {
     margin-bottom: 18px;
 }
 
+.ss-button-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
 .ss-card-title {
     margin: 0 0 8px;
     font-size: 11px;
@@ -170,6 +177,22 @@ body.jtools-page-screensaver-settings .sidemenu {
 .ss-release-status-text {
     font-size: 14px;
     color: var(--ss-text);
+}
+
+.ss-update-run-status {
+    margin: -4px 0 18px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--ss-text);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.ss-update-run-status.is-running {
+    border-color: rgba(107, 182, 255, 0.22);
+    background: rgba(107, 182, 255, 0.08);
 }
 
 .ss-info-grid {
@@ -510,6 +533,12 @@ body.jtools-page-screensaver-settings .sidemenu {
 .ss-button-primary {
     color: #06131e;
     background: linear-gradient(135deg, #7fd6ff 0%, #4bbdff 100%);
+}
+
+.ss-button-secondary {
+    color: var(--ss-text-bright);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.14);
 }
 
 .ss-loading {

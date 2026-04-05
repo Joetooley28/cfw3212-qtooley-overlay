@@ -21,10 +21,12 @@
         release: null,
         loading: true,
         saving: false,
-        checkingUpdates: false
+        checkingUpdates: false,
+        triggeringUpdate: false
     };
 
     var toastTimer = null;
+    var updatePollTimer = null;
 
     function $(id) {
         return document.getElementById(id);
@@ -45,6 +47,22 @@
         toastTimer = setTimeout(function () {
             el.classList.remove("is-visible");
         }, 2200);
+    }
+
+    function stopUpdatePoll() {
+        if (updatePollTimer) {
+            clearTimeout(updatePollTimer);
+            updatePollTimer = null;
+        }
+    }
+
+    function scheduleUpdatePoll() {
+        stopUpdatePoll();
+        updatePollTimer = setTimeout(function () {
+            fetchSettings(true, function () {
+                render();
+            });
+        }, 4000);
     }
 
     function parseResponse(xhr) {
@@ -103,6 +121,12 @@
             state.loading = false;
             state.checkingUpdates = false;
 
+            if (release && release.update_job && release.update_job.running) {
+                scheduleUpdatePoll();
+            } else {
+                stopUpdatePoll();
+            }
+
             if (cb) cb(xhr.status === 200, response);
         };
         xhr.send();
@@ -149,6 +173,43 @@
         }));
     }
 
+    function triggerUpdate() {
+        if (state.triggeringUpdate) {
+            return;
+        }
+
+        state.triggeringUpdate = true;
+        render();
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/screensaver_api/update", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState !== 4) return;
+
+            state.triggeringUpdate = false;
+            var response = parseResponse(xhr) || {};
+            var ok = xhr.status === 200 && response.ok !== false;
+
+            if (response.update_job) {
+                state.release = state.release || {};
+                state.release.update_job = response.update_job;
+            }
+
+            if (ok) {
+                showToast(response.status_text || "Qtooley update started");
+                fetchSettings(true, function () {
+                    render();
+                });
+                return;
+            }
+
+            render();
+            showToast(response.status_text || "Qtooley update failed to start");
+        };
+        xhr.send("csrfToken=" + encodeURIComponent(csrfToken));
+    }
+
     function renderLoading(host) {
         host.innerHTML = [
             "<div class='ss-page'>",
@@ -165,6 +226,7 @@
 
     function renderReleaseSection() {
         var release = state.release || {};
+        var updateJob = release.update_job || {};
         var releaseUrl = release.release_url ? String(release.release_url) : "";
         var releaseLink = releaseUrl
             ? "<a class='ss-link' href='" + escapeHtml(releaseUrl) + "' target='_blank' rel='noopener noreferrer'>Open latest GitHub release</a>"
@@ -176,7 +238,10 @@
         var checkedAt = release.checked_at ? formatUtc(release.checked_at) : "Not checked yet";
         var zipAsset = release.zip_asset_name || "Unavailable";
         var statusText = release.status_text || "Latest release information is unavailable.";
-        var buttonLabel = state.checkingUpdates ? "Checking..." : "Check now";
+        var checkButtonLabel = state.checkingUpdates ? "Checking..." : "Check now";
+        var updateButtonLabel = (state.triggeringUpdate || updateJob.running) ? "Updating..." : "Update now";
+        var updateDisabled = state.triggeringUpdate || !!updateJob.running;
+        var updateStatus = updateJob.status_text ? String(updateJob.status_text) : "";
 
         return [
             "<div class='ss-card ss-card-updates'>",
@@ -185,12 +250,16 @@
             "      <div class='ss-card-title'>Qtooley Updates</div>",
             "      <div class='ss-card-note'>Use this section to confirm what release the router is on before you update from GitHub or a Windows ZIP.</div>",
             "    </div>",
-            "    <button type='button' class='ss-button ss-button-primary' id='ssCheckUpdates'" + (state.checkingUpdates ? " disabled" : "") + ">" + escapeHtml(buttonLabel) + "</button>",
+            "    <div class='ss-button-stack'>",
+            "      <button type='button' class='ss-button ss-button-primary' id='ssCheckUpdates'" + (state.checkingUpdates ? " disabled" : "") + ">" + escapeHtml(checkButtonLabel) + "</button>",
+            "      <button type='button' class='ss-button ss-button-secondary' id='ssRunUpdate'" + (updateDisabled ? " disabled" : "") + ">" + escapeHtml(updateButtonLabel) + "</button>",
+            "    </div>",
             "  </div>",
             "  <div class='ss-release-summary'>",
             "    <span class='ss-release-badge " + releaseBadgeClass(release) + "'>" + escapeHtml(releaseBadgeText(release)) + "</span>",
             "    <span class='ss-release-status-text'>" + escapeHtml(statusText) + "</span>",
             "  </div>",
+            updateStatus ? "  <div class='ss-update-run-status" + (updateJob.running ? " is-running" : "") + "'>" + escapeHtml(updateStatus) + "</div>" : "",
             "  <div class='ss-info-grid'>",
             "    <div class='ss-info-item'>",
             "      <span class='ss-info-label'>Current installed version</span>",
@@ -331,9 +400,14 @@
         var statusLabel = $("ssStatusLabel");
         var previewBtn = $("ssPreviewBtn");
         var checkUpdatesBtn = $("ssCheckUpdates");
+        var runUpdateBtn = $("ssRunUpdate");
 
         if (checkUpdatesBtn) {
             checkUpdatesBtn.addEventListener("click", refreshReleaseInfo);
+        }
+
+        if (runUpdateBtn) {
+            runUpdateBtn.addEventListener("click", triggerUpdate);
         }
 
         if (enabledEl) {

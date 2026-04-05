@@ -2413,6 +2413,20 @@ end
 function ScreensaverApiHandler:post(url, action)
     action = normalize_action("screensaver_api", url, action)
 
+    if action == "update" then
+        local ok, result = pcall(screensaver_settings.trigger_update)
+        if not ok then
+            self:set_status(500)
+            self:write({ ok = false, error = "screensaver_update_start_failed" })
+            return
+        end
+        if result and not result.ok then
+            self:set_status(500)
+        end
+        self:write(result)
+        return
+    end
+
     if action == "settings" then
         -- Try JSON body first (from screensaver_settings.js), fall back to form-encoded
         local payload = {}
@@ -2772,6 +2786,7 @@ return {
         table.insert(handlers, 1, {"^/(ttl_helper_api)/(remove)$", TtlHelperApiHandler})
         table.insert(handlers, 1, {"^/(quick_overview_api)/(settings)$", QuickOverviewApiHandler})
         table.insert(handlers, 1, {"^/(screensaver_api)/(settings)$", ScreensaverApiHandler})
+        table.insert(handlers, 1, {"^/(screensaver_api)/(update)$", ScreensaverApiHandler})
         table.insert(handlers, 1, {"^/(jtools_general_api)/(state)$", JtoolGeneralApiHandler})
         table.insert(handlers, 1, {"^/(band_locking_api)/(state)$", BandLockingApiHandler})
         table.insert(handlers, 1, {"^/(band_locking_api)/(mode)$", BandLockingApiHandler})

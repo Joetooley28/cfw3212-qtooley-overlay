@@ -5,7 +5,10 @@ local M = {}
 M.paths = {
     config = "/usrdata/at-stock-ui/screensaver_settings.json",
     release_info = "/usrdata/at-stock-ui/JTOOLS_RELEASE.txt",
-    release_cache = "/tmp/qtooley-release-check-cache.json"
+    release_cache = "/tmp/qtooley-release-check-cache.json",
+    update_state = "/tmp/qtooley-release-update-state.json",
+    update_pid = "/tmp/qtooley-release-update.pid",
+    update_runner = "/usrdata/at-stock-ui/run_github_release_update.sh"
 }
 
 M.release = {
@@ -98,6 +101,17 @@ local function run_capture(command)
     return raw
 end
 
+local function run_with_status(command)
+    local marker = "__EXIT_STATUS__:"
+    local raw = run_capture("(" .. command .. "); printf '\\n" .. marker .. "%s' \"$?\"")
+    raw = raw or ""
+    local status = raw:match(marker .. "(%d+)%s*$")
+    if status then
+        raw = raw:gsub("\n?" .. marker .. "%d+%s*$", "")
+    end
+    return tonumber(status or "1"), raw
+end
+
 local function command_exists(name)
     local raw = run_capture("command -v " .. shell_quote(name) .. " >/dev/null 2>&1; echo $?")
     return trim(raw) == "0"
@@ -138,6 +152,97 @@ local function read_release_date()
         end
     end
     return ""
+end
+
+local function read_update_pid()
+    local raw = read_file(M.paths.update_pid)
+    if not raw then
+        return nil
+    end
+    local pid = tonumber(trim(raw))
+    return pid
+end
+
+local function pid_is_running(pid)
+    if not pid then
+        return false
+    end
+    local status, raw = run_with_status("kill -0 " .. tostring(pid) .. " >/dev/null 2>&1")
+    return status == 0 and trim(raw or "") == ""
+end
+
+local function get_update_job()
+    local job = decode_json(read_file(M.paths.update_state))
+    if type(job) ~= "table" then
+        job = {
+            ok = true,
+            status = "idle",
+            phase = "idle",
+            status_text = ""
+        }
+    end
+
+    local pid = read_update_pid()
+    local running = pid_is_running(pid)
+    job.pid = pid
+    job.running = running
+
+    if running then
+        if job.status ~= "running" then
+            job.status = "running"
+        end
+        if job.phase ~= "running" then
+            job.phase = "running"
+        end
+        if not job.status_text or job.status_text == "" then
+            job.status_text = "Qtooley update is running on the router."
+        end
+    elseif job.status == "running" then
+        job.running = false
+        job.status = "unknown"
+        job.phase = "finished"
+        job.status_text = "The previous Qtooley update finished, but the final result could not be confirmed."
+    end
+
+    return job
+end
+
+local function trigger_release_update()
+    if not read_file(M.paths.update_runner) then
+        return {
+            ok = false,
+            error = "update_runner_missing",
+            status_text = "Router update helper is missing."
+        }
+    end
+
+    local status, raw = run_with_status("/bin/sh " .. shell_quote(M.paths.update_runner) .. " --start")
+    local output = trim(raw or "")
+    if status ~= 0 then
+        return {
+            ok = false,
+            error = "update_start_failed",
+            status_text = output ~= "" and output or "Failed to start Qtooley update."
+        }
+    end
+
+    local job = get_update_job()
+    local started = (output == "started")
+    if output == "already_running" then
+        return {
+            ok = true,
+            started = false,
+            update_job = job,
+            status_text = job.status_text ~= "" and job.status_text or "Qtooley update is already running."
+        }
+    end
+
+    return {
+        ok = true,
+        started = started,
+        update_job = job,
+        status_text = "Started Qtooley update from GitHub."
+    }
 end
 
 local function fetch_latest_release_info()
@@ -326,9 +431,14 @@ function M.get_settings(force_refresh)
             checked_at = latest and latest.checked_at or "",
             update_available = update.update_available,
             status = update.status,
-            status_text = update.status_text
+            status_text = update.status_text,
+            update_job = get_update_job()
         }
     }
+end
+
+function M.trigger_update()
+    return trigger_release_update()
 end
 
 function M.save_settings(partial)
