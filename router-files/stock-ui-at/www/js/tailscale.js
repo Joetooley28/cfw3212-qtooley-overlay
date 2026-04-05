@@ -35,6 +35,8 @@
     var pollTimer = null;
     var pageEventsBound = false;
     var authDismissStorageKey = "qtooleyTailscaleAuthDismiss";
+    var authDismissAnyValue = "__auth_prompt_dismissed__";
+    var authDismissInstallValue = "__install_next_step__";
 
     function escapeHtml(value) {
         return String(value == null ? "" : value)
@@ -65,6 +67,16 @@
             }
             window.localStorage.setItem(authDismissStorageKey, value);
         } catch (e) {}
+    }
+
+    function clearAuthPromptDismiss() {
+        state.authPromptDismissed = false;
+        writeStoredAuthDismiss("");
+    }
+
+    function dismissAuthPrompt(value) {
+        state.authPromptDismissed = true;
+        writeStoredAuthDismiss(value || state.auth_url || authDismissAnyValue);
     }
 
     function prefersDarkMode() {
@@ -373,7 +385,7 @@
             "      <p class='ts-modal-copy'>", escapeHtml(busyDialogContent().copy), "</p>",
             "      <div class='ts-progress-note'>Status updates will appear here when the action finishes.</div>",
             "      <div class='ts-modal-actions ts-modal-actions-centered'>",
-            "        <button id='ts-busy-dismiss' class='qt-btn qt-btn-secondary' type='button'", tipAttr("Close this progress window while the router keeps working"), ">Cancel</button>",
+            "        <button id='ts-busy-dismiss' class='qt-btn qt-btn-secondary' type='button'", tipAttr("Hide this progress window while the router keeps working"), ">Hide</button>",
             "      </div>",
             "    </div>",
             "  </div>"
@@ -406,13 +418,12 @@
         if (!payload) return;
         var nextAuthUrl = payload.auth_url || "";
         var priorAuthUrl = state.auth_url || "";
+        var storedDismiss = readStoredAuthDismiss();
         if (nextAuthUrl && nextAuthUrl !== priorAuthUrl) {
-            state.authPromptDismissed = false;
-            writeStoredAuthDismiss("");
+            clearAuthPromptDismiss();
         }
-        if (!nextAuthUrl) {
-            state.authPromptDismissed = false;
-            writeStoredAuthDismiss("");
+        if (!nextAuthUrl && storedDismiss !== authDismissAnyValue && storedDismiss !== authDismissInstallValue) {
+            clearAuthPromptDismiss();
         }
         state.installed = !!payload.installed;
         state.service_active = !!payload.service_active;
@@ -433,11 +444,12 @@
         state.loaded = true;
 
         if (state.logged_in) {
-            state.authPromptDismissed = false;
-            writeStoredAuthDismiss("");
-        } else if (nextAuthUrl && readStoredAuthDismiss() === nextAuthUrl) {
+            clearAuthPromptDismiss();
+        } else if (storedDismiss === authDismissAnyValue) {
             state.authPromptDismissed = true;
-        } else if (!nextAuthUrl && readStoredAuthDismiss() === "__install_next_step__") {
+        } else if (nextAuthUrl && storedDismiss === nextAuthUrl) {
+            state.authPromptDismissed = true;
+        } else if (!nextAuthUrl && storedDismiss === authDismissInstallValue) {
             state.authPromptDismissed = true;
         }
     }
@@ -481,6 +493,9 @@
 
     function postAction(actionName, successMessage) {
         if (state.busy) return;
+        if (actionName === "install" || actionName === "update" || actionName === "connect" || actionName === "connect_ssh" || actionName === "reconnect_no_ssh") {
+            clearAuthPromptDismiss();
+        }
         state.busy = true;
         state.busyAction = actionName;
         state.busyOverlayDismissed = false;
@@ -622,6 +637,9 @@
         if (busyDismiss) {
             busyDismiss.addEventListener("click", function () {
                 state.busyOverlayDismissed = true;
+                if (state.busyAction === "install" || state.busyAction === "update" || state.busyAction === "connect" || state.busyAction === "connect_ssh" || state.busyAction === "reconnect_no_ssh") {
+                    writeStoredAuthDismiss(authDismissAnyValue);
+                }
                 render();
             });
         }
@@ -629,8 +647,7 @@
         var authDismiss = byId("ts-auth-dismiss");
         if (authDismiss) {
             authDismiss.addEventListener("click", function () {
-                state.authPromptDismissed = true;
-                writeStoredAuthDismiss(state.auth_url || "__install_next_step__");
+                dismissAuthPrompt(state.auth_url || authDismissInstallValue);
                 render();
             });
         }
@@ -647,6 +664,8 @@
         if (authCopyModal) {
             authCopyModal.addEventListener("click", function () {
                 copyAuthUrl();
+                dismissAuthPrompt();
+                render();
             });
         }
 

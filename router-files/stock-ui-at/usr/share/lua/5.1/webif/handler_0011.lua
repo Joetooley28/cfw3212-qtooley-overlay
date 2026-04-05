@@ -2395,7 +2395,9 @@ function ScreensaverApiHandler:get(url, action)
     action = normalize_action("screensaver_api", url, action)
 
     if action == "settings" then
-        local ok, result = pcall(screensaver_settings.get_settings)
+        local refresh = tostring(self:get_argument("refresh", "")):lower()
+        local force_refresh = (refresh == "1" or refresh == "true" or refresh == "yes")
+        local ok, result = pcall(screensaver_settings.get_settings, force_refresh)
         if not ok then
             self:set_status(500)
             self:write({ ok = false, error = "screensaver_settings_read_failed" })

@@ -1,8 +1,6 @@
 Qtooley stock UI ZIP install for Windows
 
-Testing status
-- public install and uninstall flow is still being validated
-- treat the current release path as not fully public-ready yet
+Feature status
 - cell locking is still under development and is not working yet
 
 First-install snapshot note
@@ -37,6 +35,7 @@ What this ZIP is for
 - install or update the Qtooley stock UI overlay on a rooted Casa Systems `CFW-3212`
 - uninstall the overlay later, either overlay-only or full uninstall
 - work from a normal Windows PC over SSH with a password prompt
+- provide the Qtooley `Settings` page that now combines screensaver controls with on-router release/update status
 
 Choose your install path first
 - if the router does **not** already have a working internet connection, use the Windows ZIP path from your PC over SSH
@@ -132,6 +131,7 @@ Notes
   - `/www/theme/js/genHeader.js`
   - `/usr/share/lua/5.1/webif/top_menu_entries.lua`
   - `/usr/share/lua/5.1/webif/userGroupAuth.lua`
+- shared cache/version tokens are treated as release data; when shared assets like `generatedMenuEntries.js` or `genHeader.js` change, the matching HTML query-string tokens must be bumped across the Jtools page set so browser cache does not pin one tab to stale shared UI code
 - bundled Ookla is treated as part of the base Qtooley install/uninstall flow
 - Tailscale remains the optional extra
 - if Tailscale is kept during uninstall, it remains usable only from the CLI after the Qtooley UI is removed

@@ -283,8 +283,19 @@ function genThemeHeader(pageData, userGroups) {
         }
 
         if (topMenuEntry) {
-            for (let j = 0; j < topMenuEntry.children.length; j++) {
-                let menuEntry = topMenuEntry.children[j];
+            let childEntries = topMenuEntry.children.slice();
+            if (pageData.menuPos && pageData.menuPos[0] === "JtoolServices") {
+                childEntries.sort(function (a, b) {
+                    const aIsSettings = a && a.url === "/screensaver_settings.html";
+                    const bIsSettings = b && b.url === "/screensaver_settings.html";
+                    if (aIsSettings === bIsSettings) {
+                        return 0;
+                    }
+                    return aIsSettings ? 1 : -1;
+                });
+            }
+            for (let j = 0; j < childEntries.length; j++) {
+                let menuEntry = childEntries[j];
                 if (menuEntry.children.length == 0) {
                     if (menuEntry["url"]) {
                         //create side menu main entry
