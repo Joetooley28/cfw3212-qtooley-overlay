@@ -69,6 +69,84 @@ function Ensure-OoklaBundle {
     Write-Output "Bundled Ookla archive added to release package: $bundlePath"
 }
 
+function Get-ReleaseToken {
+    param(
+        [string]$Version
+    )
+
+    $sanitized = ($Version.ToLowerInvariant() -replace '[^a-z0-9]+', '-').Trim('-')
+    if (-not $sanitized) {
+        $sanitized = Get-Date -Format "yyyyMMddHHmmss"
+    }
+    return "rel-$sanitized"
+}
+
+function Replace-InFile {
+    param(
+        [string]$Path,
+        [string]$Pattern,
+        [string]$Replacement
+    )
+
+    if (-not (Test-Path $Path)) {
+        return
+    }
+
+    $content = [System.IO.File]::ReadAllText($Path)
+    $updated = [System.Text.RegularExpressions.Regex]::Replace($content, $Pattern, $Replacement)
+    if ($updated -ne $content) {
+        [System.IO.File]::WriteAllText($Path, $updated, (New-Object System.Text.UTF8Encoding($false)))
+    }
+}
+
+function Apply-ReleaseCacheTokens {
+    param(
+        [string]$ReleasePackageRoot,
+        [string]$Version
+    )
+
+    $token = Get-ReleaseToken -Version $Version
+    $htmlFiles = Get-ChildItem (Join-Path $ReleasePackageRoot "www") -Filter *.html -File -Recurse
+    $pageUrlFiles = @(
+        Join-Path $ReleasePackageRoot "www\js\generatedMenuEntries.js"
+        Join-Path $ReleasePackageRoot "overlay\www\js\generatedMenuEntries.js"
+    )
+    $genHeaderPath = Join-Path $ReleasePackageRoot "www\theme\js\genHeader.js"
+    $releaseInfoPath = Join-Path $ReleasePackageRoot "usrdata\at-stock-ui\JTOOLS_RELEASE.txt"
+
+    foreach ($file in $htmlFiles) {
+        Replace-InFile -Path $file.FullName -Pattern 'qtooley-v[^"\s]+' -Replacement ("qtooley-" + $token)
+        Replace-InFile -Path $file.FullName -Pattern 'jtools-dark-v[^"\s]+' -Replacement ("jtools-dark-" + $token)
+        Replace-InFile -Path $file.FullName -Pattern 'jtools-menu-v[^"\s]+' -Replacement ("jtools-menu-" + $token)
+        Replace-InFile -Path $file.FullName -Pattern 'jtools-genheader-v[^"\s]+' -Replacement ("jtools-genheader-" + $token)
+        Replace-InFile -Path $file.FullName -Pattern 'jtools-general-css-v[^"\s]+' -Replacement ("jtools-general-css-" + $token)
+        Replace-InFile -Path $file.FullName -Pattern 'jtools-general-core-v[^"\s]+' -Replacement ("jtools-general-core-" + $token)
+        Replace-InFile -Path $file.FullName -Pattern 'jtools-general-v[^"\s]+' -Replacement ("jtools-general-" + $token)
+    }
+
+    foreach ($filePath in $pageUrlFiles) {
+        Replace-InFile -Path $filePath -Pattern '/general_dashboard\.html\?v=[^"]+' -Replacement ("/general_dashboard.html?v=" + $token)
+        Replace-InFile -Path $filePath -Pattern '/at_terminal\.html\?v=[^"]+' -Replacement ("/at_terminal.html?v=" + $token)
+        Replace-InFile -Path $filePath -Pattern '/ookla_speedtest\.html\?v=[^"]+' -Replacement ("/ookla_speedtest.html?v=" + $token)
+        Replace-InFile -Path $filePath -Pattern '/tailscale\.html\?v=[^"]+' -Replacement ("/tailscale.html?v=" + $token)
+    }
+
+    Replace-InFile -Path $genHeaderPath -Pattern 'jtools-dark-v[^"\s]+' -Replacement ("jtools-dark-" + $token)
+
+    if (Test-Path $releaseInfoPath) {
+        $lines = Get-Content $releaseInfoPath
+        $updatedLines = foreach ($line in $lines) {
+            if ($line -match '^Jtools asset tokens$') {
+                $line
+                " - release-cache-token=$token"
+            } else {
+                $line
+            }
+        }
+        [System.IO.File]::WriteAllLines($releaseInfoPath, $updatedLines, (New-Object System.Text.UTF8Encoding($false)))
+    }
+}
+
 $version = Get-VersionText -RepoPath $RepoRoot -Requested $ReleaseVersion
 $stageRoot = Join-Path $env:TEMP ("stock-ui-at-release-" + (Get-Date -Format "yyyyMMdd_HHmmss"))
 $releaseRoot = Join-Path $stageRoot ("stock-ui-at-installer-" + $version)
@@ -87,6 +165,7 @@ try {
         Remove-Item -Recurse -Force $releaseStockSnapshots
     }
     Ensure-OoklaBundle -ReleasePackageRoot $releasePackageRoot -RequestedSource $OoklaBundleSource -DownloadUrl $OoklaBundleUrl
+    Apply-ReleaseCacheTokens -ReleasePackageRoot $releasePackageRoot -Version $version
     Copy-Item -Force (Join-Path $scriptsRoot "stock_ui_at_release_common.ps1") (Join-Path $releaseRoot "scripts\stock_ui_at_release_common.ps1")
     Copy-Item -Force (Join-Path $scriptsRoot "install_stock_ui_at.ps1") (Join-Path $releaseRoot "install_stock_ui_at.ps1")
     Copy-Item -Force (Join-Path $scriptsRoot "uninstall_stock_ui_at.ps1") (Join-Path $releaseRoot "uninstall_stock_ui_at.ps1")
