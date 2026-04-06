@@ -48,7 +48,7 @@ Important cleanup note
 
 Normal Windows install (No internet method)
 1. Open the latest GitHub release page.
-2. Download and extract the top file in the `Assets` section at the bottom of that page.
+2. Download and extract the top file in the `Assets` section at the bottom of this release page.
    Do not use GitHub's auto-generated `Source code (zip)` download for Windows install.
 3. Open PowerShell in the extracted folder.
 4. Run:
