@@ -1,0 +1,17 @@
+/www/theme/js/genHeader.js
+/www/js/generatedMenuEntries.js
+/www/css/style.css
+/www/css/qtooley.css
+/www/css/jtools_dark_mode.css
+/www/quick_overview.html
+/www/general_dashboard.html
+/www/at_terminal.html
+/www/band_cell_locking.html
+/www/ookla_speedtest.html
+/www/ttl_helper.html
+/www/tailscale.html
+/www/sms.html
+/www/screensaver_settings.html
+/usr/share/lua/5.1/webif/top_menu_entries.lua
+/usr/share/lua/5.1/webif/userGroupAuth.lua
+/usr/share/lua/5.1/webif/handler_0011.lua
