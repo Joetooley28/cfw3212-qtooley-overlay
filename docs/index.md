@@ -43,11 +43,12 @@ Dark mode note:
 
 ## Install Flow
 
-1. Download the latest Windows release ZIP.
-2. Run the PowerShell installer from a normal Windows PC.
-3. Connect over SSH with the router IP, username, and password.
-4. Let the installer place the Qtooley overlay and bundled Ookla base components.
-5. If you want Tailscale, install it afterward from the Qtooley UI as the optional extra.
+1. Open the latest GitHub release page and download the top file in the `Assets` section at the bottom.
+2. Do not use the auto-generated `Source code (zip)` download.
+3. Run the PowerShell installer from a normal Windows PC.
+4. Connect over SSH with the router IP, username, and password.
+5. Let the installer place the Qtooley overlay and bundled Ookla base components.
+6. If you want Tailscale, install it afterward from the Qtooley UI as the optional extra.
 
 Prerequisites:
 
