@@ -48,18 +48,24 @@ Important cleanup note
 
 Normal Windows install (No internet method)
 1. Download and extract the latest release ZIP.
+   Use the installer ZIP from the GitHub release `Assets` section.
+   Do not use GitHub's auto-generated `Source code (zip)` download for Windows install.
 2. Open PowerShell in the extracted folder.
 3. Run:
-   - `powershell -ExecutionPolicy Bypass -File .\install_stock_ui_at.ps1`
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install_stock_ui_at.ps1
+```
 4. Choose `2` for `SSH`.
 5. Enter the router IP and SSH username.
-6. Enter the SSH password when `ssh` prompts.
+6. Enter the SSH password when `scp` or `ssh` prompts, unless you already have a working SSH key setup.
 7. Answer the simple `y/n` prompts.
 
 Normal Windows uninstall (No internet method)
 1. Open PowerShell in the extracted folder.
 2. Run:
-   - `powershell -ExecutionPolicy Bypass -File .\uninstall_stock_ui_at.ps1`
+```powershell
+powershell -ExecutionPolicy Bypass -File .\uninstall_stock_ui_at.ps1
+```
 3. Choose `2` for `SSH`.
 4. Choose uninstall mode:
    - `1` remove Qtooley and bundled Ookla

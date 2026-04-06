@@ -69,6 +69,24 @@ function Ensure-OoklaBundle {
     Write-Output "Bundled Ookla archive added to release package: $bundlePath"
 }
 
+function Assert-OoklaBundlePresent {
+    param(
+        [string]$ReleasePackageRoot
+    )
+
+    $bundlePath = Join-Path $ReleasePackageRoot "usrdata\at-stock-ui\bundles\ookla\ookla-speedtest-1.2.0-linux-armhf.tgz"
+    if (-not (Test-Path $bundlePath)) {
+        throw "Release packaging error: bundled Ookla archive is missing at $bundlePath"
+    }
+
+    $item = Get-Item $bundlePath
+    if ($item.Length -le 0) {
+        throw "Release packaging error: bundled Ookla archive is empty at $bundlePath"
+    }
+
+    Write-Output "Verified bundled Ookla archive in release package: $bundlePath"
+}
+
 function Get-ReleaseToken {
     param(
         [string]$Version
@@ -183,6 +201,7 @@ try {
         Remove-Item -Recurse -Force $releaseStockSnapshots
     }
     Ensure-OoklaBundle -ReleasePackageRoot $releasePackageRoot -RequestedSource $OoklaBundleSource -DownloadUrl $OoklaBundleUrl
+    Assert-OoklaBundlePresent -ReleasePackageRoot $releasePackageRoot
     Apply-ReleaseCacheTokens -ReleasePackageRoot $releasePackageRoot -Version $version
     Copy-Item -Force (Join-Path $scriptsRoot "stock_ui_at_release_common.ps1") (Join-Path $releaseRoot "scripts\stock_ui_at_release_common.ps1")
     Copy-Item -Force (Join-Path $scriptsRoot "install_stock_ui_at.ps1") (Join-Path $releaseRoot "install_stock_ui_at.ps1")

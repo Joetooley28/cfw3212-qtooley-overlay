@@ -35,6 +35,7 @@ Use the Windows release ZIP when:
 
 - the router does not already have working internet
 - you want the normal Windows-assisted install, update, or uninstall flow over SSH
+- you downloaded the installer ZIP from the GitHub release `Assets` section, not the auto-generated `Source code (zip)` download
 
 Use the direct GitHub router command when:
 

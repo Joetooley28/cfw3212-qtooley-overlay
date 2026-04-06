@@ -102,6 +102,11 @@ function Assert-SshAvailable {
     if ($LASTEXITCODE -ne 0) {
         throw "ssh is not available."
     }
+
+    & cmd /c "where scp >nul 2>nul"
+    if ($LASTEXITCODE -ne 0) {
+        throw "scp is not available."
+    }
 }
 
 function Invoke-SshCommand {
@@ -124,11 +129,28 @@ function Push-PackageViaSsh {
     )
 
     $parent = [System.IO.Path]::GetDirectoryName($RemoteStageRoot).Replace("\", "/")
+    $tempTar = Join-Path ([System.IO.Path]::GetTempPath()) ("qtooley-stock-ui-" + [System.Guid]::NewGuid().ToString("N") + ".tar")
+    $remoteTar = "$parent/qtooley-stock-ui-package.tar"
 
-    Invoke-SshCommand -Target $Target -Command "rm -rf '$RemoteStageRoot' && mkdir -p '$parent' && mkdir -p '$RemoteStageRoot'"
-    & tar -cf - -C $PackageRoot . | & ssh $Target "cd '$RemoteStageRoot' && tar -xf -" | Out-Host
-    if ($LASTEXITCODE -ne 0) {
-        throw "Tar-over-SSH package push failed."
+    try {
+        Invoke-SshCommand -Target $Target -Command "rm -rf '$RemoteStageRoot' && mkdir -p '$parent' && mkdir -p '$RemoteStageRoot'"
+
+        & tar -cf $tempTar -C $PackageRoot . | Out-Host
+        if ($LASTEXITCODE -ne 0 -or -not (Test-Path $tempTar)) {
+            throw "Local package tar creation failed."
+        }
+
+        & scp -O $tempTar "${Target}:$remoteTar" | Out-Host
+        if ($LASTEXITCODE -ne 0) {
+            throw "SCP package push failed."
+        }
+
+        Invoke-SshCommand -Target $Target -Command "tar -xf '$remoteTar' -C '$RemoteStageRoot' && rm -f '$remoteTar'"
+    }
+    finally {
+        if (Test-Path $tempTar) {
+            Remove-Item -Force $tempTar -ErrorAction SilentlyContinue
+        }
     }
 }
 
