@@ -16,54 +16,104 @@
     };
 })(window);
 
+var QTOOLEY_THEMED_PAGES = {
+    "quick_overview.html": true,
+    "general_dashboard.html": true,
+    "at_terminal.html": true,
+    "band_cell_locking.html": true,
+    "ookla_speedtest.html": true,
+    "ttl_helper.html": true,
+    "tailscale.html": true,
+    "sms.html": true,
+    "screensaver_settings.html": true,
+    "status.html": true,
+    "profile_list.html": true,
+    "operator_setting.html": true,
+    "roaming.html": true,
+    "lan.html": true,
+    "dhcp.html": true,
+    "vlan.html": true,
+    "NAT.html": true,
+    "mac_whitelist.html": true,
+    "routing.html": true,
+    "service_assurance.html": true,
+    "NTP.html": true,
+    "TR069.html": true,
+    "dns_server.html": true,
+    "gps_configuration.html": true,
+    "agps.html": true,
+    "gps_odometer.html": true,
+    "gps_geofence.html": true,
+    "lwm2m.html": true,
+    "logfile.html": true,
+    "logsettings.html": true,
+    "ping_diag.html": true,
+    "FactoryReset.html": true,
+    "web_server_setting.html": true,
+    "admin_credentials.html": true,
+    "webui_credentials.html": true,
+    "settings_backup.html": true,
+    "runtime_config.html": true,
+    "upgrade.html": true,
+    "access_control.html": true,
+    "Reboot.html": true,
+    "field_test.html": true,
+    "encrypted_debuginfo.html": true
+};
+
+(function () {
+    "use strict";
+    var themeStorageKey = "jtoolsThemeMode";
+    var darkModeHref = "/css/jtools_dark_mode.css?jtools-dark-v20260329a";
+    var pageName = typeof relUrlOfPage === "string" ? relUrlOfPage : "";
+    var wantsDark = true;
+
+    if (!QTOOLEY_THEMED_PAGES[pageName]) {
+        return;
+    }
+
+    try {
+        wantsDark = window.localStorage.getItem(themeStorageKey) !== "light";
+    } catch (e) {}
+
+    if (!wantsDark || !document.head) {
+        return;
+    }
+
+    if (!document.querySelector("link[href*='/css/jtools_dark_mode.css']")) {
+        var link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = darkModeHref;
+        link.setAttribute("data-jtools-dark-mode-preload", "1");
+        document.head.appendChild(link);
+    }
+
+    if (!document.getElementById("qtooley-dark-preload")) {
+        var style = document.createElement("style");
+        style.id = "qtooley-dark-preload";
+        style.textContent = "html,body{background:#1e1e1e;color:#d7dde4;}";
+        document.head.appendChild(style);
+    }
+})();
+
 // generating header and menu
 function genThemeHeader(pageData, userGroups) {
 
     const themeStorageKey = "jtoolsThemeMode";
-    const themedPages = {
-        "quick_overview.html": true,
-        "general_dashboard.html": true,
-        "at_terminal.html": true,
-        "band_cell_locking.html": true,
-        "ookla_speedtest.html": true,
-        "ttl_helper.html": true,
-        "tailscale.html": true,
-        "sms.html": true,
-        "screensaver_settings.html": true,
-        "status.html": true,
-        "profile_list.html": true,
-        "operator_setting.html": true,
-        "roaming.html": true,
-        "lan.html": true,
-        "dhcp.html": true,
-        "vlan.html": true,
-        "NAT.html": true,
-        "mac_whitelist.html": true,
-        "routing.html": true,
-        "service_assurance.html": true,
-        "NTP.html": true,
-        "TR069.html": true,
-        "dns_server.html": true,
-        "gps_configuration.html": true,
-        "agps.html": true,
-        "gps_odometer.html": true,
-        "gps_geofence.html": true,
-        "lwm2m.html": true,
-        "logfile.html": true,
-        "logsettings.html": true,
-        "ping_diag.html": true,
-        "FactoryReset.html": true,
-        "web_server_setting.html": true,
-        "admin_credentials.html": true,
-        "webui_credentials.html": true,
-        "settings_backup.html": true,
-        "runtime_config.html": true,
-        "upgrade.html": true,
-        "access_control.html": true,
-        "Reboot.html": true,
-        "field_test.html": true,
-        "encrypted_debuginfo.html": true
-    };
+    const themedPages = QTOOLEY_THEMED_PAGES;
+
+    function escapeHtml(value) {
+        return String(value == null ? "" : value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+
+    function escapeAttr(value) {
+        return escapeHtml(value);
+    }
 
     function ensureJtoolsDarkModeStylesheet() {
         const darkModeHref = "/css/jtools_dark_mode.css?jtools-dark-v20260329a";
@@ -195,7 +245,7 @@ function genThemeHeader(pageData, userGroups) {
         if (pageData.menuPos && id == pageData.menuPos[1]) {
             active=" class='active' ";
         }
-        return "<li><a"+active+"href="+url+">"+title+"</a></li>";
+        return "<li><a" + active + "href='" + escapeAttr(url) + "'>" + escapeHtml(title) + "</a></li>";
     }
 
     // This generates all the html for a menu and submenus
@@ -236,12 +286,12 @@ function genThemeHeader(pageData, userGroups) {
                 active =" class='inactive' ";
             }
             numVisible += 1;
-            html += "<a"+active+"href="+subMenuUrl+">"+subMenuTitle+"</a>";
+            html += "<a" + active + "href='" + escapeAttr(subMenuUrl) + "'>" + escapeHtml(subMenuTitle) + "</a>";
         }
         if (numVisible == 0) {
             return "";
         }
-        return "<li"+open+"><a class='expandable'>"+menuTitle+"</a><div class='submenu"+hide+"'>"+html+"</div></li>";
+        return "<li" + open + "><a class='expandable'>" + escapeHtml(menuTitle) + "</a><div class='submenu" + hide + "'>" + html + "</div></li>";
     }
 
     ensureJtoolsDarkModeStylesheet();
@@ -260,13 +310,13 @@ function genThemeHeader(pageData, userGroups) {
         if (pageData.menuPos && pageData.menuPos[0] == MENU_ENTRIES[i].id) {
             attr = " class='active'";
         }
-        h_top += "<li "+attr + "><a href='" + MENU_ENTRIES[i]["url"] + "'>"+_(MENU_ENTRIES[i]["title"])+"</a></li>";
+        h_top += "<li " + attr + "><a href='" + escapeAttr(MENU_ENTRIES[i]["url"]) + "'>" + escapeHtml(_(MENU_ENTRIES[i]["title"])) + "</a></li>";
     }
 
     h_top+="</ul>\
     </nav></header>\
     <div class='right-item account-btn'>\
-    <span class='login-foot'></span><span class='login-foot-user'>"+user+"</span>\
+    <span class='login-foot'></span><span class='login-foot-user'>" + escapeHtml(user) + "</span>\
     <span id='logOff'><form id='logOffForm' method='post' action='logout'><button type='submit' class='log-off'></button></form></span>\
     </div></div>";
 

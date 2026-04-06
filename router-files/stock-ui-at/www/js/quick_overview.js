@@ -231,12 +231,13 @@
 
         var w = chartCanvas.parentElement.clientWidth;
         var h = chartCanvas.parentElement.clientHeight;
-        chartCanvas.width = w * (window.devicePixelRatio || 1);
-        chartCanvas.height = h * (window.devicePixelRatio || 1);
+        var dpr = window.devicePixelRatio || 1;
+        chartCanvas.width = w * dpr;
+        chartCanvas.height = h * dpr;
         chartCanvas.style.width = w + "px";
         chartCanvas.style.height = h + "px";
         var ctx = chartCtx;
-        ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         ctx.clearRect(0, 0, w, h);
 
         if (chartData.length < 2) {

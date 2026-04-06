@@ -121,6 +121,16 @@ function Apply-ReleaseCacheTokens {
         Replace-InFile -Path $file.FullName -Pattern 'jtools-dark-v[^"\s]+' -Replacement ("jtools-dark-" + $token)
         Replace-InFile -Path $file.FullName -Pattern 'jtools-menu-v[^"\s]+' -Replacement ("jtools-menu-" + $token)
         Replace-InFile -Path $file.FullName -Pattern 'jtools-genheader-v[^"\s]+' -Replacement ("jtools-genheader-" + $token)
+        Replace-InFile -Path $file.FullName -Pattern 'jtools-at-v[^"\s]+' -Replacement ("jtools-at-" + $token)
+        Replace-InFile -Path $file.FullName -Pattern 'jtools-qo-v[^"\s]+' -Replacement ("jtools-qo-" + $token)
+        Replace-InFile -Path $file.FullName -Pattern 'jtools-ss-v[^"\s]+' -Replacement ("jtools-ss-" + $token)
+        Replace-InFile -Path $file.FullName -Pattern 'jtools-sms-v[^"\s]+' -Replacement ("jtools-sms-" + $token)
+        Replace-InFile -Path $file.FullName -Pattern 'jtools-speedtest-ui-v[^"\s]+' -Replacement ("jtools-speedtest-ui-" + $token)
+        Replace-InFile -Path $file.FullName -Pattern 'jtools-speedtest-v[^"\s]+' -Replacement ("jtools-speedtest-" + $token)
+        Replace-InFile -Path $file.FullName -Pattern 'jtools-tailscale-v[^"\s]+' -Replacement ("jtools-tailscale-" + $token)
+        Replace-InFile -Path $file.FullName -Pattern 'jtools-ttl-v[^"\s]+' -Replacement ("jtools-ttl-" + $token)
+        Replace-InFile -Path $file.FullName -Pattern 'jtools-bandlock-v[^"\s]+' -Replacement ("jtools-bandlock-" + $token)
+        Replace-InFile -Path $file.FullName -Pattern 'jtools-bandlock-core-v[^"\s]+' -Replacement ("jtools-bandlock-core-" + $token)
         Replace-InFile -Path $file.FullName -Pattern 'jtools-general-css-v[^"\s]+' -Replacement ("jtools-general-css-" + $token)
         Replace-InFile -Path $file.FullName -Pattern 'jtools-general-core-v[^"\s]+' -Replacement ("jtools-general-core-" + $token)
         Replace-InFile -Path $file.FullName -Pattern 'jtools-general-v[^"\s]+' -Replacement ("jtools-general-" + $token)
@@ -134,16 +144,22 @@ function Apply-ReleaseCacheTokens {
     }
 
     Replace-InFile -Path $genHeaderPath -Pattern 'jtools-dark-v[^"\s]+' -Replacement ("jtools-dark-" + $token)
+    Replace-InFile -Path $genHeaderPath -Pattern 'jtools-qo-v[^"\s]+' -Replacement ("jtools-qo-" + $token)
+    Replace-InFile -Path $genHeaderPath -Pattern 'jtools-session-v[^"\s]+' -Replacement ("jtools-session-" + $token)
 
     if (Test-Path $releaseInfoPath) {
         $lines = Get-Content $releaseInfoPath
         $updatedLines = foreach ($line in $lines) {
             if ($line -match '^Jtools asset tokens$') {
                 $line
+            } elseif ($line -match '^\s*-\s*release-cache-token=') {
                 " - release-cache-token=$token"
             } else {
                 $line
             }
+        }
+        if (-not ($updatedLines -match '^\s*-\s*release-cache-token=')) {
+            $updatedLines += " - release-cache-token=$token"
         }
         [System.IO.File]::WriteAllLines($releaseInfoPath, $updatedLines, (New-Object System.Text.UTF8Encoding($false)))
     }

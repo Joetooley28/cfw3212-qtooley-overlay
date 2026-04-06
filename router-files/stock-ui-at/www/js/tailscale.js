@@ -101,7 +101,7 @@
 
     function maskIP(ip) {
         if (!state.hideIPs || !ip) return escapeHtml(ip || "Unavailable");
-        return ip.replace(/\d/g, "&#x2022;");
+        return escapeHtml(String(ip).replace(/\d/g, "\u2022"));
     }
 
     function tipAttr(text) {

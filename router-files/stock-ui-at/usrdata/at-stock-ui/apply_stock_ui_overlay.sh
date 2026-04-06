@@ -18,6 +18,37 @@ detach_mount_if_needed() {
     fi
 }
 
+remove_ttl_rule_if_present() {
+    local table_name="$1"
+    local chain_name="$2"
+    shift 2
+    while iptables -t "$table_name" -C "$chain_name" "$@" 2>/dev/null; do
+        iptables -t "$table_name" -D "$chain_name" "$@" 2>/dev/null || break
+    done
+}
+
+remove_ttl_rule_if_present_v6() {
+    local table_name="$1"
+    local chain_name="$2"
+    shift 2
+    while ip6tables -t "$table_name" -C "$chain_name" "$@" 2>/dev/null; do
+        ip6tables -t "$table_name" -D "$chain_name" "$@" 2>/dev/null || break
+    done
+}
+
+bind_mount_checked() {
+    local source="$1"
+    local target="$2"
+    if ! mount --bind "$source" "$target"; then
+        echo "Failed to bind-mount $source onto $target" >&2
+        return 1
+    fi
+    if ! grep -q " $target " /proc/self/mountinfo 2>/dev/null; then
+        echo "Bind mount did not appear in mountinfo for $target" >&2
+        return 1
+    fi
+}
+
 build_live_tree() {
     rm -rf "$LIVE"
     mkdir -p "$LIVE_WWW" "$LIVE_WEBIF"
@@ -54,8 +85,14 @@ detach_mount_if_needed "$STOCK_WWW"
 
 build_live_tree
 
-mount --bind "$LIVE_WWW" "$STOCK_WWW"
-mount --bind "$LIVE_WEBIF" "$STOCK_WEBIF"
+if ! bind_mount_checked "$LIVE_WWW" "$STOCK_WWW"; then
+    exit 1
+fi
+
+if ! bind_mount_checked "$LIVE_WEBIF" "$STOCK_WEBIF"; then
+    detach_mount_if_needed "$STOCK_WWW"
+    exit 1
+fi
 
 # --- Speedtest: initialize clean state for reliable post-boot startup ---
 SPEEDTEST_STATE="/tmp/ookla-speedtest-state.json"
@@ -80,10 +117,14 @@ TTL_CONFIG="$BASE/ttl_config.json"
 if [ -f "$TTL_CONFIG" ]; then
     TTL_VALUE=$(cat "$TTL_CONFIG" 2>/dev/null | grep -o '"ttl_value"[[:space:]]*:[[:space:]]*[0-9]*' | grep -o '[0-9]*$' || true)
     if [ -n "$TTL_VALUE" ] && [ "$TTL_VALUE" -gt 0 ] 2>/dev/null; then
-        iptables -t mangle -D POSTROUTING -o rmnet+ -j TTL --ttl-set "$TTL_VALUE" 2>/dev/null || true
-        ip6tables -t mangle -D POSTROUTING -o rmnet+ -j HL --hl-set "$TTL_VALUE" 2>/dev/null || true
-        iptables -t mangle -I POSTROUTING -o rmnet+ -j TTL --ttl-set "$TTL_VALUE"
-        ip6tables -t mangle -I POSTROUTING -o rmnet+ -j HL --hl-set "$TTL_VALUE"
+        remove_ttl_rule_if_present mangle POSTROUTING -o rmnet+ -j TTL --ttl-set "$TTL_VALUE"
+        remove_ttl_rule_if_present_v6 mangle POSTROUTING -o rmnet+ -j HL --hl-set "$TTL_VALUE"
+        if ! iptables -t mangle -C POSTROUTING -o rmnet+ -j TTL --ttl-set "$TTL_VALUE" 2>/dev/null; then
+            iptables -t mangle -I POSTROUTING -o rmnet+ -j TTL --ttl-set "$TTL_VALUE"
+        fi
+        if ! ip6tables -t mangle -C POSTROUTING -o rmnet+ -j HL --hl-set "$TTL_VALUE" 2>/dev/null; then
+            ip6tables -t mangle -I POSTROUTING -o rmnet+ -j HL --hl-set "$TTL_VALUE"
+        fi
         echo "TTL override reapplied: $TTL_VALUE"
     fi
 fi
@@ -102,6 +143,9 @@ end
 LUA
 fi
 
-systemctl restart turbontc.service
+if ! systemctl restart turbontc.service; then
+    echo "Failed to restart turbontc.service after overlay apply" >&2
+    exit 1
+fi
 
 echo "stock-ui AT live tree bound"
