@@ -47,21 +47,21 @@ Important cleanup note
 - before deleting a file like that, save an off-box copy first and record its SHA-256 hash if you can, because it may be a useful stock firmware artifact later
 
 Normal Windows install (No internet method)
-1. Download and extract the latest release ZIP.
-   Use the installer ZIP from the GitHub release `Assets` section.
+1. Open the latest GitHub release page.
+2. Download and extract the top file in the `Assets` section at the bottom of that page.
    Do not use GitHub's auto-generated `Source code (zip)` download for Windows install.
-2. Open PowerShell in the extracted folder.
-3. Run:
+3. Open PowerShell in the extracted folder.
+4. Run:
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install_stock_ui_at.ps1
 ```
-4. Choose `2` for `SSH`.
-5. Enter the router IP and SSH username.
-6. Enter the SSH password when `scp` or `ssh` prompts, unless you already have a working SSH key setup.
-7. Answer the simple `y/n` prompts.
+5. Choose `2` for `SSH`.
+6. Enter the router IP and SSH username.
+7. Enter the SSH password when `scp` or `ssh` prompts, unless you already have a working SSH key setup.
+8. Answer the simple `y/n` prompts.
 
 Normal Windows uninstall (No internet method)
-1. Open PowerShell in the extracted folder.
+1. Open PowerShell in the extracted folder from the same release ZIP.
 2. Run:
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\uninstall_stock_ui_at.ps1
