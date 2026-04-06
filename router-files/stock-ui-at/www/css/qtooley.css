@@ -573,6 +573,11 @@ body.jtools-layout-wide-sticky #content > .container {
     overflow: visible;
 }
 
+body.jtools-layout-wide-sticky {
+    max-width: none !important;
+    width: 100% !important;
+}
+
 body.jtools-layout-wide-sticky #content .grid-3.alpha {
     align-self: flex-start;
     flex: 0 0 260px;

@@ -9,13 +9,14 @@ fi
 
 BASE="/usrdata/at-stock-ui"
 SNAP_DIR="$1"
+PAYLOAD_DIR="$SNAP_DIR/base-payload"
 
 if [ ! -d "$SNAP_DIR" ]; then
     echo "snapshot not found: $SNAP_DIR" >&2
     exit 1
 fi
 
-for required in "$SNAP_DIR/www" "$SNAP_DIR/usr" "$SNAP_DIR/apply_stock_ui_overlay.sh"; do
+for required in "$PAYLOAD_DIR" "$PAYLOAD_DIR/www" "$PAYLOAD_DIR/usr" "$PAYLOAD_DIR/apply_stock_ui_overlay.sh"; do
     if [ ! -e "$required" ]; then
         echo "snapshot is missing required content: $required" >&2
         exit 1
@@ -25,21 +26,32 @@ done
 ROLLBACK_DIR="/tmp/overlay-rollback-$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$ROLLBACK_DIR"
 
-cp -a "$BASE/www" "$ROLLBACK_DIR/" 2>/dev/null || true
-cp -a "$BASE/usr" "$ROLLBACK_DIR/" 2>/dev/null || true
-cp -a "$BASE/overlay" "$ROLLBACK_DIR/" 2>/dev/null || true
-cp -a "$BASE/apply_stock_ui_overlay.sh" "$ROLLBACK_DIR/" 2>/dev/null || true
+for item in "$BASE"/*; do
+    [ -e "$item" ] || continue
+    name="$(basename "$item")"
+    case "$name" in
+        live|recovery-snapshots)
+            continue
+            ;;
+    esac
+    cp -a "$item" "$ROLLBACK_DIR/" 2>/dev/null || true
+done
 
-rm -rf "$BASE/www" "$BASE/usr" "$BASE/overlay"
+for item in "$BASE"/*; do
+    [ -e "$item" ] || continue
+    name="$(basename "$item")"
+    case "$name" in
+        live|recovery-snapshots)
+            continue
+            ;;
+    esac
+    rm -rf "$item"
+done
 
-cp -a "$SNAP_DIR/www" "$BASE/"
-cp -a "$SNAP_DIR/usr" "$BASE/"
-if [ -d "$SNAP_DIR/overlay" ]; then
-    cp -a "$SNAP_DIR/overlay" "$BASE/"
-fi
-cp -a "$SNAP_DIR/apply_stock_ui_overlay.sh" "$BASE/apply_stock_ui_overlay.sh"
-cp -a "$SNAP_DIR/remove_stock_ui_overlay.sh" "$BASE/remove_stock_ui_overlay.sh" 2>/dev/null || true
-cp -a "$SNAP_DIR/verify_stock_ui_overlay.sh" "$BASE/verify_stock_ui_overlay.sh" 2>/dev/null || true
+for item in "$PAYLOAD_DIR"/*; do
+    [ -e "$item" ] || continue
+    cp -a "$item" "$BASE/"
+done
 
 tr -d '\r' < "$BASE/apply_stock_ui_overlay.sh" > /tmp/apply_stock_ui_overlay.sh
 mv /tmp/apply_stock_ui_overlay.sh "$BASE/apply_stock_ui_overlay.sh"

@@ -2,8 +2,14 @@
 
 set -eu
 
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
 BASELINE_DIR="${1:-/usrdata/at-stock-ui/installer-state/install-baseline}"
 VERIFY_ROOT="/tmp/install-baseline-verify.$$"
+TRACKED_FILE_LIST="$BASELINE_DIR/tracked_stock_files.txt"
+
+if [ ! -f "$TRACKED_FILE_LIST" ]; then
+    TRACKED_FILE_LIST="$SCRIPT_DIR/tracked_stock_files.txt"
+fi
 
 for required in "$BASELINE_DIR/install_www.tar" "$BASELINE_DIR/install_webif.tar"; do
     if [ ! -f "$required" ]; then
@@ -24,29 +30,35 @@ trap 'rm -rf "$VERIFY_ROOT"' EXIT INT TERM
 tar -xf "$BASELINE_DIR/install_www.tar" -C "$VERIFY_ROOT"
 tar -xf "$BASELINE_DIR/install_webif.tar" -C "$VERIFY_ROOT"
 
-for pair in \
-    "/www/js/generatedMenuEntries.js:$VERIFY_ROOT/www/js/generatedMenuEntries.js" \
-    "/www/theme/js/genHeader.js:$VERIFY_ROOT/www/theme/js/genHeader.js" \
-    "/usr/share/lua/5.1/webif/top_menu_entries.lua:$VERIFY_ROOT/usr/share/lua/5.1/webif/top_menu_entries.lua" \
-    "/usr/share/lua/5.1/webif/userGroupAuth.lua:$VERIFY_ROOT/usr/share/lua/5.1/webif/userGroupAuth.lua"
-do
-    live_path="${pair%%:*}"
-    baseline_path="${pair##*:}"
-
-    if [ ! -f "$live_path" ] || [ ! -f "$baseline_path" ]; then
-        echo "Unable to verify install baseline file: $live_path" >&2
-        exit 1
-    fi
-
-    if ! cmp -s "$live_path" "$baseline_path"; then
-        echo "Install baseline verification failed for $live_path" >&2
-        exit 1
-    fi
-done
-
-if [ -e /usr/share/lua/5.1/webif/handler_0011.lua ]; then
-    echo "Overlay file still present after uninstall: /usr/share/lua/5.1/webif/handler_0011.lua" >&2
+if [ ! -f "$TRACKED_FILE_LIST" ]; then
+    echo "Missing tracked stock file list for uninstall verification." >&2
     exit 1
 fi
+
+while IFS= read -r live_path; do
+    [ -n "$live_path" ] || continue
+    case "$live_path" in
+        \#*) continue ;;
+    esac
+
+    rel_path="${live_path#/}"
+    baseline_path="$VERIFY_ROOT/$rel_path"
+
+    if [ -e "$baseline_path" ]; then
+        if [ ! -e "$live_path" ]; then
+            echo "Expected baseline file is missing after uninstall: $live_path" >&2
+            exit 1
+        fi
+        if ! cmp -s "$live_path" "$baseline_path"; then
+            echo "Install baseline verification failed for $live_path" >&2
+            exit 1
+        fi
+    else
+        if [ -e "$live_path" ]; then
+            echo "Overlay file still present after uninstall: $live_path" >&2
+            exit 1
+        fi
+    fi
+done < "$TRACKED_FILE_LIST"
 
 echo "verified_install_baseline=$BASELINE_DIR"
