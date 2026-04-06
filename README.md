@@ -19,7 +19,7 @@ This is not a generic web app and it is not a generic USB modem project.
 - Quick Overview
 - General Info
 - AT terminal
-- Settings page with screensaver controls, release/update status, and a router-side `Update now` action
+- Settings page with screensaver controls and release/update status
 - RAT / band / cell locking
 - Ookla Speedtest
 - TTL helper
@@ -35,6 +35,7 @@ Use the Windows release ZIP when:
 
 - the router does not already have working internet
 - you want the normal Windows-assisted install, update, or uninstall flow over SSH
+- you downloaded the installer ZIP from the GitHub release `Assets` section, not the auto-generated `Source code (zip)` download
 
 Use the direct GitHub router command when:
 
@@ -56,13 +57,6 @@ Direct GitHub uninstall:
 - the normal public release asset is the Windows ZIP
 - bundled Ookla is expected in public release ZIPs
 - Tailscale is optional and is installed later from the Qtooley UI
-
-## Known Limits
-
-- cell locking is still under development and is not working yet
-- root access is required
-- SSH access is required
-- Tailscale is optional and not part of the base install
 
 ## Device Scope
 
@@ -142,13 +136,13 @@ If you are new to the project, use `main`.
 
 ![Ookla Speedtest](docs/images/qtooley/speedtest.jpg)
 
-### TTL Helper
-
-![TTL helper](docs/images/qtooley/ttl-helper.jpg)
-
 ### Tailscale
 
 ![Tailscale](docs/images/qtooley/tailscale.jpg)
+
+### TTL Helper
+
+![TTL helper](docs/images/qtooley/ttl-helper.jpg)
 
 ## More Docs
 

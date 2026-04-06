@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.3.6-qtooley-2026-04-06
+
+Pre-public hardening and stock-box compatibility release for the Qtooley stock UI overlay.
+
+Included:
+- shared header and Tailscale UI XSS hardening
+- Quick Overview canvas redraw fix and dark prepaint/cache-busting follow-up
+- safer Windows ZIP installer transport over SSH plus clearer install guide wording
+- Box 2 style stock-router support when `/overlay/pivot/...` does not exist
+- in-UI GitHub release update runner hardening and refreshed release metadata
+
+Key behavior:
+- packaged install, update, uninstall, and in-UI update paths were re-tested on Box 1
+- uninstall on a clean stock Box 2 returned the shared UI/auth files to the saved stock baseline
+- the Windows release ZIP now hard-fails the build if the bundled Ookla archive is missing
+- direct public docs still lead users to the release ZIP and router-side GitHub release flow
+
 ## v0.3.5-qtooley-2026-04-05
 
 Public release documentation and release-flow polish for the Qtooley stock UI overlay.

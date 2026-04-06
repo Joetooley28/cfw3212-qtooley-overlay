@@ -50,20 +50,47 @@ start_runner() {
     fi
 
     write_state "starting" "queued" "Preparing Qtooley update from GitHub."
+
+    if command -v systemd-run >/dev/null 2>&1; then
+        if systemd-run --quiet --collect --unit=qtooley-release-update /bin/sh "$0" --run >/dev/null 2>&1; then
+            echo "started"
+            exit 0
+        fi
+    fi
+
     nohup /bin/sh "$0" --run >/dev/null 2>&1 &
     echo "started"
 }
 
 run_runner() {
+    completed="0"
+
+    finalize_interrupted() {
+        if [ "$completed" = "1" ]; then
+            return 0
+        fi
+
+        last_line="$(tail -n 1 "$LOG_FILE" 2>/dev/null || true)"
+        if [ -z "$last_line" ]; then
+            last_line="Qtooley update was interrupted before it reported a final result."
+        fi
+        write_state "error" "finished" "$last_line"
+        rm -f "$PID_FILE"
+    }
+
+    trap finalize_interrupted EXIT HUP INT TERM
+
     echo "$$" > "$PID_FILE"
     write_state "running" "running" "Downloading and installing the latest Qtooley release from GitHub."
 
     if /bin/sh "$RUNNER_PATH" > "$LOG_FILE" 2>&1; then
+        completed="1"
         write_state "success" "finished" "Qtooley update completed. Give the web UI a moment to come back, then reload this page."
         rm -f "$PID_FILE"
         exit 0
     fi
 
+    completed="1"
     last_line="$(tail -n 1 "$LOG_FILE" 2>/dev/null || true)"
     if [ -z "$last_line" ]; then
         last_line="Qtooley update failed. Check the router update log for more detail."

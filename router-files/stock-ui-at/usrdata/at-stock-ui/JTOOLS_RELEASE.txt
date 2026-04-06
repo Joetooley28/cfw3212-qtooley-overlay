@@ -1,7 +1,7 @@
 Jtools stock UI package
-Release date: 2026-04-05
-Release label: v0.3.5-qtooley-2026-04-05
-Checkpoint commit: 0bd8b5f
+Release date: 2026-04-06
+Release label: v0.3.6-qtooley-2026-04-06
+Checkpoint commit: 1cd52ef
 
 Current proven model
 - Keep payload in /usrdata/at-stock-ui
@@ -12,12 +12,31 @@ Current proven model
 - Reapply late with jtools-stock-ui.timer
 
 Jtools asset tokens
-- qtooley.css?qtooley-v20260324a
-- at_terminal.css?jtools-ui-v20260324b
-- quick_overview.js?jtools-qo-v20260324a
-- band_cell_locking_core.js?jtools-bandlock-core-v20260324d
-- band_cell_locking.js?jtools-bandlock-v20260324a
-- ookla_speedtest.css?jtools-speedtest-ui-v20260324c
+- qtooley.css?qtooley-v20260329e
+- jtools_dark_mode.css?jtools-dark-v20260329a
+- generatedMenuEntries.js?jtools-menu-v20260405c
+- genHeader.js?jtools-genheader-v20260405h
+- jtools_screensaver.js?jtools-qo-v20260405a
+- jtools_session_keepalive.js?jtools-session-v20260330a
+- quick_overview.css?jtools-qo-v20260331g
+- quick_overview_core.js?jtools-qo-v20260331f
+- quick_overview.js?jtools-qo-v20260331g
+- screensaver_settings.css?jtools-ss-v20260405b
+- screensaver_settings.js?jtools-ss-v20260405b
+- at_terminal.css?jtools-at-v20260331h
+- at_terminal.js?jtools-at-v20260331c
+- general_dashboard_core.js?jtools-general-core-v20260330i
+- general_dashboard.js?jtools-general-v20260331c
+- band_cell_locking_core.js?jtools-bandlock-core-v20260401c
+- band_cell_locking.js?jtools-bandlock-v20260401b
+- sms.css?jtools-sms-v20260405d
+- sms.js?jtools-sms-v20260405d
+- tailscale.css?jtools-tailscale-v20260405f
+- tailscale.js?jtools-tailscale-v20260405k
+- ttl_helper.css?jtools-ttl-v20260405b
+- ttl_helper.js?jtools-ttl-v20260405b
+- ookla_speedtest.css?jtools-speedtest-ui-v20260405b
+- ookla_speedtest.js?jtools-speedtest-v20260405b
 
 Important reminders
 - Do not replace the late timer with early boot logic unless a better model is proven.

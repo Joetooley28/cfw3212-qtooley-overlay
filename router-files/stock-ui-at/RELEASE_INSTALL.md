@@ -35,15 +35,10 @@ Important install behavior
 - do not use `FORCE_RECAPTURE_BASELINE=1` unless the saved baseline is missing or known-bad and the router is already showing the stock state you want uninstall to restore later
 
 Space note
-- measured on the current test router:
-  - `/usrdata/at-stock-ui` was about `14.1 MB`
-  - `/usrdata/at-stock-ui/installer-state/install-baseline` was about `4.0 MB`
-  - `/usrdata/tailscale` was about `60.5 MB`
-  - free space on `/usrdata` was about `88.1 MB` at the time of the check
 - first install stores a router-specific stock baseline under `/usrdata` in addition to the base Qtooley payload
-- bundled Ookla adds a few more MB beyond the base Qtooley files
-- Tailscale is a separate optional runtime under `/usrdata/tailscale` and is by far the biggest optional `/usrdata` user in the normal setup
-- practical recommendation: try to have at least `20 MB` free on `/usrdata` before first install if you only want base Qtooley, and substantially more headroom if you expect to add Tailscale
+- bundled Ookla adds a few more MB
+- Tailscale is a separate optional runtime under `/usrdata/tailscale` and uses noticeably more space than the core Qtooley files alone
+- practical recommendation: try to have at least `15 MB` to `20 MB` free on `/usrdata` before first install, and leave more headroom if you plan to add optional runtimes later
 - if space is tight, clean up old files first instead of trying to install with only a few MB left
 
 Important cleanup note
@@ -53,18 +48,24 @@ Important cleanup note
 
 Normal Windows install (No internet method)
 1. Download and extract the latest release ZIP.
+   Use the installer ZIP from the GitHub release `Assets` section.
+   Do not use GitHub's auto-generated `Source code (zip)` download for Windows install.
 2. Open PowerShell in the extracted folder.
 3. Run:
-   - `powershell -ExecutionPolicy Bypass -File .\install_stock_ui_at.ps1`
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install_stock_ui_at.ps1
+```
 4. Choose `2` for `SSH`.
 5. Enter the router IP and SSH username.
-6. Enter the SSH password when `ssh` prompts.
+6. Enter the SSH password when `scp` or `ssh` prompts, unless you already have a working SSH key setup.
 7. Answer the simple `y/n` prompts.
 
 Normal Windows uninstall (No internet method)
 1. Open PowerShell in the extracted folder.
 2. Run:
-   - `powershell -ExecutionPolicy Bypass -File .\uninstall_stock_ui_at.ps1`
+```powershell
+powershell -ExecutionPolicy Bypass -File .\uninstall_stock_ui_at.ps1
+```
 3. Choose `2` for `SSH`.
 4. Choose uninstall mode:
    - `1` remove Qtooley and bundled Ookla
