@@ -1,6 +1,26 @@
 param(
-    [string]$RepoRoot = "C:\at_terminal\repo-public"
+    [string]$RepoRoot = ""
 )
+
+if (-not $RepoRoot) {
+    $candidates = @(
+        $PSScriptRoot,
+        (Split-Path -Parent $PSScriptRoot),
+        "C:\at_terminal\repo-public"
+    ) | Where-Object { $_ } | Select-Object -Unique
+
+    foreach ($candidate in $candidates) {
+        if ((Test-Path (Join-Path $candidate "scripts\stock_ui_at_release_common.ps1")) -and
+            (Test-Path (Join-Path $candidate "router-files\stock-ui-at"))) {
+            $RepoRoot = $candidate
+            break
+        }
+    }
+}
+
+if (-not $RepoRoot) {
+    throw "Unable to resolve RepoRoot automatically. Pass -RepoRoot explicitly."
+}
 
 . (Join-Path $RepoRoot "scripts\stock_ui_at_release_common.ps1")
 
