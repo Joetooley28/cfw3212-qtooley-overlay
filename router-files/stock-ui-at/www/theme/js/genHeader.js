@@ -265,19 +265,73 @@ function genThemeHeader(pageData, userGroups) {
         }
     }
 
+    function isStatusInvalidRequestAlert(title, message) {
+        if (relUrlOfPage !== "status.html") {
+            return false;
+        }
+        var titleText = String(title == null ? "" : title).toLowerCase();
+        var messageText = String(message == null ? "" : message).toLowerCase();
+        return titleText.indexOf("invalid request") >= 0 || messageText.indexOf("invalid request") >= 0;
+    }
+
+    function suppressStatusInvalidRequestAlert() {
+        if (relUrlOfPage !== "status.html") {
+            return;
+        }
+
+        if (typeof window.alertInvalidRequest === "function" && !window.alertInvalidRequest._qtooleyStatusWrapped) {
+            var originalAlertInvalidRequest = window.alertInvalidRequest;
+            var wrappedAlertInvalidRequest = function () {
+                clearStatusFormErrorNote();
+                return;
+            };
+            wrappedAlertInvalidRequest._qtooleyStatusWrapped = true;
+            wrappedAlertInvalidRequest._qtooleyOriginal = originalAlertInvalidRequest;
+            window.alertInvalidRequest = wrappedAlertInvalidRequest;
+        }
+
+        if (typeof window.validate_alert === "function" && !window.validate_alert._qtooleyStatusWrapped) {
+            var originalValidateAlert = window.validate_alert;
+            var wrappedValidateAlert = function (t1, t2, t3) {
+                if (isStatusInvalidRequestAlert(t1, t2)) {
+                    clearStatusFormErrorNote();
+                    return;
+                }
+                return originalValidateAlert.apply(this, arguments);
+            };
+            wrappedValidateAlert._qtooleyStatusWrapped = true;
+            wrappedValidateAlert._qtooleyOriginal = originalValidateAlert;
+            window.validate_alert = wrappedValidateAlert;
+        }
+    }
+
     function scheduleStatusFormErrorCleanup() {
         if (relUrlOfPage !== "status.html") {
             return;
         }
+        suppressStatusInvalidRequestAlert();
+        clearStatusFormErrorNote();
         var attempts = 0;
-        var maxAttempts = 8;
+        var maxAttempts = 60;
         var timer = window.setInterval(function () {
             attempts += 1;
             clearStatusFormErrorNote();
             if (attempts >= maxAttempts) {
                 window.clearInterval(timer);
             }
-        }, 600);
+        }, 250);
+
+        if (window.MutationObserver && document.body) {
+            var observer = new window.MutationObserver(function () {
+                clearStatusFormErrorNote();
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
+            window.setTimeout(function () {
+                try {
+                    observer.disconnect();
+                } catch (e) {}
+            }, 15000);
+        }
     }
 
     // This generates all the html for a simple menu with no submenus
