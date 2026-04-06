@@ -43,7 +43,7 @@ Dark mode note:
 
 ## Install Flow
 
-1. Open the latest GitHub release page and download the top file in the `Assets` section at the bottom.
+1. Open the latest GitHub release page and download the top file in the `Assets` section at the bottom of this release page.
 2. Do not use the auto-generated `Source code (zip)` download.
 3. Run the PowerShell installer from a normal Windows PC.
 4. Connect over SSH with the router IP, username, and password.
