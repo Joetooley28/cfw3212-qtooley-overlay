@@ -49,12 +49,46 @@ bind_mount_checked() {
     fi
 }
 
+resolve_stock_source_www() {
+    if [ -d "$STOCK_BASE_WWW" ]; then
+        echo "$STOCK_BASE_WWW"
+        return 0
+    fi
+    if [ -d "$STOCK_WWW" ]; then
+        echo "$STOCK_WWW"
+        return 0
+    fi
+    return 1
+}
+
+resolve_stock_source_webif() {
+    if [ -d "$STOCK_BASE_WEBIF" ]; then
+        echo "$STOCK_BASE_WEBIF"
+        return 0
+    fi
+    if [ -d "$STOCK_WEBIF" ]; then
+        echo "$STOCK_WEBIF"
+        return 0
+    fi
+    return 1
+}
+
 build_live_tree() {
+    local source_www source_webif
+
+    source_www="$(resolve_stock_source_www || true)"
+    source_webif="$(resolve_stock_source_webif || true)"
+
+    if [ -z "$source_www" ] || [ -z "$source_webif" ]; then
+        echo "Unable to resolve stock source trees for overlay rebuild." >&2
+        exit 1
+    fi
+
     rm -rf "$LIVE"
     mkdir -p "$LIVE_WWW" "$LIVE_WEBIF"
 
-    cp -a "$STOCK_BASE_WWW/." "$LIVE_WWW/"
-    cp -a "$STOCK_BASE_WEBIF/." "$LIVE_WEBIF/"
+    cp -a "$source_www/." "$LIVE_WWW/"
+    cp -a "$source_webif/." "$LIVE_WEBIF/"
 
     cp -a "$BASE/www/." "$LIVE_WWW/"
     cp -a "$BASE/usr/share/lua/5.1/webif/." "$LIVE_WEBIF/"

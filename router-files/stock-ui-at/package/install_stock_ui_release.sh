@@ -15,6 +15,10 @@ UNIT_SRC="$PACKAGE_ROOT/etc/systemd/system"
 DEFAULT_BUNDLED_OOKLA="$TARGET_BASE/bundles/ookla/ookla-speedtest-1.2.0-linux-armhf.tgz"
 INSTALL_BUNDLED_OOKLA="${INSTALL_BUNDLED_OOKLA:-1}"
 OOKLA_ARCHIVE_PATH="${OOKLA_ARCHIVE_PATH:-$DEFAULT_BUNDLED_OOKLA}"
+LIVE_WWW="/www"
+LIVE_WEBIF="/usr/share/lua/5.1/webif"
+PIVOT_WWW="/overlay/pivot/www"
+PIVOT_WEBIF="/overlay/pivot/usr/share/lua/5.1/webif"
 
 log() {
     echo "$1"
@@ -39,10 +43,44 @@ has_install_baseline() {
     [ -f "$INSTALL_BASELINE_DIR/install_www.tar" ] && [ -f "$INSTALL_BASELINE_DIR/install_webif.tar" ]
 }
 
-get_install_baseline_required_kb() {
-    local total_kb
+stock_source_www() {
+    if [ -d "$PIVOT_WWW" ]; then
+        echo "$PIVOT_WWW"
+        return 0
+    fi
+    if [ -d "$LIVE_WWW" ]; then
+        echo "$LIVE_WWW"
+        return 0
+    fi
+    return 1
+}
 
-    total_kb="$(du -sk /overlay/pivot/www /overlay/pivot/usr/share/lua/5.1/webif 2>/dev/null | awk '{sum += $1} END {print sum+1024}')"
+stock_source_webif() {
+    if [ -d "$PIVOT_WEBIF" ]; then
+        echo "$PIVOT_WEBIF"
+        return 0
+    fi
+    if [ -d "$LIVE_WEBIF" ]; then
+        echo "$LIVE_WEBIF"
+        return 0
+    fi
+    return 1
+}
+
+get_install_baseline_required_kb() {
+    local total_kb source_www source_webif
+
+    source_www="$(stock_source_www || true)"
+    source_webif="$(stock_source_webif || true)"
+    if [ -n "$source_www" ] && [ -n "$source_webif" ]; then
+        total_kb="$(du -sk "$source_www" "$source_webif" 2>/dev/null | awk '{sum += $1} END {print sum+1024}')"
+    elif [ -n "$source_www" ]; then
+        total_kb="$(du -sk "$source_www" 2>/dev/null | awk '{sum += $1} END {print sum+1024}')"
+    elif [ -n "$source_webif" ]; then
+        total_kb="$(du -sk "$source_webif" 2>/dev/null | awk '{sum += $1} END {print sum+1024}')"
+    else
+        total_kb="0"
+    fi
     echo "${total_kb:-0}"
 }
 
@@ -114,8 +152,16 @@ verify_prerequisites() {
     require_path "$PACKAGE_ROOT/usrdata/at-stock-ui/restore_install_baseline.sh"
     require_path "$UNIT_SRC/jtools-stock-ui.service"
     require_path "$UNIT_SRC/jtools-stock-ui.timer"
-    require_path "/overlay/pivot/www"
-    require_path "/overlay/pivot/usr/share/lua/5.1/webif"
+
+    if ! stock_source_www >/dev/null 2>&1; then
+        echo "Missing stock web source path. Checked: $PIVOT_WWW and $LIVE_WWW" >&2
+        exit 1
+    fi
+
+    if ! stock_source_webif >/dev/null 2>&1; then
+        echo "Missing stock webif source path. Checked: $PIVOT_WEBIF and $LIVE_WEBIF" >&2
+        exit 1
+    fi
 
     if ! command -v systemctl >/dev/null 2>&1; then
         echo "systemctl is required on the router." >&2
