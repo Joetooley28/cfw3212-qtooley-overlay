@@ -233,6 +233,53 @@ function genThemeHeader(pageData, userGroups) {
         document.body.appendChild(wrap);
     }
 
+    function clearStatusFormErrorNote() {
+        if (relUrlOfPage !== "status.html") {
+            return;
+        }
+        var forms = window.document.forms || [];
+        var targetForm = null;
+        for (var i = 0; i < forms.length; i++) {
+            if (forms[i] && forms[i].id !== "logOffForm") {
+                targetForm = forms[i];
+                break;
+            }
+        }
+        if (!targetForm) {
+            return;
+        }
+        var note = targetForm.previousElementSibling;
+        if (note && note.id === "form-error") {
+            var heading = note.querySelector("h2");
+            var text = heading ? String(heading.textContent || "") : "";
+            if (/invalid request/i.test(text)) {
+                note.parentNode.removeChild(note);
+            }
+        }
+        if (window.location.hash === "#form-error") {
+            try {
+                history.replaceState(null, document.title, window.location.pathname + window.location.search);
+            } catch (e) {
+                window.location.hash = "";
+            }
+        }
+    }
+
+    function scheduleStatusFormErrorCleanup() {
+        if (relUrlOfPage !== "status.html") {
+            return;
+        }
+        var attempts = 0;
+        var maxAttempts = 8;
+        var timer = window.setInterval(function () {
+            attempts += 1;
+            clearStatusFormErrorNote();
+            if (attempts >= maxAttempts) {
+                window.clearInterval(timer);
+            }
+        }, 600);
+    }
+
     // This generates all the html for a simple menu with no submenus
     // @param id Menu entry ID
     // @param title Menu entry title
@@ -371,6 +418,7 @@ function genThemeHeader(pageData, userGroups) {
 
     $("#side-menu").append(h_side);
     renderThemeToggle();
+    scheduleStatusFormErrorCleanup();
 
     var injectScreensaverJs = typeof relUrlOfPage !== "undefined" && themedPages[relUrlOfPage];
     if (injectScreensaverJs && !document.querySelector("script[src*='/js/jtools_screensaver.js']")) {

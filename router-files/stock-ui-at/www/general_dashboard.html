@@ -55,7 +55,7 @@ for (const [key, value] of searchParams) { queryParams[key] = value; }
 <script src="/theme/js/genHeader.js?jtools-genheader-v20260405h"></script>
 <script src="/theme/js/genFooter.js?1.1.79.0"></script>
 <script src="/js/general_dashboard_core.js?jtools-general-core-v20260330i"></script>
-<script src="/js/general_dashboard.js?jtools-general-v20260331c"></script>
+<script src="/js/general_dashboard.js?jtools-general-v20260406a"></script>
 <script>
 var pageData = {
     title: "Qtooley General Info",
@@ -67,7 +67,20 @@ var pageData = {
         }
     }
 };
-if (pageData.disabled !== true) requestPageObjects();
+$(document).ready(function () {
+    if (pageData.disabled === true) {
+        setVisible("#body", "1");
+        return;
+    }
+    if (window.JtoolGeneralDashboard && typeof window.JtoolGeneralDashboard.bootstrap === "function") {
+        window.JtoolGeneralDashboard.bootstrap();
+        return;
+    }
+    if (typeof pageData.onReady === "function") {
+        pageData.onReady();
+    }
+    setVisible("#body", "1");
+});
 </script>
 </head>
 <body id="body" style="display: none;"></body>

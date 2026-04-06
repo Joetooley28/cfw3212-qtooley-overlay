@@ -5,6 +5,7 @@
     var state = core.createState();
     var atRefreshTimer = null;
     var clockTimer = null;
+    var stockPollTimers = [];
     var rawDetailsOpen = false;
 
     function setApiBanner(kind, text) {
@@ -14,6 +15,24 @@
         }
         node.className = "jgd-banner " + (kind ? "is-" + kind : "");
         node.textContent = text || "";
+    }
+
+    function clearStockFormError() {
+        var form = document.getElementById("form");
+        if (!form || !form.parentNode) {
+            return;
+        }
+        var previous = form.previousElementSibling;
+        if (previous && previous.id === "form-error") {
+            previous.parentNode.removeChild(previous);
+        }
+        if (window.location.hash === "#form-error") {
+            try {
+                history.replaceState(null, document.title, window.location.pathname + window.location.search);
+            } catch (e) {
+                window.location.hash = "";
+            }
+        }
     }
 
     function updateClock() {
@@ -96,7 +115,87 @@
 
     function stockUpdated() {
         ensurePanel();
+        clearStockFormError();
         renderDashboard();
+    }
+
+    function getPageObjects() {
+        return (window.pageData && Array.isArray(window.pageData.pageObjects)) ? window.pageData.pageObjects : [];
+    }
+
+    function getReadableObjectNames() {
+        return getPageObjects().filter(function (pgeObj) {
+            var readGroups = pgeObj.readGroups || window.pageData.readGroups || ["root", "admin"];
+            return window.pageData.authenticatedOnly === false || checkGroupAccess(readGroups, userGroups);
+        }).map(function (pgeObj) {
+            return pgeObj.objName;
+        });
+    }
+
+    function applyStockResponse(resp) {
+        getPageObjects().forEach(function (pgeObj) {
+            var obj = resp ? resp[pgeObj.objName] : null;
+            if (!obj) {
+                return;
+            }
+            if (typeof pgeObj.decodeRdb === "function") {
+                obj = pgeObj.decodeRdb(obj);
+            }
+            pgeObj.obj = obj;
+            if (typeof pgeObj.populate === "function") {
+                pgeObj.populate();
+            }
+        });
+    }
+
+    function requestStockObjects(objNames) {
+        if (!objNames || !objNames.length) {
+            return;
+        }
+        requestObjects(objNames, function (resp) {
+            if (resp && resp.result === 0) {
+                applyStockResponse(resp);
+            } else if (resp && resp.access === "NeedsAuthentication") {
+                setApiBanner("error", "Authentication expired. Please refresh and sign in again.");
+            } else if (resp && typeof resp.errorText !== "undefined") {
+                setApiBanner("warn", _(resp.errorText));
+            } else {
+                setApiBanner("warn", "Some stock modem fields are unavailable on this router right now. Showing the last good values.");
+            }
+        });
+    }
+
+    function stopStockPolls() {
+        stockPollTimers.forEach(function (timer) {
+            window.clearInterval(timer);
+        });
+        stockPollTimers = [];
+    }
+
+    function startStockPolls() {
+        var pollGroups = {};
+
+        stopStockPolls();
+        getPageObjects().forEach(function (pgeObj) {
+            if (!pgeObj || typeof pgeObj.pollPeriod === "undefined" || pgeObj.pollPeriod === 0) {
+                return;
+            }
+            if (!pollGroups[pgeObj.pollPeriod]) {
+                pollGroups[pgeObj.pollPeriod] = [];
+            }
+            pollGroups[pgeObj.pollPeriod].push(pgeObj.objName);
+        });
+
+        Object.keys(pollGroups).forEach(function (periodKey) {
+            var period = parseInt(periodKey, 10);
+            var objNames = pollGroups[periodKey].slice();
+            if (!period || !objNames.length) {
+                return;
+            }
+            stockPollTimers.push(window.setInterval(function () {
+                requestStockObjects(objNames);
+            }, period));
+        });
     }
 
     function createSystemInfoObj() {
@@ -254,6 +353,15 @@
                 createAdvObj(),
                 createCellInfoObj()
             ];
+        },
+        bootstrap: function () {
+            applyShellClass();
+            ensurePanel();
+            renderDashboard();
+            this.init();
+            setVisible("#body", "1");
+            requestStockObjects(getReadableObjectNames());
+            startStockPolls();
         },
         init: function () {
             applyShellClass();
