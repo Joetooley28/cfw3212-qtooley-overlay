@@ -77,6 +77,20 @@ remove_units() {
     systemctl daemon-reload >/dev/null 2>&1 || true
 }
 
+remove_payload_if_requested() {
+    if [ "$REMOVE_PAYLOAD" != "1" ]; then
+        log "Qtooley payload retained at $TARGET_BASE"
+        return 0
+    fi
+
+    if [ -d "$TARGET_BASE" ]; then
+        rm -rf "$TARGET_BASE"
+        log "Removed Qtooley payload and installer baseline from $TARGET_BASE"
+    else
+        log "Qtooley payload path already absent: $TARGET_BASE"
+    fi
+}
+
 verify_install_baseline_if_present() {
     if [ -f "$PACKAGE_ROOT/usrdata/at-stock-ui/restore_install_baseline.sh" ] && [ -d "$INSTALL_BASELINE_DIR" ]; then
         /bin/sh "$PACKAGE_ROOT/usrdata/at-stock-ui/restore_install_baseline.sh" "$INSTALL_BASELINE_DIR"
@@ -105,9 +119,7 @@ remove_bundled_ookla
 remove_tailscale_if_requested
 remove_units
 
-if [ "$REMOVE_PAYLOAD" = "1" ]; then
-    rm -rf "$TARGET_BASE"
-fi
+remove_payload_if_requested
 
 systemctl restart turbontc.service 2>/dev/null || true
 verify_stock_state
