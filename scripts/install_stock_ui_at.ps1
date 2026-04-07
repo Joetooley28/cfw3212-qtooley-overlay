@@ -6,7 +6,7 @@ if (-not $RepoRoot) {
     $candidates = @(
         $PSScriptRoot,
         (Split-Path -Parent $PSScriptRoot),
-        "C:\at_terminal\repo-public"
+        (Get-Location).Path
     ) | Where-Object { $_ } | Select-Object -Unique
 
     foreach ($candidate in $candidates) {
@@ -19,7 +19,7 @@ if (-not $RepoRoot) {
 }
 
 if (-not $RepoRoot) {
-    throw "Unable to resolve RepoRoot automatically. Pass -RepoRoot explicitly."
+    throw "Unable to resolve RepoRoot automatically from the extracted installer folder. Open PowerShell in the extracted ZIP root and run this script there, or pass -RepoRoot explicitly for local dev use."
 }
 
 . (Join-Path $RepoRoot "scripts\stock_ui_at_release_common.ps1")
