@@ -31,7 +31,7 @@ $remoteScriptPath = "$remoteStageRoot/package/install_stock_ui_release.sh"
 Write-Host "Qtooley stock UI install / update"
 Show-BundledOoklaStatus -PackageRoot $packageRoot
 
-$transport = Select-Transport
+$transport = Select-Transport -AllowAdb:$false
 Write-Host "Note: on a normal first install, the stock uninstall baseline is captured automatically. You do not need forced recapture."
 $forceRecaptureBaseline = Read-YesNo -Prompt "Last-resort only: force recapture of the uninstall stock baseline from this router right now?" -DefaultYes $false
 

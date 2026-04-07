@@ -155,14 +155,23 @@ function Push-PackageViaSsh {
 }
 
 function Select-Transport {
-    $choice = Read-MenuChoice -Prompt "Choose transport: 1) ADB 2) SSH" -Allowed @("1", "2")
-    if ($choice -eq "1") {
-        Assert-AdbAvailable
-        Assert-AdbDeviceConnected
-        return @{
-            Name = "adb"
-            Target = ""
+    param(
+        [bool]$AllowAdb = $false
+    )
+
+    if ($AllowAdb) {
+        $choice = Read-MenuChoice -Prompt "Choose transport: 1) ADB 2) SSH" -Allowed @("1", "2")
+        if ($choice -eq "1") {
+            Assert-AdbAvailable
+            Assert-AdbDeviceConnected
+            return @{
+                Name = "adb"
+                Target = ""
+            }
         }
+    } else {
+        Write-Host "Transport: SSH"
+        Write-Host "Note: the public Windows installer flow is SSH-only. ADB is not part of the public Windows install path."
     }
 
     Assert-SshAvailable

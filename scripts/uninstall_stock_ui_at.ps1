@@ -29,7 +29,7 @@ $remoteStageRoot = "/tmp/qtooley-stock-ui-at-package"
 $remoteScriptPath = "$remoteStageRoot/package/uninstall_stock_ui_release.sh"
 
 Write-Host "Qtooley stock UI uninstall"
-$transport = Select-Transport
+$transport = Select-Transport -AllowAdb:$false
 $mode = Read-MenuChoice -Prompt "Choose uninstall mode: 1) Remove Qtooley and bundled Ookla 2) Remove Qtooley, bundled Ookla, and Tailscale" -Allowed @("1", "2")
 $removeTailscale = if ($mode -eq "2") { $true } else { $false }
 
