@@ -43,12 +43,40 @@ Dark mode note:
 
 ## Install Flow
 
-1. Open the latest GitHub release page and download the top file in the `Assets` section at the bottom of this release page.
-2. Do not use the auto-generated `Source code (zip)` download.
-3. Run the PowerShell installer from a normal Windows PC.
-4. Connect over SSH with the router IP, username, and password.
-5. Let the installer place the Qtooley overlay and bundled Ookla base components.
-6. If you want Tailscale, install it afterward from the Qtooley UI as the optional extra.
+**Normal Windows install (No internet on modem yet)**
+
+1. Open the latest GitHub release page.
+2. Download the top file in the `Assets` section at the bottom of this release page.
+3. Do not use the auto-generated `Source code` download.
+4. Extract the ZIP.
+5. Open PowerShell in the extracted folder.
+6. Run:
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install_stock_ui_at.ps1
+```
+7. Connect over SSH with the router IP, username, and password.
+8. Let the installer place the Qtooley overlay and bundled Ookla base components.
+9. If you want Tailscale, install it afterward from the Qtooley UI as the optional extra.
+
+Important notes:
+
+- follow the packaged `README.txt` for the exact Windows install, update, and uninstall commands
+- the public Windows installer flow is SSH-only
+
+
+**Direct router install/update/uninstall (Internet already working on modem)**
+
+Install or update from the router:
+
+```sh
+sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/update_from_github_release.sh)"
+```
+
+Uninstall from the router:
+
+```sh
+sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/uninstall_from_github_release.sh)"
+```
 
 Prerequisites:
 

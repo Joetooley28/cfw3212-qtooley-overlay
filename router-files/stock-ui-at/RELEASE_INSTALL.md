@@ -24,6 +24,8 @@ Before you start
 - SSH must already be reachable
 - you need the router IP, SSH username, and SSH password
 - Windows needs the built-in `ssh` client available
+- the public Windows installer flow is SSH-only
+
 
 Important install behavior
 - on first install, the installer captures a compact router-specific stock baseline from the live stock `/www` and `/usr/share/lua/5.1/webif` trees before any Qtooley overlay mounts are active
@@ -46,46 +48,56 @@ Important cleanup note
 - in that logged case, `upgrade.star` was about `108.8 MB`
 - before deleting a file like that, save an off-box copy first and record its SHA-256 hash if you can, because it may be a useful stock firmware artifact later
 
-Normal Windows install (No internet method)
+**Normal Windows install (No internet on modem yet)**
 1. Open the latest GitHub release page.
-2. Download and extract the top file in the `Assets` section at the bottom of this release page.
-   Do not use GitHub's auto-generated `Source code (zip)` download for Windows install.
-3. Open PowerShell in the extracted folder.
-4. Run:
+2. Download the top file in the `Assets` section at the bottom of this release page.
+3. Do not use GitHub's auto-generated `Source code` download.
+4. Extract the ZIP.
+5. Open PowerShell in the extracted folder.
+6. Run exactly:
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install_stock_ui_at.ps1
 ```
-5. Choose `2` for `SSH`.
-6. Enter the router IP and SSH username.
-7. Enter the SSH password when `scp` or `ssh` prompts, unless you already have a working SSH key setup.
-8. Answer the simple `y/n` prompts.
+7. Enter the router IP and SSH username.
+8. Enter the SSH password when `scp` or `ssh` prompts, unless you already have a working SSH key setup.
+9. Answer the simple `y/n` prompts.
 
-Normal Windows uninstall (No internet method)
+**Normal Windows uninstall (No internet on modem yet)**
 1. Open PowerShell in the extracted folder from the same release ZIP.
-2. Run:
+2. Run exactly:
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\uninstall_stock_ui_at.ps1
 ```
-3. Choose `2` for `SSH`.
-4. Choose uninstall mode:
+3. Choose uninstall mode:
    - `1` remove Qtooley and bundled Ookla
    - `2` remove Qtooley, bundled Ookla, and Tailscale
 
-Direct GitHub install or update from the router
-- `sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/update_from_github_release.sh)"`
-- if the router has `curl` instead of `wget`, use:
-  - `sh -c "$(curl -fsSL https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/update_from_github_release.sh)"`
+**Direct GitHub install or update from the router (Internet already working on modem)**
+```sh
+sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/update_from_github_release.sh)"
+```
+If the router has `curl` instead of `wget`, use:
+```sh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/update_from_github_release.sh)"
+```
 
-Direct GitHub uninstall from the router
-- prompt flow:
-  - `sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/uninstall_from_github_release.sh)"`
-- `curl` fallback:
-  - `sh -c "$(curl -fsSL https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/uninstall_from_github_release.sh)"`
-- if Qtooley is already installed and you want non-interactive uninstall:
-  - keep Tailscale:
-    `REMOVE_TAILSCALE=0 /bin/sh /usrdata/at-stock-ui/uninstall_from_github_release.sh`
-  - remove Tailscale too:
-    `REMOVE_TAILSCALE=1 /bin/sh /usrdata/at-stock-ui/uninstall_from_github_release.sh`
+**Direct GitHub uninstall from the router (Internet already working on modem)**
+```sh
+sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/uninstall_from_github_release.sh)"
+```
+`curl` fallback:
+```sh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/uninstall_from_github_release.sh)"
+```
+If Qtooley is already installed and you want non-interactive uninstall:
+- keep Tailscale:
+```sh
+REMOVE_TAILSCALE=0 /bin/sh /usrdata/at-stock-ui/uninstall_from_github_release.sh
+```
+- remove Tailscale too:
+```sh
+REMOVE_TAILSCALE=1 /bin/sh /usrdata/at-stock-ui/uninstall_from_github_release.sh
+```
 
 Important uninstall behavior
 - uninstall removes the live overlay mounts and verifies key shared stock files against the saved first-install baseline when that baseline is available

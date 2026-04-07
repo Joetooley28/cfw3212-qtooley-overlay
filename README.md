@@ -31,25 +31,33 @@ Dark mode note:
 
 ## Choose Your Install Path
 
-Use the Windows release ZIP when:
+**Normal Windows install (No internet on modem yet)**
 
 - the router does not already have working internet
 - you want the normal Windows-assisted install, update, or uninstall flow over SSH
 - download the top file in the `Assets` section at the bottom of this release page
-- do not use the auto-generated `Source code (zip)` download
+- do not use the auto-generated `Source code` download
+- extract the ZIP before running anything
+- follow the packaged `README.txt` for the exact Windows commands
+- the public Windows installer flow is SSH-only
 
-Use the direct GitHub router command when:
+
+**Direct router install/update/uninstall (Internet already working on modem)**
 
 - the router already has working internet
 - you want to install, update, or uninstall from an SSH shell on the router itself
 
 Direct GitHub install or update:
 
-- `sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/update_from_github_release.sh)"`
+```sh
+sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/update_from_github_release.sh)"
+```
 
 Direct GitHub uninstall:
 
-- `sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/uninstall_from_github_release.sh)"`
+```sh
+sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/uninstall_from_github_release.sh)"
+```
 
 ## Before You Install
 
