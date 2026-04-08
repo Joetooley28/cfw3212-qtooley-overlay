@@ -35,7 +35,7 @@ Dark mode note:
 
 - the router does not already have working internet
 - you want the normal Windows-assisted install, update, or uninstall flow over SSH
-- download the top file in the `Assets` section at the bottom of this release page
+- download the top file in the `Assets` section at the bottom of this [release page](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
 - do not use the auto-generated `Source code` download
 - extract the ZIP before running anything
 - follow the packaged `README.txt` for the exact Windows commands
@@ -62,6 +62,8 @@ sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley
 ## Before You Install
 
 - the router must already be rooted
+  Full credit to [@Luke](https://github.com/lukejenkins/cellular/tree/main/casasystems/cfw3212) for the root script and the broader `CFW-3212` platform research.
+- if you are starting from a stock carrier-managed box, also read Luke's [`guide_block_carrier_remote_mgmt`](https://github.com/lukejenkins/cellular/blob/main/casasystems/cfw3212/guide_block_carrier_remote_mgmt.md) to block the carrier remote-management path
 - SSH must already be enabled and reachable
 - the normal public release asset is the Windows ZIP
 - bundled Ookla is expected in public release ZIPs
