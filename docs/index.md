@@ -23,6 +23,7 @@ It is not a generic web app and it is not a generic USB modem project.
 
 - [Latest Release](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
 - [Quick Must Read](quick-must-read.md)
+- [Windows ZIP Install Guide](windows-zip-install.md)
 - Install guide: [RELEASE_INSTALL.md](../router-files/stock-ui-at/RELEASE_INSTALL.md)
 - Main repo README: [README.md](../README.md)
 - Platform notes: [platform-notes.md](platform-notes.md)
@@ -50,7 +51,7 @@ Dark mode note:
 - use the top ZIP in the `Assets` section of the latest [release page](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
 - do not use the auto-generated `Source code` download
 - extract the ZIP
-- follow the packaged `README.txt` for the exact Windows install, update, and uninstall commands
+- follow the packaged `README.txt` or [Windows ZIP Install Guide](windows-zip-install.md)
 - the public Windows installer flow is SSH-only
 
 
@@ -160,5 +161,6 @@ Important warning:
 ## Docs
 
 - [Quick Must Read](quick-must-read.md)
+- [Windows ZIP Install Guide](windows-zip-install.md)
 - [Release Install Guide](../router-files/stock-ui-at/RELEASE_INSTALL.md)
 - [platform-notes.md](platform-notes.md)
