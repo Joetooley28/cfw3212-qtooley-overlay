@@ -1,0 +1,755 @@
+(function (window) {
+    "use strict";
+
+    // ── Helpers (inlined from general_dashboard_core.js for self-containment) ──
+
+    function escapeHtml(value) {
+        return String(value == null ? "" : value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+
+    function asText(value, fallback) {
+        var text = value == null ? "" : String(value);
+        text = text.replace(/^\s+|\s+$/g, "");
+        return text === "" ? (fallback || "N/A") : text;
+    }
+
+    function hasValue(value) {
+        var text = value == null ? "" : String(value);
+        text = text.replace(/^\s+|\s+$/g, "");
+        return text !== "" && text !== "N/A";
+    }
+
+    function asInt(value) {
+        var parsed = parseInt(value, 10);
+        return isNaN(parsed) ? null : parsed;
+    }
+
+    function asFloat(value) {
+        var parsed = parseFloat(value);
+        return isNaN(parsed) ? null : parsed;
+    }
+
+    function formatDb(value, units) {
+        var parsed = asInt(value);
+        if (parsed == null || parsed <= -32768) {
+            return "N/A";
+        }
+        return String(parsed) + (units || "");
+    }
+
+    function chooseFirst() {
+        var i;
+        for (i = 0; i < arguments.length; i += 1) {
+            if (hasValue(arguments[i])) {
+                return asText(arguments[i], "N/A");
+            }
+        }
+        return "N/A";
+    }
+
+    function choosePrimarySignal(stockSignal, field, fallback) {
+        var lte = stockSignal && stockSignal.lte ? stockSignal.lte[field] : null;
+        var nr5g = stockSignal && stockSignal.nr5g ? stockSignal.nr5g[field] : null;
+        return chooseFirst(lte, nr5g, fallback);
+    }
+
+    function clamp(val, min, max) {
+        return val < min ? min : (val > max ? max : val);
+    }
+
+    // ── AT Response Parsers ──
+
+    function parseQnwinfo(summary) {
+        var line = "";
+        (summary || "").split(/\n/).some(function (part) {
+            var trimmed = String(part || "").replace(/^\s+|\s+$/g, "");
+            if (trimmed.indexOf("+QNWINFO:") === 0) {
+                line = trimmed;
+                return true;
+            }
+            return false;
+        });
+        if (!line) { return {}; }
+        var match = line.match(/^\+QNWINFO:\s*"([^"]*)","([^"]*)","([^"]*)",\s*([0-9-]+)/);
+        if (!match) { return {}; }
+        return {
+            access: asText(match[1], ""),
+            operatorCode: asText(match[2], ""),
+            bandLabel: asText(match[3], ""),
+            arfcn: asText(match[4], "")
+        };
+    }
+
+    function parseQspn(summary) {
+        var line = "";
+        (summary || "").split(/\n/).some(function (part) {
+            var trimmed = String(part || "").replace(/^\s+|\s+$/g, "");
+            if (trimmed.indexOf("+QSPN:") === 0) {
+                line = trimmed;
+                return true;
+            }
+            return false;
+        });
+        if (!line) { return {}; }
+        var match = line.match(/^\+QSPN:\s*"([^"]*)","([^"]*)","([^"]*)",\s*([0-9-]+),\s*"([^"]*)"/);
+        if (!match) { return {}; }
+        return {
+            longName: asText(match[1], ""),
+            shortName: asText(match[2], ""),
+            displayName: chooseFirst(match[1], match[2]),
+            mccmnc: asText(match[5], "")
+        };
+    }
+
+    function parseCops(summary) {
+        var line = "";
+        (summary || "").split(/\n/).some(function (part) {
+            var trimmed = String(part || "").replace(/^\s+|\s+$/g, "");
+            if (trimmed.indexOf("+COPS:") === 0) {
+                line = trimmed;
+                return true;
+            }
+            return false;
+        });
+        if (!line) { return {}; }
+        var match = line.match(/^\+COPS:\s*\d+,\d+,"([^"]+)"(?:,\d+)?/);
+        if (!match) { return {}; }
+        return { operatorName: asText(match[1], "") };
+    }
+
+    function parseServingcell(summary) {
+        var line = "";
+        var item = {};
+        (summary || "").split(/\n/).some(function (part) {
+            var trimmed = String(part || "").replace(/^\s+|\s+$/g, "");
+            if (trimmed.indexOf("+QENG:") === 0) {
+                line = trimmed;
+                return true;
+            }
+            return false;
+        });
+        if (!line) { return {}; }
+        var parts = line.replace(/^\+QENG:\s*/, "").split(",");
+        parts = parts.map(function (part) {
+            return String(part || "").replace(/^\s+|\s+$/g, "").replace(/^"|"$/g, "");
+        });
+        if (parts.length >= 15 && parts[0] === "servingcell") {
+            item.state = asText(parts[1], "");
+            item.radio = asText(parts[2], "");
+            item.duplex = asText(parts[3], "");
+            item.mcc = asText(parts[4], "");
+            item.mnc = asText(parts[5], "");
+            item.cellId = asText(parts[6], "");
+            item.pci = asText(parts[7], "");
+
+            var radio = String(item.radio).toUpperCase();
+            if (radio.indexOf("LTE") !== -1) {
+                // LTE: ...,cellID,PCI,EARFCN,band,UL_BW,DL_BW,TAC,RSRP,RSRQ,RSSI,SINR,...
+                item.arfcn = asText(parts[8], "");
+                item.band = hasValue(parts[9]) ? "LTE BAND " + parts[9] : "";
+                item.tac = asText(parts[12], "");
+                item.rsrp = asText(parts[13], "");
+                item.rsrq = asText(parts[14], "");
+                item.sinr = parts.length > 16 ? asText(parts[16], "") : "";
+            } else {
+                // NR5G-SA: ...,cellID,PCI,TAC,ARFCN,band,DL_BW,RSRP,RSRQ,SINR
+                item.tac = asText(parts[8], "");
+                item.arfcn = asText(parts[9], "");
+                item.band = hasValue(parts[10]) ? "NR5G BAND " + parts[10] : "";
+                item.nrDlBw = asText(parts[11], "");
+                item.rsrp = asText(parts[12], "");
+                item.rsrq = asText(parts[13], "");
+                item.sinr = asText(parts[14], "");
+            }
+        }
+        return item;
+    }
+
+    // ── Signal Grade ──
+
+    var DEFAULTS = {
+        rsrpMin: -120, rsrpMax: -70,
+        rsrqMin: -20,  rsrqMax: -5,
+        sinrMin: -5,   sinrMax: 30,
+        timeout: 45000,
+        weightRsrp: 50,
+        weightSinr: 30,
+        weightRsrq: 20
+    };
+
+    function normalizeSettings(input) {
+        var s = input || {};
+        var weightRsrp = asInt(s.weightRsrp);
+        var weightSinr = asInt(s.weightSinr);
+        var weightRsrq = asInt(s.weightRsrq);
+        var weightsAreValid = weightRsrp != null && weightSinr != null && weightRsrq != null &&
+            weightRsrp >= 0 && weightSinr >= 0 && weightRsrq >= 0 &&
+            weightRsrp <= 100 && weightSinr <= 100 && weightRsrq <= 100 &&
+            (weightRsrp + weightSinr + weightRsrq) === 100;
+
+        return {
+            enabled:       s.enabled !== false,
+            timeout:       asInt(s.timeout) > 0 ? asInt(s.timeout) : DEFAULTS.timeout,
+            dismissMode:   s.dismissMode || "movement",
+            weightRsrp:    weightsAreValid ? weightRsrp : DEFAULTS.weightRsrp,
+            weightSinr:    weightsAreValid ? weightSinr : DEFAULTS.weightSinr,
+            weightRsrq:    weightsAreValid ? weightRsrq : DEFAULTS.weightRsrq
+        };
+    }
+
+    function readSettingsFromStorage() {
+        try {
+            var raw = window.localStorage.getItem("jtoolsQoSettings");
+            if (raw) { return normalizeSettings(JSON.parse(raw)); }
+        } catch (e) { /* ignore */ }
+        return normalizeSettings({});
+    }
+
+    function writeSettingsToStorage(settings) {
+        try {
+            window.localStorage.setItem("jtoolsQoSettings", JSON.stringify(settings));
+        } catch (e) { /* ignore */ }
+    }
+
+    var cachedSettings = readSettingsFromStorage();
+
+    function getSettings() {
+        return normalizeSettings(cachedSettings);
+    }
+
+    function mergeSettings(obj) {
+        var merged = {};
+        var current = getSettings();
+        var key;
+        for (key in current) { merged[key] = current[key]; }
+        for (key in obj) { merged[key] = obj[key]; }
+        return normalizeSettings(merged);
+    }
+
+    function saveSettings(obj) {
+        cachedSettings = mergeSettings(obj || {});
+        writeSettingsToStorage(cachedSettings);
+
+        if (!window.XMLHttpRequest) { return; }
+        try {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/quick_overview_api/settings", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+            xhr.send(
+                "csrfToken=" + encodeURIComponent(typeof csrfToken !== "undefined" ? csrfToken : "") +
+                "&enabled=" + encodeURIComponent(cachedSettings.enabled ? "true" : "false") +
+                "&timeout=" + encodeURIComponent(String(cachedSettings.timeout)) +
+                "&dismissMode=" + encodeURIComponent(cachedSettings.dismissMode) +
+                "&weightRsrp=" + encodeURIComponent(String(cachedSettings.weightRsrp)) +
+                "&weightSinr=" + encodeURIComponent(String(cachedSettings.weightSinr)) +
+                "&weightRsrq=" + encodeURIComponent(String(cachedSettings.weightRsrq))
+            );
+        } catch (e) { /* ignore */ }
+    }
+
+    function loadSettings(callback) {
+        if (!window.XMLHttpRequest) {
+            if (callback) { callback(getSettings()); }
+            return;
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/quick_overview_api/settings", true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState !== 4) { return; }
+            if (xhr.status === 200) {
+                try {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response && response.ok && response.settings) {
+                        cachedSettings = normalizeSettings(response.settings);
+                        writeSettingsToStorage(cachedSettings);
+                    }
+                } catch (e) { /* ignore */ }
+            }
+            if (callback) { callback(getSettings()); }
+        };
+        xhr.send();
+    }
+
+    function normalizeMetric(value, min, max) {
+        var v = asFloat(value);
+        if (v == null) { return null; }
+        return clamp((v - min) / (max - min) * 100, 0, 100);
+    }
+
+    function calcSignalGrade(rsrp, rsrq, sinr) {
+        var settings = getSettings();
+        var rsrpScore = normalizeMetric(rsrp, DEFAULTS.rsrpMin, DEFAULTS.rsrpMax);
+        var rsrqScore = normalizeMetric(rsrq, DEFAULTS.rsrqMin, DEFAULTS.rsrqMax);
+        var sinrScore = normalizeMetric(sinr, DEFAULTS.sinrMin, DEFAULTS.sinrMax);
+
+        var totalWeight = 0;
+        var weightedSum = 0;
+
+        if (rsrpScore != null) {
+            weightedSum += rsrpScore * settings.weightRsrp;
+            totalWeight += settings.weightRsrp;
+        }
+        if (sinrScore != null) {
+            weightedSum += sinrScore * settings.weightSinr;
+            totalWeight += settings.weightSinr;
+        }
+        if (rsrqScore != null) {
+            weightedSum += rsrqScore * settings.weightRsrq;
+            totalWeight += settings.weightRsrq;
+        }
+
+        if (totalWeight === 0) { return null; }
+        return Math.round(weightedSum / totalWeight);
+    }
+
+    // ── Signal Quality Classification ──
+
+    function getSignalClass(rsrp) {
+        var v = asInt(rsrp);
+        if (v == null) { return "qo-sig-na"; }
+        if (v > -80)  { return "qo-sig-excellent"; }
+        if (v > -90)  { return "qo-sig-good"; }
+        if (v > -100) { return "qo-sig-fair"; }
+        if (v > -110) { return "qo-sig-poor"; }
+        return "qo-sig-vpoor";
+    }
+
+    function getGradeClass(grade) {
+        if (grade == null) { return "qo-sig-na"; }
+        if (grade >= 80) { return "qo-sig-excellent"; }
+        if (grade >= 60) { return "qo-sig-good"; }
+        if (grade >= 40) { return "qo-sig-fair"; }
+        if (grade >= 20) { return "qo-sig-poor"; }
+        return "qo-sig-vpoor";
+    }
+
+    function getRsrqClass(rsrq) {
+        var v = asInt(rsrq);
+        if (v == null) { return "qt-sig-na"; }
+        if (v > -8)  { return "qt-sig-excellent"; }
+        if (v > -11) { return "qt-sig-good"; }
+        if (v > -15) { return "qt-sig-fair"; }
+        if (v > -18) { return "qt-sig-poor"; }
+        return "qt-sig-vpoor";
+    }
+
+    function getSinrClass(sinr) {
+        var v = asInt(sinr);
+        if (v == null) { return "qt-sig-na"; }
+        if (v > 20)  { return "qt-sig-excellent"; }
+        if (v > 13)  { return "qt-sig-good"; }
+        if (v > 5)   { return "qt-sig-fair"; }
+        if (v > 0)   { return "qt-sig-poor"; }
+        return "qt-sig-vpoor";
+    }
+
+    function getCarrierClass(provider) {
+        var p = String(provider || "").toLowerCase();
+        if (p.indexOf("t-mobile") !== -1 || p.indexOf("tmobile") !== -1) { return "qt-carrier-tmobile"; }
+        if (p.indexOf("at&t") !== -1 || p.indexOf("att") !== -1) { return "qt-carrier-att"; }
+        if (p.indexOf("verizon") !== -1) { return "qt-carrier-verizon"; }
+        return "";
+    }
+
+    function getRatClass(rat) {
+        var r = String(rat || "").toUpperCase();
+        if (r.indexOf("NSA") !== -1 || r === "5GNSA") { return "qo-rat-nsa"; }
+        if (r.indexOf("SA") !== -1 || r === "5GSA") { return "qt-rat-sa"; }
+        if (r.indexOf("NR") !== -1 || r.indexOf("5G") !== -1) { return "qo-rat-nr"; }
+        return "qo-rat-lte";
+    }
+
+    function getBandToneClass(carrier) {
+        var c = carrier || {};
+        var rat = String(c.rat || "").toUpperCase();
+        var band = String(c.band || c.band_label || "").toLowerCase().replace(/[^0-9]/g, "");
+        if (!band) { return ""; }
+        if (rat === "NR5G") { return "qt-band-n" + band; }
+        if (rat === "LTE") { return "qt-band-b" + band; }
+        return "";
+    }
+
+    function getRatLabel(qnwinfo, servingcell) {
+        var access = String(qnwinfo.access || "").toUpperCase();
+        if (access.indexOf("NR5G") !== -1) {
+            if (servingcell.radio && servingcell.radio.toUpperCase() === "NR5G-NSA") {
+                return "5G NSA";
+            }
+            return "NR5G";
+        }
+        if (access.indexOf("LTE") !== -1) { return "LTE"; }
+        if (access.indexOf("WCDMA") !== -1) { return "WCDMA"; }
+        if (access) { return access; }
+        if (servingcell.radio) { return servingcell.radio; }
+        return "N/A";
+    }
+
+    // ── Phone-style Signal Bars ──
+
+    function buildPhoneBars(grade) {
+        var v = (typeof grade === "number") ? grade : null;
+        var level = 0;
+        if (v != null) {
+            if (v >= 80) { level = 5; }
+            else if (v >= 60) { level = 4; }
+            else if (v >= 40) { level = 3; }
+            else if (v >= 20) { level = 2; }
+            else if (v > 0) { level = 1; }
+        }
+        var bars = [];
+        for (var i = 1; i <= 5; i++) {
+            bars.push("<span class='qo-bar" + (i <= level ? " is-on" : "") + "' style='height:" + (i * 20) + "%'></span>");
+        }
+        return bars.join("");
+    }
+
+    // ── Gradient Bar (H5000-style) ──
+
+    function buildGradientBar(grade) {
+        var pct = grade != null ? clamp(grade, 0, 100) : 0;
+        var show = grade != null;
+        return [
+            "<div class='qo-gradient-bar'>",
+            "<div class='qo-gradient-track'></div>",
+            show ? "<div class='qo-gradient-marker' style='left:" + pct + "%'></div>" : "",
+            "</div>"
+        ].join("");
+    }
+
+    // ── Per-Metric Fill Bar ──
+
+    function buildFillBar(value, min, max, cssClass) {
+        var pct = normalizeMetric(value, min, max);
+        if (pct == null) { pct = 0; }
+        return "<div class='qo-fill-bar'><div class='qo-fill-bar-inner " + (cssClass || "") + "' style='width:" + pct + "%'></div></div>";
+    }
+
+    // ── Per-Metric Spectrum Bar ──
+
+    function buildSpectrumBar(value, min, max) {
+        var pct = normalizeMetric(value, min, max);
+        var show = pct != null;
+        if (pct == null) { pct = 0; }
+        return [
+            "<div class='qo-spectrum-bar'>",
+            "<div class='qo-spectrum-track'></div>",
+            show ? "<div class='qo-spectrum-marker' style='left:" + pct + "%'></div>" : "",
+            "</div>"
+        ].join("");
+    }
+
+    // ── Band Combo Formatting ──
+
+    /** RDB / modem fields sometimes include "MHz" already; avoid "5MHz" + "MHz" → "5MHZMHZ" in UI. */
+    function formatBandwidthMhzSuffix(raw) {
+        if (raw == null || raw === "") { return ""; }
+        var s = String(raw).trim();
+        if (!s) { return ""; }
+        s = s.replace(/\s*(?:MHz|MHZ|mhz)\s*$/i, "").trim();
+        if (!s) { return ""; }
+        return " " + s + "MHz";
+    }
+
+    function formatBandCombo(carriers) {
+        if (!carriers || !carriers.length) { return "N/A"; }
+        return carriers.map(function (c) {
+            var label = c.band_label || c.band || "?";
+            var bw = formatBandwidthMhzSuffix(c.bandwidth_mhz);
+            var role = c.role ? " (" + c.role + ")" : "";
+            return label + bw + role;
+        }).join("  +  ");
+    }
+
+    function formatBandShort(carriers) {
+        if (!carriers || !carriers.length) { return ""; }
+        return carriers.map(function (c) {
+            var rat = String(c.rat || "").toUpperCase();
+            var band = c.band || "";
+            if (rat === "NR5G") { return "n" + band; }
+            if (rat === "LTE") { return "B" + band; }
+            return band;
+        }).join("+");
+    }
+
+    // ── Band Change Tracking ──
+
+    var bandChangeHistory = [];
+    var lastBandKey = null;
+
+    function loadBandHistory() {
+        try {
+            var raw = window.localStorage.getItem("jtoolsBandHistory");
+            if (raw) {
+                bandChangeHistory = JSON.parse(raw);
+                if (!Array.isArray(bandChangeHistory)) { bandChangeHistory = []; }
+            }
+        } catch (e) { bandChangeHistory = []; }
+    }
+
+    function saveBandHistory() {
+        try {
+            window.localStorage.setItem("jtoolsBandHistory", JSON.stringify(bandChangeHistory));
+        } catch (e) { /* ignore */ }
+    }
+
+    function trackBandChange(carriers, qnwinfo) {
+        var currentKey = formatBandShort(carriers);
+        if (!currentKey && qnwinfo && qnwinfo.bandLabel) {
+            currentKey = qnwinfo.bandLabel;
+        }
+        if (!currentKey) { currentKey = "No service"; }
+
+        if (lastBandKey === null) {
+            lastBandKey = currentKey;
+            if (bandChangeHistory.length === 0) {
+                var now = new Date();
+                var timeStr = String(now.getHours()).replace(/^(\d)$/, "0$1") + ":" +
+                              String(now.getMinutes()).replace(/^(\d)$/, "0$1");
+                bandChangeHistory.unshift({
+                    time: timeStr,
+                    from: "",
+                    to: currentKey,
+                    type: "initial"
+                });
+                saveBandHistory();
+            }
+            return null;
+        }
+
+        if (currentKey === lastBandKey) { return null; }
+
+        var now2 = new Date();
+        var timeStr2 = String(now2.getHours()).replace(/^(\d)$/, "0$1") + ":" +
+                       String(now2.getMinutes()).replace(/^(\d)$/, "0$1");
+        var entry = {
+            time: timeStr2,
+            from: lastBandKey,
+            to: currentKey,
+            type: currentKey === "No service" ? "lost" : (lastBandKey === "No service" ? "restored" : "changed")
+        };
+        lastBandKey = currentKey;
+        bandChangeHistory.unshift(entry);
+        if (bandChangeHistory.length > 5) { bandChangeHistory.length = 5; }
+        saveBandHistory();
+        return entry;
+    }
+
+    function getBandChangeHistory() {
+        return bandChangeHistory.slice(0, 5);
+    }
+
+    function formatBandChangeText(entry) {
+        if (!entry) { return ""; }
+        if (entry.type === "initial") {
+            return entry.time + " \u2014 Initial connection: " + entry.to;
+        }
+        if (entry.type === "lost") {
+            return entry.time + " \u2014 Lost service";
+        }
+        if (entry.type === "restored") {
+            return entry.time + " \u2014 Service restored: " + entry.to;
+        }
+        return entry.time + " \u2014 Switched from " + entry.from + " \u2192 " + entry.to;
+    }
+
+    // ── Temperature Formatting ──
+
+    function getTempClass(tempText) {
+        var match = String(tempText || "").match(/(\d+)/);
+        if (!match) { return ""; }
+        var val = parseInt(match[1], 10);
+        if (val >= 55) { return "qt-temp-red"; }
+        if (val >= 48) { return "qt-temp-orange"; }
+        if (val >= 40) { return "qt-temp-yellow"; }
+        return "qt-temp-green";
+    }
+
+    // ── Data Fetch ──
+
+    var _pollCount = 0;
+    var _lastCrosscheck = null; // cache between polls
+
+    function fetchData(callback) {
+        _pollCount++;
+        var url = "/jtools_general_api/state";
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.timeout = 25000;
+        xhr.ontimeout = function () {
+            callback(null, "timeout");
+        };
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState !== 4) { return; }
+            if (xhr.status !== 200) {
+                callback(null, "HTTP " + xhr.status);
+                return;
+            }
+            try {
+                var resp = JSON.parse(xhr.responseText);
+                if (!resp || !resp.ok) {
+                    callback(null, (resp && resp.error) || "API error");
+                    return;
+                }
+                callback(processResponse(resp), null);
+            } catch (e) {
+                callback(null, e.message);
+            }
+        };
+        xhr.send();
+    }
+
+    function processResponse(resp) {
+        if (resp.signal_crosscheck) { _lastCrosscheck = resp.signal_crosscheck; }
+        var qnwinfo = parseQnwinfo(resp.qnwinfo_summary || "");
+        var qspn = parseQspn(resp.qspn_summary || "");
+        var cops = parseCops(resp.cops_summary || "");
+        var servingcell = parseServingcell(resp.qeng_summary || "");
+        var carriers = resp.carriers || [];
+        var stockSignal = resp.stock_signal || {};
+        var provider = chooseFirst(qspn.displayName, cops.operatorName, resp.rdb_network || "");
+        var rat = getRatLabel(qnwinfo, servingcell);
+        if (rat === "N/A" && carriers.length) {
+            var hasNr = false;
+            var hasLte = false;
+            var ci;
+            for (ci = 0; ci < carriers.length; ci += 1) {
+                var cr = String(carriers[ci].rat || "").toUpperCase();
+                if (cr === "NR5G") { hasNr = true; }
+                if (cr === "LTE") { hasLte = true; }
+            }
+            if (hasNr && hasLte) { rat = "5G NSA"; }
+            else if (hasNr) { rat = "NR5G"; }
+            else if (hasLte) { rat = "LTE"; }
+        }
+        var rsrp = choosePrimarySignal(stockSignal, "rsrp", servingcell.rsrp || null);
+        var rsrq = choosePrimarySignal(stockSignal, "rsrq", servingcell.rsrq || null);
+        var sinr = choosePrimarySignal(stockSignal, "snr", servingcell.sinr || null);
+        /* Same RDB keys as StsAdvStatus (objStsAdvStatus.lua): LTE + NR5G CQI, no extra AT. */
+        var cqi = choosePrimarySignal(stockSignal, "cqi", null);
+        var pci = servingcell.pci || null;
+        var cellId = servingcell.cellId || null;
+        var arfcn = chooseFirst(qnwinfo.arfcn, servingcell.arfcn);
+        var bandLabel = chooseFirst(qnwinfo.bandLabel, servingcell.band);
+        var grade = calcSignalGrade(rsrp, rsrq, sinr);
+        var temp = resp.primary_temperature_text || "N/A";
+        var fwVersion = resp.firmware_version || null;
+
+        return {
+            provider: provider,
+            rat: rat,
+            ratClass: getRatClass(rat),
+            rsrp: rsrp,
+            rsrq: rsrq,
+            sinr: sinr,
+            rsrpText: formatDb(rsrp, " dBm"),
+            rsrqText: formatDb(rsrq, " dB"),
+            sinrText: formatDb(sinr, " dB"),
+            cqi: cqi,
+            cqiText: asText(cqi, "N/A"),
+            signalClass: getSignalClass(rsrp),
+            rsrqClass: getRsrqClass(rsrq),
+            sinrClass: getSinrClass(sinr),
+            carrierClass: getCarrierClass(provider),
+            grade: grade,
+            gradeClass: getGradeClass(grade),
+            gradeText: grade != null ? grade + "%" : "N/A",
+            pci: asText(pci),
+            cellId: asText(cellId),
+            arfcn: arfcn,
+            bandLabel: bandLabel,
+            carriers: carriers,
+            bandComboText: formatBandCombo(carriers),
+            bandShort: formatBandShort(carriers),
+            temp: temp,
+            tempClass: getTempClass(temp),
+            qnwinfo: qnwinfo,
+            servingcell: servingcell,
+            firmwareVersion: fwVersion,
+            signalCrosscheck: _lastCrosscheck,
+            raw: resp
+        };
+    }
+
+    // ── Init ──
+
+    loadBandHistory();
+
+    // ── Friendly Error Messages ──
+
+    var ERROR_MESSAGES = {
+        "at_channel_busy": "AT port is busy. Another command or page is using the modem right now. Try again in a few seconds.",
+        "timeout": "The modem did not respond in time. It may be busy or temporarily unavailable. Try again shortly.",
+        "backend_internal_error": "An internal error occurred communicating with the modem. Try again or check the AT terminal for diagnostics.",
+        "request_failed": "The request to the modem failed. Check that the router is reachable and try again.",
+        "config_read_failed": "Could not read the AT backend configuration file.",
+        "backend_bad_result": "The modem returned an unexpected result. Try again.",
+        "response_too_large": "The modem response was too large to process.",
+        "API error": "The API returned an error. The modem may be busy or restarting."
+    };
+
+    function friendlyError(rawError) {
+        if (!rawError) { return "An unknown error occurred."; }
+        var raw = String(rawError);
+        // Check for exact match first
+        if (ERROR_MESSAGES[raw]) { return ERROR_MESSAGES[raw]; }
+        // Check for prefix match (e.g. "backend_internal_error:details")
+        var prefix = raw.split(":")[0];
+        if (ERROR_MESSAGES[prefix]) { return ERROR_MESSAGES[prefix]; }
+        // CME/CMS errors
+        if (raw.indexOf("CME_ERROR") === 0 || raw.indexOf("CMS_ERROR") === 0) {
+            return "The modem returned an error: " + raw.replace(/_/g, " ") + ".";
+        }
+        // HTTP errors
+        if (raw.indexOf("HTTP ") === 0) {
+            if (raw === "HTTP 401") {
+                return "Login required";
+            }
+            return "Server returned " + raw + ". The router may be busy or restarting.";
+        }
+        return raw;
+    }
+
+    // ── Public API ──
+
+    window.JtoolsQuickOverview = {
+        fetchData: fetchData,
+        processResponse: processResponse,
+        calcSignalGrade: calcSignalGrade,
+        normalizeMetric: normalizeMetric,
+        getSignalClass: getSignalClass,
+        getRsrqClass: getRsrqClass,
+        getSinrClass: getSinrClass,
+        getCarrierClass: getCarrierClass,
+        getGradeClass: getGradeClass,
+        getRatClass: getRatClass,
+        getBandToneClass: getBandToneClass,
+        buildPhoneBars: buildPhoneBars,
+        buildGradientBar: buildGradientBar,
+        buildFillBar: buildFillBar,
+        buildSpectrumBar: buildSpectrumBar,
+        formatBandCombo: formatBandCombo,
+        formatBandShort: formatBandShort,
+        trackBandChange: trackBandChange,
+        getBandChangeHistory: getBandChangeHistory,
+        formatBandChangeText: formatBandChangeText,
+        getTempClass: getTempClass,
+        loadSettings: loadSettings,
+        getSettings: getSettings,
+        saveSettings: saveSettings,
+        escapeHtml: escapeHtml,
+        asText: asText,
+        hasValue: hasValue,
+        asInt: asInt,
+        formatDb: formatDb,
+        friendlyError: friendlyError,
+        formatBandwidthMhzSuffix: formatBandwidthMhzSuffix,
+        DEFAULTS: DEFAULTS
+    };
+
+})(window);

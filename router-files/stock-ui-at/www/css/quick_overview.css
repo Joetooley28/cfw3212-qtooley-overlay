@@ -1,0 +1,877 @@
+/* ================================================================
+   Quick Overview — Screensaver Overlay + Tab Page
+   Dark mode only. H5000-inspired gradient bar styling.
+   ================================================================ */
+
+/* ── CSS Variables ── */
+:root {
+    --qo-bg-deep: #0a0a0f;
+    --qo-bg-mid: #0f1018;
+    --qo-bg-card: rgba(255,255,255,0.04);
+    --qo-border: rgba(255,255,255,0.08);
+    --qo-text: #d7dde4;
+    --qo-text-dim: #8a8f98;
+    --qo-text-bright: #f0f2f5;
+    --qo-accent-blue: #8db9ff;
+    --qo-accent-cyan: #00e5ff;
+    --qo-accent-purple: #b388ff;
+    --qo-green-bright: #00e676;
+    --qo-green: #4caf50;
+    --qo-orange: #ff8a00;
+    --qo-red: #d16969;
+    --qo-red-bright: #ff1744;
+    --qo-yellow: #ffc107;
+    --qo-font-mono: Consolas, "Courier New", monospace;
+    --qo-font-sans: "Segoe UI", "Open Sans Regular", sans-serif;
+    --qo-gradient-bar: linear-gradient(to right, #ff1744, #d16969, #ff8a00, #ffc107, #4caf50, #00e676);
+    --qo-card-blur: blur(10px);
+    --qo-card-radius: 12px;
+}
+
+/* ── Signal Color Classes ── */
+.qo-sig-excellent { color: #00e676 !important; }
+.qo-sig-good     { color: #4caf50 !important; }
+.qo-sig-fair     { color: #ff8a00 !important; }
+.qo-sig-poor     { color: #d16969 !important; }
+.qo-sig-vpoor    { color: #ff1744 !important; }
+.qo-sig-na       { color: #8a8f98 !important; }
+
+/* ── Temperature Colors ── */
+.qo-temp-ok   { color: #4caf50; }
+.qo-temp-warm { color: #ff8a00; }
+.qo-temp-hot  { color: #ff1744; }
+
+/* ================================================================
+   SCREENSAVER OVERLAY
+   ================================================================ */
+
+.qo-screensaver {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: linear-gradient(135deg, var(--qo-bg-deep) 0%, var(--qo-bg-mid) 50%, #0d0d18 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--qo-font-sans);
+    color: var(--qo-text);
+    opacity: 0;
+    transition: opacity 500ms ease;
+    cursor: default;
+    overflow: hidden;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.qo-screensaver.is-visible {
+    opacity: 1;
+}
+.qo-screensaver.is-hiding {
+    opacity: 0;
+    transition: opacity 300ms ease;
+}
+
+/* ── Signal bars + grade (top-right corner) ── */
+.qo-ss-corner {
+    position: absolute;
+    top: 24px;
+    right: 32px;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+}
+.qo-phone-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 28px;
+}
+.qo-bar {
+    width: 6px;
+    border-radius: 2px 2px 0 0;
+    background: rgba(255,255,255,0.12);
+    transition: background 0.3s;
+}
+.qo-bar.is-on {
+    background: var(--qo-green-bright);
+    box-shadow: 0 0 6px rgba(0,230,118,0.4);
+}
+.qo-ss-grade-label {
+    font-family: var(--qo-font-mono);
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* ── Center content ── */
+.qo-ss-center {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+.qo-ss-clock {
+    font-family: var(--qo-font-mono);
+    font-size: 72px;
+    font-weight: 300;
+    letter-spacing: 4px;
+    color: var(--qo-text-bright);
+    text-shadow: 0 0 30px rgba(141,185,255,0.15);
+    line-height: 1;
+    margin-bottom: 4px;
+}
+.qo-ss-ampm {
+    font-family: var(--qo-font-mono);
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--qo-text-dim);
+    letter-spacing: 3px;
+    margin-top: -2px;
+    margin-bottom: 4px;
+}
+.qo-ss-device {
+    font-size: 14px;
+    color: var(--qo-text-dim);
+    letter-spacing: 1px;
+}
+.qo-ss-provider {
+    font-size: 18px;
+    color: var(--qo-text);
+    font-weight: 500;
+    margin: 2px 0;
+}
+.qo-ss-temp {
+    font-family: var(--qo-font-mono);
+    font-size: 16px;
+    margin-top: 2px;
+}
+
+/* ── RAT Badge (glowing pill) ── */
+.qo-rat-badge {
+    display: inline-block;
+    padding: 4px 16px;
+    border-radius: 20px;
+    font-family: var(--qo-font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin: 6px 0;
+}
+.qo-rat-lte {
+    background: rgba(33,150,243,0.15);
+    color: #64b5f6;
+    border: 1px solid rgba(33,150,243,0.3);
+    box-shadow: 0 0 12px rgba(33,150,243,0.2);
+}
+.qo-rat-nr {
+    background: rgba(179,136,255,0.15);
+    color: #ce93d8;
+    border: 1px solid rgba(179,136,255,0.3);
+    box-shadow: 0 0 12px rgba(179,136,255,0.2);
+}
+.qo-rat-nsa {
+    background: rgba(0,229,255,0.12);
+    color: #00e5ff;
+    border: 1px solid rgba(0,229,255,0.25);
+    box-shadow: 0 0 14px rgba(0,229,255,0.2);
+}
+
+/* ── Metric values row ── */
+.qo-ss-metrics {
+    display: flex;
+    gap: 32px;
+    margin: 16px 0 12px;
+    font-family: var(--qo-font-mono);
+    font-size: 15px;
+}
+.qo-ss-metric-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+.qo-ss-metric-label {
+    font-size: 11px;
+    color: var(--qo-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.qo-ss-metric-value {
+    font-size: 17px;
+    font-weight: 600;
+}
+
+/* ── H5000-style Gradient Bar ── */
+.qo-gradient-bar {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    height: 14px;
+    margin: 8px auto;
+    border-radius: 7px;
+    overflow: visible;
+}
+.qo-gradient-track {
+    width: 100%;
+    height: 100%;
+    border-radius: 7px;
+    background: var(--qo-gradient-bar);
+    box-shadow: 0 0 12px rgba(255,138,0,0.15), inset 0 1px 2px rgba(0,0,0,0.3);
+}
+.qo-gradient-marker {
+    position: absolute;
+    top: -6px;
+    width: 4px;
+    height: 26px;
+    background: #fff;
+    border-radius: 2px;
+    box-shadow: 0 0 8px rgba(255,255,255,0.6), 0 2px 4px rgba(0,0,0,0.4);
+    transform: translateX(-50%);
+    transition: left 0.6s ease;
+}
+
+/* ── Band combo pills ── */
+.qo-ss-bands {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 14px 0 10px;
+}
+.qo-band-pill {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 14px;
+    font-family: var(--qo-font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--qo-text);
+    letter-spacing: 0.5px;
+}
+.qo-band-pill.is-nr {
+    border-color: rgba(179,136,255,0.3);
+    color: #ce93d8;
+}
+.qo-band-pill.is-pcc,
+.qo-band-pill.is-nr.is-pcc {
+    border-color: rgba(0,229,255,0.35);
+    color: #00e5ff;
+    background: rgba(0,229,255,0.08);
+}
+
+/* ── Bottom detail line ── */
+.qo-ss-detail {
+    font-family: var(--qo-font-mono);
+    font-size: 12px;
+    color: var(--qo-text-dim);
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+}
+.qo-ss-detail span {
+    margin: 0 10px;
+}
+
+/* ── Toast notification ── */
+.qo-toast-container {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100000;
+    pointer-events: none;
+}
+.qo-toast {
+    background: rgba(20,20,30,0.92);
+    backdrop-filter: var(--qo-card-blur);
+    -webkit-backdrop-filter: var(--qo-card-blur);
+    border: 1px solid rgba(0,229,255,0.2);
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-family: var(--qo-font-mono);
+    font-size: 13px;
+    color: var(--qo-accent-cyan);
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 400ms ease, transform 400ms ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.qo-toast.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ================================================================
+   TAB PAGE
+   ================================================================ */
+
+html,
+body.jtools-page-quick-overview,
+body.jtools-page-quick-overview #body,
+body.jtools-page-quick-overview .site-content,
+body.jtools-page-quick-overview #content,
+body.jtools-page-quick-overview #content > .container,
+body.jtools-page-quick-overview #content .grid-9.omega,
+body.jtools-page-quick-overview #content .body-box,
+body.jtools-page-quick-overview #content .body-box > .pad,
+body.jtools-page-quick-overview #htmlGoesHere {
+    background: #0a0a0f !important;
+}
+
+.qo-page {
+    background: linear-gradient(135deg, var(--qo-bg-deep) 0%, var(--qo-bg-mid) 100%);
+    min-height: 100vh;
+    padding: 20px;
+    font-family: var(--qo-font-sans);
+    color: var(--qo-text);
+}
+.qo-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--qo-border);
+}
+.qo-page-title {
+    font-size: 26px;
+    font-weight: 600;
+    color: #c8d6e5;
+    letter-spacing: 0.3px;
+}
+/* ── Collapsible card ── */
+.qo-card-toggle {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.qo-card-toggle:hover {
+    color: var(--qo-text);
+}
+.qo-card-arrow {
+    font-size: 10px;
+    transition: transform 0.3s ease;
+    color: var(--qo-text-dim);
+}
+.qo-card-arrow.is-open {
+    transform: rotate(180deg);
+}
+
+/* ── Card (glassmorphism) ── */
+.qo-card {
+    background: var(--qo-bg-card);
+    backdrop-filter: var(--qo-card-blur);
+    -webkit-backdrop-filter: var(--qo-card-blur);
+    border: 1px solid var(--qo-border);
+    border-radius: var(--qo-card-radius);
+    padding: 20px;
+    margin-bottom: 16px;
+}
+.qo-card-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--qo-text-dim);
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--qo-border);
+}
+
+/* ── Carrier Brand Colors ── */
+.qo-carrier-tmo   { color: #e20074; }
+.qo-carrier-att   { color: #009fdb; }
+.qo-carrier-vzw   { color: #cd040b; }
+.qo-carrier-other { color: var(--qo-text); }
+
+/* ── Active Band Card ── */
+.qo-ab-combo {
+    font-family: var(--qo-font-mono);
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    line-height: 1.3;
+}
+.qo-ab-pcc {
+    color: #00e5ff;
+}
+.qo-ab-nr {
+    color: #ce93d8;
+}
+.qo-ab-lte {
+    color: #00e676;
+}
+.qo-ab-plus {
+    color: var(--qo-text-dim);
+    margin: 0 4px;
+    font-weight: 400;
+}
+.qo-ab-none {
+    color: var(--qo-text-dim);
+    font-size: 16px;
+}
+.qo-ab-sub {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+.qo-ab-provider {
+    font-size: 13px;
+    color: var(--qo-text-dim);
+}
+
+/* ── Signal Grade Card ── */
+.qo-grade-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+.qo-grade-pct {
+    font-family: var(--qo-font-mono);
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1;
+}
+.qo-grade-bars-wrap {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 32px;
+}
+
+/* ── Per-metric row (tab page) ── */
+.qo-metric-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 10px;
+    font-family: var(--qo-font-mono);
+    font-size: 14px;
+}
+.qo-metric-label {
+    width: 50px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--qo-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+}
+.qo-metric-value {
+    width: 100px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+.qo-metric-bars {
+    flex: 1;
+    min-width: 0;
+}
+
+.qo-metric-row-plain .qo-metric-value {
+    flex: 1;
+    min-width: 0;
+    width: auto;
+}
+
+/* ── Fill Bar (per-metric) ── */
+.qo-fill-bar {
+    height: 8px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+.qo-fill-bar-inner {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.6s ease;
+}
+.qo-fill-bar-inner.qo-sig-excellent { background: #00e676; box-shadow: 0 0 6px rgba(0,230,118,0.3); }
+.qo-fill-bar-inner.qo-sig-good     { background: #4caf50; box-shadow: 0 0 6px rgba(76,175,80,0.3); }
+.qo-fill-bar-inner.qo-sig-fair     { background: #ff8a00; box-shadow: 0 0 6px rgba(255,138,0,0.3); }
+.qo-fill-bar-inner.qo-sig-poor     { background: #d16969; box-shadow: 0 0 6px rgba(209,105,105,0.3); }
+.qo-fill-bar-inner.qo-sig-vpoor    { background: #ff1744; box-shadow: 0 0 6px rgba(255,23,68,0.3); }
+.qo-fill-bar-inner.qo-sig-na       { background: #555; }
+
+/* ── Spectrum Bar (per-metric) ── */
+.qo-spectrum-bar {
+    position: relative;
+    height: 6px;
+    border-radius: 3px;
+    overflow: visible;
+}
+.qo-spectrum-track {
+    width: 100%;
+    height: 100%;
+    border-radius: 3px;
+    background: var(--qo-gradient-bar);
+    opacity: 0.5;
+}
+.qo-spectrum-marker {
+    position: absolute;
+    top: -4px;
+    width: 3px;
+    height: 14px;
+    background: #fff;
+    border-radius: 1.5px;
+    box-shadow: 0 0 6px rgba(255,255,255,0.5);
+    transform: translateX(-50%);
+    transition: left 0.6s ease;
+}
+
+/* ── Sparkline Chart ── */
+.qo-chart-wrap {
+    position: relative;
+    width: 100%;
+    height: 140px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    overflow: hidden;
+}
+.qo-chart-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+.qo-chart-legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--qo-text-dim);
+}
+.qo-chart-legend-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+/* ── Band Change History ── */
+.qo-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.qo-history-item {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 8px;
+    border-left: 3px solid var(--qo-accent-blue);
+    font-size: 13px;
+}
+.qo-history-item.is-lost {
+    border-left-color: var(--qo-red-bright);
+}
+.qo-history-item.is-restored {
+    border-left-color: var(--qo-green-bright);
+}
+.qo-history-item.is-initial {
+    border-left-color: var(--qo-text-dim);
+}
+.qo-history-time {
+    font-family: var(--qo-font-mono);
+    font-weight: 700;
+    color: var(--qo-text-dim);
+    flex-shrink: 0;
+    font-size: 12px;
+}
+.qo-history-text {
+    color: var(--qo-text);
+}
+
+/* ── Connection Info ── */
+.qo-conn-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+}
+.qo-conn-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.qo-conn-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--qo-text-dim);
+}
+.qo-conn-value {
+    font-family: var(--qo-font-mono);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--qo-text-bright);
+}
+.qo-conn-bands-row {
+    grid-column: 1 / -1;
+    margin-top: 4px;
+}
+
+/* ── Settings Section ── */
+.qo-settings {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.35s ease;
+}
+.qo-settings.is-open {
+    max-height: 600px;
+}
+.qo-settings-inner {
+    padding-top: 12px;
+}
+.qo-setting-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+    font-size: 13px;
+}
+.qo-setting-label {
+    min-width: 120px;
+    color: var(--qo-text-dim);
+    font-weight: 600;
+}
+
+/* Toggle switch */
+.qo-toggle {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+}
+.qo-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+.qo-toggle-track {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.qo-toggle-track::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+}
+.qo-toggle input:checked + .qo-toggle-track {
+    background: var(--qo-green);
+}
+.qo-toggle input:checked + .qo-toggle-track::after {
+    transform: translateX(20px);
+}
+
+/* Select dropdown */
+.qo-select {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    color: var(--qo-text);
+    font-family: var(--qo-font-mono);
+    font-size: 13px;
+    padding: 4px 8px;
+    cursor: pointer;
+    outline: none;
+}
+.qo-select:focus {
+    border-color: var(--qo-accent-blue);
+}
+.qo-select option {
+    background: #1e1e1e;
+    color: var(--qo-text);
+}
+
+/* Weight inputs */
+.qo-weight-group {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.qo-weight-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--qo-font-mono);
+    font-size: 13px;
+}
+.qo-weight-input {
+    width: 52px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    color: var(--qo-text);
+    font-family: var(--qo-font-mono);
+    font-size: 13px;
+    padding: 4px 6px;
+    text-align: center;
+    outline: none;
+}
+.qo-weight-input:focus {
+    border-color: var(--qo-accent-blue);
+}
+.qo-weight-sum {
+    font-size: 12px;
+    margin-left: 8px;
+}
+.qo-weight-sum.is-valid {
+    color: var(--qo-green);
+}
+.qo-weight-sum.is-invalid {
+    color: var(--qo-red-bright);
+}
+
+/* Formula explanation */
+.qo-formula-info {
+    margin-top: 10px;
+    padding: 12px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--qo-text-dim);
+    line-height: 1.6;
+}
+.qo-formula-info code {
+    font-family: var(--qo-font-mono);
+    color: var(--qo-accent-blue);
+    background: rgba(141,185,255,0.08);
+    padding: 1px 5px;
+    border-radius: 3px;
+}
+
+/* ── No data state ── */
+.qo-no-data {
+    text-align: center;
+    padding: 24px;
+    color: var(--qo-text-dim);
+    font-size: 14px;
+}
+
+/* ── Status dot (polling indicator) ── */
+.qo-status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--qo-green);
+    margin-right: 8px;
+    box-shadow: 0 0 6px rgba(76,175,80,0.4);
+    animation: qo-pulse 2s ease-in-out infinite;
+}
+@keyframes qo-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+.qo-status-dot.is-error {
+    background: var(--qo-red-bright);
+    box-shadow: 0 0 6px rgba(255,23,68,0.4);
+}
+
+/* ================================================================
+   MOBILE RESPONSIVE
+   ================================================================ */
+
+@media (max-width: 768px) {
+    /* Screensaver */
+    .qo-ss-clock {
+        font-size: 48px;
+        letter-spacing: 2px;
+    }
+    .qo-ss-metrics {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+    .qo-ss-corner {
+        top: 12px;
+        right: 16px;
+    }
+    .qo-ss-grade-label {
+        font-size: 18px;
+    }
+    .qo-gradient-bar {
+        max-width: 90%;
+    }
+    .qo-ss-bands {
+        max-width: 90%;
+    }
+    .qo-ss-detail {
+        font-size: 11px;
+    }
+    .qo-ss-detail span {
+        display: block;
+        margin: 2px 0;
+    }
+
+    /* Tab page */
+    .qo-page {
+        padding: 12px;
+    }
+    .qo-page-title {
+        font-size: 22px;
+    }
+    .qo-card {
+        padding: 14px;
+    }
+    .qo-grade-pct {
+        font-size: 32px;
+    }
+    .qo-metric-row {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .qo-metric-value {
+        width: auto;
+    }
+    .qo-metric-bars {
+        width: 100%;
+        flex-basis: 100%;
+    }
+    .qo-conn-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .qo-chart-wrap {
+        height: 110px;
+    }
+    .qo-setting-row {
+        flex-wrap: wrap;
+    }
+    .qo-weight-group {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .qo-ss-clock {
+        font-size: 36px;
+    }
+    .qo-conn-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,379 @@
+/* ================================================================
+   Screensaver Overlay — Standalone styles
+   No dependency on quick_overview.css.
+   All classes use ss- prefix to avoid collisions.
+   ================================================================ */
+
+:root {
+    --ss-ov-bg-deep: #0a0a0f;
+    --ss-ov-bg-mid: #0f1018;
+    --ss-ov-border: rgba(255,255,255,0.08);
+    --ss-ov-text: #d7dde4;
+    --ss-ov-text-dim: #8a8f98;
+    --ss-ov-text-bright: #f0f2f5;
+    --ss-ov-accent-blue: #8db9ff;
+    --ss-ov-accent-cyan: #00e5ff;
+    --ss-ov-accent-purple: #b388ff;
+    --ss-ov-green-bright: #00e676;
+    --ss-ov-green: #4caf50;
+    --ss-ov-orange: #ff8a00;
+    --ss-ov-red: #d16969;
+    --ss-ov-red-bright: #ff1744;
+    --ss-ov-yellow: #ffc107;
+    --ss-ov-font-mono: Consolas, "Courier New", monospace;
+    --ss-ov-font-sans: "Segoe UI", "Open Sans Regular", sans-serif;
+    --ss-ov-gradient-bar: linear-gradient(to right, #ff1744, #d16969, #ff8a00, #ffc107, #4caf50, #00e676);
+    --ss-ov-card-blur: blur(10px);
+}
+
+/* ── Signal Color Classes ── */
+.ss-sig-excellent { color: #00e676 !important; }
+.ss-sig-good     { color: #4caf50 !important; }
+.ss-sig-fair     { color: #ff8a00 !important; }
+.ss-sig-poor     { color: #d16969 !important; }
+.ss-sig-vpoor    { color: #ff1744 !important; }
+.ss-sig-na       { color: #8a8f98 !important; }
+
+/* ── Temperature Colors ── */
+.ss-temp-green  { color: #4caf50; }
+.ss-temp-yellow { color: #ffc107; }
+.ss-temp-orange { color: #ff8a00; }
+.ss-temp-red    { color: #ff1744; }
+
+/* ================================================================
+   SCREENSAVER OVERLAY
+   ================================================================ */
+
+.ss-screensaver {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: linear-gradient(135deg, var(--ss-ov-bg-deep) 0%, var(--ss-ov-bg-mid) 50%, #0d0d18 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--ss-ov-font-sans);
+    color: var(--ss-ov-text);
+    opacity: 0;
+    transition: opacity 500ms ease;
+    cursor: default;
+    overflow: hidden;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.ss-screensaver.is-visible {
+    opacity: 1;
+}
+.ss-screensaver.is-hiding {
+    opacity: 0;
+    transition: opacity 300ms ease;
+}
+
+/* ── Signal bars + grade (top-right corner) ── */
+.ss-ov-corner {
+    position: absolute;
+    top: 24px;
+    right: 32px;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+}
+.ss-phone-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 28px;
+}
+.ss-bar {
+    width: 6px;
+    border-radius: 2px 2px 0 0;
+    background: rgba(255,255,255,0.12);
+    transition: background 0.3s;
+}
+.ss-bar.is-on {
+    background: var(--ss-ov-green-bright);
+    box-shadow: 0 0 6px rgba(0,230,118,0.4);
+}
+.ss-ov-grade-label {
+    font-family: var(--ss-ov-font-mono);
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* ── Center content ── */
+.ss-ov-center {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+.ss-ov-clock {
+    font-family: var(--ss-ov-font-mono);
+    font-size: 72px;
+    font-weight: 300;
+    letter-spacing: 4px;
+    color: var(--ss-ov-text-bright);
+    text-shadow: 0 0 30px rgba(141,185,255,0.15);
+    line-height: 1;
+    margin-bottom: 4px;
+}
+.ss-ov-ampm {
+    font-family: var(--ss-ov-font-mono);
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--ss-ov-text-dim);
+    letter-spacing: 3px;
+    margin-top: -2px;
+    margin-bottom: 4px;
+}
+.ss-ov-device {
+    font-size: 14px;
+    color: var(--ss-ov-text-dim);
+    letter-spacing: 1px;
+}
+.ss-ov-provider {
+    font-size: 18px;
+    color: var(--ss-ov-text);
+    font-weight: 500;
+    margin: 2px 0;
+}
+.ss-ov-temp {
+    font-family: var(--ss-ov-font-mono);
+    font-size: 16px;
+    margin-top: 2px;
+}
+
+/* ── Carrier Brand Colors ── */
+.ss-carrier-tmobile { color: #e20074; }
+.ss-carrier-att     { color: #009fdb; }
+.ss-carrier-verizon { color: #cd040b; }
+.ss-carrier-other   { color: var(--ss-ov-text); }
+
+/* ── RAT Badge (glowing pill) ── */
+.ss-rat-badge {
+    display: inline-block;
+    padding: 4px 16px;
+    border-radius: 20px;
+    font-family: var(--ss-ov-font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin: 6px 0;
+}
+.ss-rat-lte {
+    background: rgba(33,150,243,0.15);
+    color: #64b5f6;
+    border: 1px solid rgba(33,150,243,0.3);
+    box-shadow: 0 0 12px rgba(33,150,243,0.2);
+}
+.ss-rat-nr {
+    background: rgba(179,136,255,0.15);
+    color: #ce93d8;
+    border: 1px solid rgba(179,136,255,0.3);
+    box-shadow: 0 0 12px rgba(179,136,255,0.2);
+}
+.ss-rat-nsa {
+    background: rgba(0,229,255,0.12);
+    color: #00e5ff;
+    border: 1px solid rgba(0,229,255,0.25);
+    box-shadow: 0 0 14px rgba(0,229,255,0.2);
+}
+.ss-rat-sa {
+    background: rgba(0,229,255,0.12);
+    color: #00e5ff;
+    border: 1px solid rgba(0,229,255,0.25);
+    box-shadow: 0 0 14px rgba(0,229,255,0.2);
+}
+
+/* ── Metric values row ── */
+.ss-ov-metrics {
+    display: flex;
+    gap: 32px;
+    margin: 16px 0 12px;
+    font-family: var(--ss-ov-font-mono);
+    font-size: 15px;
+}
+.ss-ov-metric-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+.ss-ov-metric-label {
+    font-size: 11px;
+    color: var(--ss-ov-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.ss-ov-metric-value {
+    font-size: 17px;
+    font-weight: 600;
+}
+
+/* ── Gradient Bar ── */
+.ss-gradient-bar {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    height: 14px;
+    margin: 8px auto;
+    border-radius: 7px;
+    overflow: visible;
+}
+.ss-gradient-track {
+    width: 100%;
+    height: 100%;
+    border-radius: 7px;
+    background: var(--ss-ov-gradient-bar);
+    box-shadow: 0 0 12px rgba(255,138,0,0.15), inset 0 1px 2px rgba(0,0,0,0.3);
+}
+.ss-gradient-marker {
+    position: absolute;
+    top: -6px;
+    width: 4px;
+    height: 26px;
+    background: #fff;
+    border-radius: 2px;
+    box-shadow: 0 0 8px rgba(255,255,255,0.6), 0 2px 4px rgba(0,0,0,0.4);
+    transform: translateX(-50%);
+    transition: left 0.6s ease;
+}
+
+/* ── Band combo pills ── */
+.ss-ov-bands {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 14px 0 10px;
+}
+.ss-band-pill {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 14px;
+    font-family: var(--ss-ov-font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--ss-ov-text);
+    letter-spacing: 0.5px;
+}
+.ss-band-pill.is-nr {
+    border-color: rgba(179,136,255,0.3);
+    color: #ce93d8;
+}
+.ss-band-pill.is-pcc,
+.ss-band-pill.is-nr.is-pcc {
+    border-color: rgba(0,229,255,0.35);
+    color: #00e5ff;
+    background: rgba(0,229,255,0.08);
+}
+
+/* ── Bottom detail line ── */
+.ss-ov-detail {
+    font-family: var(--ss-ov-font-mono);
+    font-size: 12px;
+    color: var(--ss-ov-text-dim);
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+}
+.ss-ov-detail span {
+    margin: 0 10px;
+}
+
+/* ── Toast notification ── */
+.ss-toast-container {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100000;
+    pointer-events: none;
+}
+.ss-toast {
+    background: rgba(20,20,30,0.92);
+    backdrop-filter: var(--ss-ov-card-blur);
+    -webkit-backdrop-filter: var(--ss-ov-card-blur);
+    border: 1px solid rgba(0,229,255,0.2);
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-family: var(--ss-ov-font-mono);
+    font-size: 13px;
+    color: var(--ss-ov-accent-cyan);
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 400ms ease, transform 400ms ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.ss-toast.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ── Dismiss button (button mode) ── */
+.ss-ov-dismiss {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 28px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--ss-ov-text-dim);
+    font-family: var(--ss-ov-font-sans);
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.ss-ov-dismiss:hover {
+    background: rgba(255,255,255,0.14);
+}
+
+/* ================================================================
+   MOBILE RESPONSIVE
+   ================================================================ */
+
+@media (max-width: 768px) {
+    .ss-ov-clock {
+        font-size: 48px;
+        letter-spacing: 2px;
+    }
+    .ss-ov-metrics {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+    .ss-ov-corner {
+        top: 12px;
+        right: 16px;
+    }
+    .ss-ov-grade-label {
+        font-size: 18px;
+    }
+    .ss-gradient-bar {
+        max-width: 90%;
+    }
+    .ss-ov-bands {
+        max-width: 90%;
+    }
+    .ss-ov-detail {
+        font-size: 11px;
+    }
+    .ss-ov-detail span {
+        display: block;
+        margin: 2px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .ss-ov-clock {
+        font-size: 36px;
+    }
+}

@@ -1,0 +1,891 @@
+html,
+body.jtools-page-ookla-speedtest,
+body.jtools-page-ookla-speedtest #body,
+body.jtools-page-ookla-speedtest .site-content,
+body.jtools-page-ookla-speedtest #content,
+body.jtools-page-ookla-speedtest #content > .container,
+body.jtools-page-ookla-speedtest #content .grid-9.omega,
+body.jtools-page-ookla-speedtest #content .body-box,
+body.jtools-page-ookla-speedtest #content .body-box > .pad,
+body.jtools-page-ookla-speedtest #htmlGoesHere {
+    background: #0a0a0f !important;
+}
+
+#ookla-speedtest-panel {
+    box-sizing: border-box;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.ookla-page {
+    background: var(--qt-bg-card, linear-gradient(180deg, #f7f9fc 0%, #eef3f9 100%));
+    border: 1px solid var(--qt-border, #dbe4ef);
+    border-radius: var(--qt-radius, 10px);
+    box-sizing: border-box;
+    max-width: 100%;
+    overflow: hidden;
+    padding: 22px;
+}
+
+.ookla-eyebrow {
+    color: var(--qt-text-dim, #496d97);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.ookla-subtitle {
+    color: var(--qt-text-dim, #395471);
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 0 0 18px 0;
+    max-width: 680px;
+}
+
+.ookla-run-button {
+    min-width: 170px;
+}
+
+.ookla-secondary-button {
+    min-width: 160px;
+}
+
+.ookla-banner {
+    background: var(--qt-bg-card-alt, #edf4fb);
+    border: 1px solid var(--qt-border, #d3dfec);
+    border-radius: var(--qt-radius-sm, 6px);
+    color: var(--qt-text-label, #294867);
+    margin-bottom: 16px;
+    min-height: 18px;
+    padding: 12px 14px;
+}
+
+.ookla-banner.is-ok {
+    background: #edf7ef;
+    border-color: #cfe3d3;
+    color: #25613d;
+}
+
+.ookla-banner.is-error {
+    background: #fff1ef;
+    border-color: #efd0cc;
+    color: #8a1f11;
+}
+
+.ookla-banner.is-info {
+    background: #edf4fb;
+    border-color: #d3dfec;
+    color: #294867;
+}
+
+.ookla-banner.is-warn {
+    background: #fff7df;
+    border-color: #ecd08b;
+    color: #7a5b0b;
+}
+
+.ookla-banner-actions {
+    display: flex;
+    justify-content: flex-start;
+    margin: -4px 0 18px 0;
+}
+
+.ookla-recover-button {
+    min-width: 230px;
+}
+
+/* ── Above-fold two-column layout ─────────────────── */
+
+.ookla-above-fold {
+    display: grid;
+    gap: 24px;
+    grid-template-columns: 1fr minmax(0, 320px);
+    margin-bottom: 24px;
+}
+
+.ookla-fold-left {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ookla-fold-right {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.ookla-toolbar-stacked {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ookla-field {
+    background: var(--qt-bg-card, #ffffff);
+    border: 1px solid var(--qt-border, #d8e0ea);
+    border-radius: var(--qt-radius-sm, 6px);
+    min-width: 0;
+    overflow: hidden;
+    padding: 12px;
+}
+
+.ookla-field label {
+    color: var(--qt-text-dim, #4d6988);
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+    overflow: hidden;
+    text-align: left;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.ookla-select,
+.ookla-static {
+    border: 1px solid var(--qt-border, #c8d4e0);
+    border-radius: var(--qt-radius-sm, 6px);
+    box-sizing: border-box;
+    color: var(--qt-text, #17324d);
+    font-size: 14px;
+    min-height: 44px;
+    overflow: hidden;
+    padding: 10px 12px;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.ookla-select {
+    background: var(--qt-bg-card, #ffffff);
+}
+
+.ookla-static {
+    background: var(--qt-bg-card-alt, #f5f8fb);
+}
+
+.ookla-grid-lower {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-bottom: 18px;
+}
+
+/* ── Single sequential gauge ─────────────────────── */
+
+.ookla-phase-rail {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ookla-phase-step {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--qt-border, #d8e0ea);
+    border-radius: 999px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0 14px;
+}
+
+.ookla-phase-step.is-active {
+    border-color: rgba(126, 209, 255, 0.55);
+    box-shadow: 0 0 0 1px rgba(126, 209, 255, 0.18), 0 10px 28px rgba(54, 126, 196, 0.18);
+}
+
+.ookla-phase-step.is-done {
+    border-color: rgba(102, 206, 148, 0.4);
+}
+
+.ookla-phase-dot {
+    background: #596578;
+    border-radius: 50%;
+    display: inline-block;
+    height: 10px;
+    width: 10px;
+}
+
+.ookla-phase-step.is-active .ookla-phase-dot {
+    background: linear-gradient(135deg, #74ebff 0%, #49c8ff 100%);
+    box-shadow: 0 0 12px rgba(73, 200, 255, 0.55);
+}
+
+.ookla-phase-step.is-done .ookla-phase-dot {
+    background: linear-gradient(135deg, #66e2a3 0%, #49b777 100%);
+}
+
+.ookla-phase-label {
+    color: var(--qt-text-dim, #5a7594);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.ookla-phase-step.is-active .ookla-phase-label,
+.ookla-phase-step.is-done .ookla-phase-label {
+    color: var(--qt-text, #17324d);
+}
+
+.ookla-flip-gauge-slot {
+    display: flex;
+    justify-content: center;
+}
+
+.ookla-flip-gauge-slot .ookla-gauge-card {
+    max-width: 420px;
+    width: 100%;
+}
+
+.ookla-flip-gauge-slot.is-running .ookla-gauge {
+    animation: ooklaPulse 1.8s ease-in-out infinite;
+}
+
+.ookla-ca-card {
+    align-items: center;
+    background: var(--qt-bg-card, #ffffff);
+    border: 1px solid var(--qt-border, #d8e0ea);
+    border-radius: var(--qt-radius-sm, 6px);
+    display: flex;
+    gap: 18px;
+    justify-content: space-between;
+    padding: 16px 18px;
+}
+
+.ookla-ca-slot-side {
+    margin-top: 2px;
+}
+
+.ookla-ca-copy {
+    min-width: 0;
+}
+
+.ookla-ca-label {
+    color: #b86118;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.ookla-ca-frozen-tag {
+    background: #e5dcd3;
+    border-radius: 4px;
+    color: #7a5a32;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    margin-left: 8px;
+    padding: 2px 7px;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
+.ookla-ca-card.is-snapshot {
+    opacity: 0.78;
+}
+
+.ookla-ca-caption {
+    color: var(--qt-text-label, #c7d0d9);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.ookla-ca-combo {
+    color: var(--qt-text-bright, #f0f2f5);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-top: 8px;
+}
+
+.ookla-ca-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.ookla-ca-pill {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    color: var(--qt-text, #d7dde4);
+    font-family: var(--qt-font-mono, Consolas, "Courier New", monospace);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    min-width: 74px;
+    padding: 6px 12px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.ookla-ca-pill.is-nr {
+    border-color: rgba(179,136,255,0.3);
+    color: #ce93d8;
+}
+
+.ookla-ca-pill.is-pcc,
+.ookla-ca-pill.is-nr.is-pcc {
+    background: rgba(0,229,255,0.08);
+    border-color: rgba(0,229,255,0.35);
+    color: #00e5ff;
+}
+
+.ookla-ca-pill.is-muted {
+    background: linear-gradient(180deg, #edf2f7 0%, #dbe3ec 100%);
+    border-color: #c0ccd8;
+    color: #6a7f97;
+}
+
+.ookla-stage-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ookla-stage-actions .qt-btn {
+    width: 100%;
+}
+
+.ookla-gauges {
+    display: none;
+}
+
+.ookla-card,
+.ookla-gauge-card {
+    background:
+        radial-gradient(circle at top, rgba(125, 214, 255, 0.08), transparent 38%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+    border: 1px solid rgba(123, 145, 173, 0.24);
+    border-radius: 22px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 24px 50px rgba(0, 0, 0, 0.16);
+    padding: 22px;
+}
+
+.ookla-card-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.ookla-details-card {
+    min-width: 0;
+}
+
+.ookla-card-bottom {
+    margin-top: 18px;
+}
+
+.ookla-card-title {
+    color: var(--qt-accent-orange, #b86118);
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 14px;
+}
+
+.ookla-card-title-sub {
+    margin-top: 18px;
+}
+
+.ookla-gauge-head {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.ookla-gauge-kicker {
+    color: #8fbdf8;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.ookla-gauge-phase-text {
+    color: rgba(230, 238, 249, 0.76);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* Same conic origin and palette as jtools_dark_mode.css so light/dark gauges match. */
+.ookla-gauge {
+    --ookla-gauge-turn: 0turn;
+    align-items: center;
+    background:
+        radial-gradient(circle at center, rgba(255, 226, 65, 0.08) 0%, rgba(255, 226, 65, 0) 58%),
+        conic-gradient(#f1d963 0turn, #ffdc43 var(--ookla-gauge-turn), #313746 var(--ookla-gauge-turn), #313746 1turn);
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(241, 217, 99, 0.45), 0 0 0 12px rgba(241, 217, 99, 0.08);
+    display: flex;
+    height: 320px;
+    justify-content: center;
+    margin: 0 auto 18px auto;
+    position: relative;
+    width: 320px;
+}
+
+.ookla-gauge-card.is-upload .ookla-gauge {
+    background:
+        radial-gradient(circle at center, rgba(255, 153, 87, 0.08) 0%, rgba(255, 153, 87, 0) 58%),
+        conic-gradient(#d7604a 0turn, #f0a45a var(--ookla-gauge-turn), #313746 var(--ookla-gauge-turn), #313746 1turn);
+    box-shadow: 0 0 0 2px rgba(240, 164, 90, 0.38), 0 0 0 12px rgba(215, 96, 74, 0.07);
+}
+
+.ookla-gauge::after {
+    background: #090b1d;
+    border-radius: 50%;
+    content: "";
+    height: 222px;
+    position: absolute;
+    width: 222px;
+}
+
+.ookla-gauge-inner {
+    position: relative;
+    text-align: center;
+    z-index: 1;
+}
+
+.ookla-gauge-value {
+    color: #f3f6f8;
+    font-size: 54px;
+    font-weight: 300;
+    letter-spacing: -0.04em;
+    line-height: 1;
+}
+
+.ookla-gauge-unit,
+.ookla-gauge-scale,
+.ookla-gauge-subtitle {
+    color: rgba(214, 225, 242, 0.72);
+}
+
+.ookla-gauge-unit {
+    font-size: 15px;
+    letter-spacing: 0.14em;
+    margin-top: 10px;
+    text-transform: uppercase;
+}
+
+.ookla-gauge-scale {
+    font-size: 13px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.ookla-gauge-idle {
+    opacity: 0.92;
+}
+
+.ookla-gauge-subtitle {
+    font-size: 14px;
+    line-height: 1.45;
+    text-align: center;
+}
+
+.ookla-gauge-stats {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ookla-gauge-stat {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(127, 145, 171, 0.2);
+    border-radius: 16px;
+    padding: 14px 12px;
+    text-align: center;
+}
+
+.ookla-gauge-stat-label {
+    color: rgba(205, 219, 239, 0.64);
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.ookla-gauge-stat-value {
+    color: #eef6ff;
+    display: block;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.ookla-gauge-stat.is-download .ookla-gauge-stat-value {
+    color: #7cefff;
+}
+
+.ookla-gauge-stat.is-upload .ookla-gauge-stat-value {
+    color: #d68cff;
+}
+
+@keyframes ooklaPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.ookla-meta-grid {
+    display: grid;
+    gap: 12px;
+}
+
+.ookla-meta-item {
+    background: var(--qt-bg-card-alt, #f7fafc);
+    border: 1px solid var(--qt-border-subtle, #dce4ee);
+    border-radius: var(--qt-radius-sm, 6px);
+    padding: 12px;
+}
+
+.ookla-meta-label {
+    color: var(--qt-text-dim, #597492);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.ookla-meta-value {
+    color: var(--qt-text, #18324d);
+    font-family: var(--qt-font-mono, Consolas, "Courier New", monospace);
+    font-size: 13px;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.ookla-action-grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Matches Quick Overview spectrum + blue tail (Jtools “flow” language). */
+.ookla-live-strip {
+    --ookla-flow-gradient: linear-gradient(
+        90deg,
+        #ff1744 0%,
+        #d16969 14%,
+        #ff8a00 30%,
+        #ffc107 46%,
+        #4caf50 62%,
+        #00e676 76%,
+        #22d3ee 88%,
+        #4bb6df 100%
+    );
+    background-color: #0c0e14;
+    background-image:
+        linear-gradient(180deg, rgba(14, 16, 22, 0.82) 0%, rgba(10, 12, 18, 0.9) 100%),
+        var(--ookla-flow-gradient);
+    background-size: 100% 100%, 200% 100%;
+    animation: ookla-live-flow 6s linear infinite;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: var(--qt-radius-sm, 6px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 20px rgba(255, 138, 0, 0.08);
+    padding: 16px 18px;
+    position: relative;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ookla-live-strip {
+        animation: none;
+        background-size: 100% 100%, 100% 100%;
+    }
+}
+
+@keyframes ookla-live-flow {
+    0% {
+        background-position: 0% 0%, 0% 50%;
+    }
+    100% {
+        background-position: 0% 0%, 100% 50%;
+    }
+}
+
+.ookla-live-strip-top {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.ookla-live-stage {
+    color: #f3f6f8;
+    font-size: 16px;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.ookla-live-progress {
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.ookla-live-bar {
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 5px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+    height: 10px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    position: relative;
+}
+
+.ookla-live-bar span {
+    background: var(--ookla-flow-gradient);
+    background-size: 200% 100%;
+    animation: ookla-live-bar-flow 4.5s linear infinite;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.25);
+    display: block;
+    height: 100%;
+    transition: width 0.4s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ookla-live-bar span {
+        animation: none;
+        background-size: 100% 100%;
+    }
+}
+
+@keyframes ookla-live-bar-flow {
+    0% {
+        background-position: 0% 50%;
+    }
+    100% {
+        background-position: 100% 50%;
+    }
+}
+
+.ookla-live-metrics {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ookla-live-metric {
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--qt-radius-sm, 6px);
+    padding: 12px;
+}
+
+.ookla-live-metric span {
+    color: rgba(255, 255, 255, 0.62);
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.ookla-live-metric strong {
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.ookla-link-button {
+    align-items: center;
+    background: #153b5c;
+    border-radius: var(--qt-radius-sm, 6px);
+    border: 1px solid #153b5c;
+    color: #ffffff;
+    display: inline-flex;
+    font-size: 13px;
+    font-weight: 700;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0 14px;
+    text-decoration: none;
+}
+
+.ookla-link-button:hover,
+.ookla-link-button:focus,
+.ookla-link-button.is-primary {
+    background: #153b5c;
+    border-color: #153b5c;
+    color: #ffffff;
+}
+
+.ookla-link-button[disabled] {
+    background: var(--qt-bg-card-alt, #edf1f5);
+    border-color: var(--qt-border, #d8e0ea);
+    color: var(--qt-text-dim, #8a98a6);
+}
+
+.ookla-summary {
+    display: grid;
+    gap: 10px;
+}
+
+.ookla-summary-line {
+    color: var(--qt-text, #d7dde4);
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.ookla-history {
+    display: grid;
+    gap: 12px;
+}
+
+.ookla-history-item {
+    background: var(--qt-bg-card-alt, #f7fafc);
+    border: 1px solid var(--qt-border-subtle, #dce4ee);
+    border-radius: var(--qt-radius-sm, 6px);
+    padding: 12px;
+}
+
+.ookla-history-top {
+    align-items: baseline;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.ookla-history-speed,
+.ookla-history-time,
+.ookla-history-meta {
+    color: var(--qt-text, #d7dde4);
+}
+
+.ookla-history-speed {
+    font-size: 14px;
+}
+
+.ookla-history-time {
+    font-size: 12px;
+    opacity: 0.82;
+}
+
+.ookla-history-meta {
+    font-size: 13px;
+    margin-bottom: 10px;
+    opacity: 0.88;
+}
+
+.ookla-history-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.ookla-empty {
+    background: var(--qt-bg-card-alt, #f7fafc);
+    border: 1px dashed var(--qt-border, #ced9e4);
+    border-radius: var(--qt-radius-sm, 6px);
+    color: var(--qt-text-dim, #5f7692);
+    line-height: 1.5;
+    padding: 16px;
+}
+
+.ookla-empty-large {
+    min-height: 280px;
+}
+
+.ookla-details {
+    border-top: 1px solid #d8e0ea;
+    margin-top: 2px;
+    padding-top: 14px;
+}
+
+.ookla-details-summary {
+    color: #b86118;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 700;
+    list-style: none;
+    margin-bottom: 14px;
+}
+
+.ookla-details-summary::-webkit-details-marker {
+    display: none;
+}
+
+
+@media (max-width: 1280px) {
+    .ookla-grid-lower {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 900px) {
+    .ookla-above-fold {
+        grid-template-columns: 1fr;
+    }
+
+    .ookla-phase-rail,
+    .ookla-gauge-stats,
+    .ookla-live-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .ookla-live-metrics {
+        gap: 10px;
+    }
+
+    .ookla-action-grid,
+    .ookla-stage-actions {
+        flex-direction: column;
+    }
+
+    .ookla-ca-card {
+        flex-direction: column;
+    }
+
+    .ookla-banner-actions {
+        justify-content: center;
+    }
+
+    .ookla-ca-slot-side {
+        margin-top: 0;
+    }
+
+    .ookla-ca-pills {
+        justify-content: flex-start;
+    }
+
+    .ookla-grid-lower {
+        grid-template-columns: 1fr;
+    }
+
+    .ookla-gauge {
+        height: 280px;
+        width: 280px;
+    }
+
+    .ookla-gauge::after {
+        height: 194px;
+        width: 194px;
+    }
+
+    .ookla-gauge-value {
+        font-size: 48px;
+    }
+}

@@ -896,6 +896,49 @@ local function read_stock_signal_snapshot()
     }
 end
 
+local build_carriers_from_rdb
+local enrich_carriers_with_bandwidth
+
+local function build_public_screensaver_snapshot()
+    local stock_signal = read_stock_signal_snapshot()
+    local carriers = build_carriers_from_rdb()
+    enrich_carriers_with_bandwidth(carriers, "")
+
+    local system_mode = rdb_get_trim("wwan.0.system_network_status.system_mode")
+    local current_band = rdb_get_trim("wwan.0.system_network_status.current_band")
+    local network = rdb_get_trim("wwan.0.system_network_status.network")
+    local rat = first_nonempty(system_mode, "N/A")
+    local rat_upper = string.upper(rat)
+    local use_nr = rat_upper:find("NR") ~= nil or rat_upper:find("5G") ~= nil
+
+    local rsrp = use_nr and first_nonempty(stock_signal.nr5g.rsrp, stock_signal.lte.rsrp) or first_nonempty(stock_signal.lte.rsrp, stock_signal.nr5g.rsrp)
+    local rsrq = use_nr and first_nonempty(stock_signal.nr5g.rsrq, stock_signal.lte.rsrq) or first_nonempty(stock_signal.lte.rsrq, stock_signal.nr5g.rsrq)
+    local sinr = use_nr and first_nonempty(stock_signal.nr5g.snr, stock_signal.lte.snr) or first_nonempty(stock_signal.lte.snr, stock_signal.nr5g.snr)
+    local cqi = use_nr and first_nonempty(stock_signal.nr5g.cqi, stock_signal.lte.cqi) or first_nonempty(stock_signal.lte.cqi, stock_signal.nr5g.cqi)
+
+    local pci = use_nr and first_nonempty(rdb_get_trim("wwan.0.radio_stack.nr5g.pci"), rdb_get_trim("wwan.0.system_network_status.PCID")) or first_nonempty(rdb_get_trim("wwan.0.system_network_status.PCID"), rdb_get_trim("wwan.0.radio_stack.nr5g.pci"))
+    local cell_id = use_nr and first_nonempty(rdb_get_trim("wwan.0.radio_stack.nr5g.CellID"), rdb_get_trim("wwan.0.system_network_status.CellID")) or first_nonempty(rdb_get_trim("wwan.0.system_network_status.CellID"), rdb_get_trim("wwan.0.radio_stack.nr5g.CellID"))
+    local arfcn = use_nr and first_nonempty(rdb_get_trim("wwan.0.radio_stack.nr5g.arfcn"), rdb_get_trim("wwan.0.system_network_status.channel")) or first_nonempty(rdb_get_trim("wwan.0.system_network_status.channel"), rdb_get_trim("wwan.0.radio_stack.nr5g.arfcn"))
+
+    return {
+        ok = true,
+        limited_public_data = true,
+        public_note = "Log in to see full modem detail.",
+        fetched_at = os.time(),
+        provider = network,
+        rat = rat,
+        band_label = current_band,
+        rsrp = rsrp,
+        rsrq = rsrq,
+        sinr = sinr,
+        cqi = cqi,
+        pci = pci,
+        cell_id = cell_id,
+        arfcn = arfcn,
+        carriers = carriers
+    }
+end
+
 local function parse_lte_rf_bandwidth_text(value)
     local text = tostring(value or "")
     return text:match("LTE%s+([%d%.]+MHz)")
@@ -995,7 +1038,7 @@ local function build_bandwidth_text(carrier)
     return "Bandwidth unavailable"
 end
 
-local function enrich_carriers_with_bandwidth(carriers, servingcell_summary)
+enrich_carriers_with_bandwidth = function (carriers, servingcell_summary)
     local qeng_bw = parse_qeng_bandwidths(servingcell_summary or "")
     local rdb_bw = read_bandwidth_rdb_snapshot()
     local lte_scell_index = 1
@@ -1064,7 +1107,7 @@ local function lte_band_text_to_num(text)
     return n or ""
 end
 
-local function build_carriers_from_rdb()
+build_carriers_from_rdb = function ()
     local out = {}
     if rdb_get_trim("wwan.0.system_network_status.attached") ~= "1" then
         return out
@@ -2084,6 +2127,28 @@ function JtoolGeneralApiHandler:get(url, action)
     self:write(payload)
 end
 
+local PublicScreensaverApiHandler = class("PublicScreensaverApiHandler", SessionRequestHandler)
+
+function PublicScreensaverApiHandler:getUrl(url, action)
+    return "PublicScreensaverApi"
+end
+
+function PublicScreensaverApiHandler:get(url, action)
+    action = normalize_action("public_screensaver_api", url, action)
+    if action ~= "state" then
+        error(turbo.web.HTTPError(404))
+    end
+
+    local ok, payload = pcall(build_public_screensaver_snapshot)
+    if not ok then
+        self:set_status(500)
+        self:write({ ok = false, error = "public_screensaver_state_failed" })
+        return
+    end
+
+    self:write(payload)
+end
+
 local OoklaSpeedtestApiHandler = class("OoklaSpeedtestApiHandler", SessionRequestHandler)
 
 function OoklaSpeedtestApiHandler:getUrl(url, action)
@@ -2787,6 +2852,7 @@ return {
         table.insert(handlers, 1, {"^/(quick_overview_api)/(settings)$", QuickOverviewApiHandler})
         table.insert(handlers, 1, {"^/(screensaver_api)/(settings)$", ScreensaverApiHandler})
         table.insert(handlers, 1, {"^/(screensaver_api)/(update)$", ScreensaverApiHandler})
+        table.insert(handlers, 1, {"^/(public_screensaver_api)/(state)$", PublicScreensaverApiHandler})
         table.insert(handlers, 1, {"^/(jtools_general_api)/(state)$", JtoolGeneralApiHandler})
         table.insert(handlers, 1, {"^/(band_locking_api)/(state)$", BandLockingApiHandler})
         table.insert(handlers, 1, {"^/(band_locking_api)/(mode)$", BandLockingApiHandler})

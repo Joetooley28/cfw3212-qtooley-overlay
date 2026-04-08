@@ -185,20 +185,20 @@ function Copy-TrackedFile {
         throw "Source file missing for tracked destination path: $RelativePath"
     }
 
-    if (-not (Test-Path $destinationPath)) {
-        throw "Destination tracked file is missing on disk: $RelativePath"
-    }
-
     $sourceBytes = [System.IO.File]::ReadAllBytes($sourcePath)
-    $destinationBytes = [System.IO.File]::ReadAllBytes($destinationPath)
-    $sameLength = $sourceBytes.Length -eq $destinationBytes.Length
-    $sameContent = $sameLength
+    $sameContent = $false
 
-    if ($sameContent) {
-        for ($i = 0; $i -lt $sourceBytes.Length; $i++) {
-            if ($sourceBytes[$i] -ne $destinationBytes[$i]) {
-                $sameContent = $false
-                break
+    if (Test-Path $destinationPath) {
+        $destinationBytes = [System.IO.File]::ReadAllBytes($destinationPath)
+        $sameLength = $sourceBytes.Length -eq $destinationBytes.Length
+        $sameContent = $sameLength
+
+        if ($sameContent) {
+            for ($i = 0; $i -lt $sourceBytes.Length; $i++) {
+                if ($sourceBytes[$i] -ne $destinationBytes[$i]) {
+                    $sameContent = $false
+                    break
+                }
             }
         }
     }
@@ -218,6 +218,27 @@ function Copy-TrackedFile {
     return $true
 }
 
+function Test-PublicPathAllowed {
+    param(
+        [string]$RelativePath,
+        [string[]]$AllowedPrefixes,
+        [System.Collections.Generic.HashSet[string]]$AllowedExact
+    )
+
+    $normalized = $RelativePath.Replace("\", "/")
+    if ($AllowedExact.Contains($normalized)) {
+        return $true
+    }
+
+    foreach ($prefix in $AllowedPrefixes) {
+        if ($normalized.StartsWith($prefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+            return $true
+        }
+    }
+
+    return $false
+}
+
 Assert-GitRepo -Path $SourceRepo
 Assert-GitRepo -Path $DestinationRepo
 
@@ -226,6 +247,7 @@ Assert-ReleaseVersionAligned -RepoRoot $SourceRepo -Label $sourceReleaseLabel
 Assert-BuildScriptSupportsOokla -RepoRoot $SourceRepo
 
 $destinationTracked = Get-TrackedFiles -RepoRoot $DestinationRepo
+$sourceTracked = Get-TrackedFiles -RepoRoot $SourceRepo
 $allowedPrefixes = New-Object System.Collections.Generic.List[string]
 $allowedExact = New-Object System.Collections.Generic.HashSet[string]([System.StringComparer]::OrdinalIgnoreCase)
 
@@ -250,20 +272,9 @@ if ($IncludeReleaseScripts) {
     }
 }
 
-$selected = foreach ($relativePath in $destinationTracked) {
+$selected = foreach ($relativePath in ($destinationTracked + $sourceTracked | Sort-Object -Unique)) {
     $normalized = $relativePath.Replace("\", "/")
-    $include = $allowedExact.Contains($normalized)
-
-    if (-not $include) {
-        foreach ($prefix in $allowedPrefixes) {
-            if ($normalized.StartsWith($prefix, [System.StringComparison]::OrdinalIgnoreCase)) {
-                $include = $true
-                break
-            }
-        }
-    }
-
-    if ($include) {
+    if (Test-PublicPathAllowed -RelativePath $normalized -AllowedPrefixes $allowedPrefixes -AllowedExact $allowedExact) {
         $normalized
     }
 }
