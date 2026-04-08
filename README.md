@@ -10,10 +10,9 @@ This is not a generic web app and it is not a generic USB modem project.
 
 ## Start Here
 
-- [Latest Release](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
 - [Quick Must Read](docs/quick-must-read.md)
+- [Latest Release](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
-- [Docs Index](docs/index.md)
 - [Platform Notes](docs/platform-notes.md)
 
 ## What You Get
