@@ -25,7 +25,7 @@ powershell -ExecutionPolicy Bypass -File .\install_stock_ui_at.ps1
 
 5. Enter the router IP.
 6. Enter the SSH username: `root`
-7. Enter the SSH password when `scp` or `ssh` prompts, unless you already have a working SSH key setup.
+7. Enter the SSH password when prompted. The Windows ZIP flow now uses one SSH session for the package transfer and install/update run, so you should normally only need the password once unless your SSH setup itself asks again.
 8. Answer the simple `y/n` prompts.
 
 ## Normal Windows Update
@@ -53,6 +53,7 @@ powershell -ExecutionPolicy Bypass -File .\uninstall_stock_ui_at.ps1
 
 ## Notes
 
+- first-time SSH connections to a new router IP are accepted automatically, so you should not need to type a blind `yes` for the host-key prompt
 - the packaged `README.txt` inside the release ZIP is this Windows ZIP guide
 - for first-install snapshot behavior, space notes, and the `upgrade.star` warning, read [Quick Must Read](quick-must-read.md)
 - for direct router `wget` install/update and uninstall commands, use [Release Install Guide](../router-files/stock-ui-at/RELEASE_INSTALL.md)

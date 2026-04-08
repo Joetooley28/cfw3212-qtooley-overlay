@@ -56,7 +56,7 @@ Important cleanup note
 powershell -ExecutionPolicy Bypass -File .\install_stock_ui_at.ps1
 ```
 7. Enter the router IP and SSH username.
-8. Enter the SSH password when `scp` or `ssh` prompts, unless you already have a working SSH key setup.
+8. Enter the SSH password when prompted. The Windows ZIP flow now uses one SSH session for the package transfer and install/update run, so you should normally only need the password once unless your SSH setup itself asks again.
 9. Answer the simple `y/n` prompts.
 
 **Normal Windows uninstall (No internet on modem yet)**
@@ -114,6 +114,7 @@ Bundled Ookla behavior
   - `router-files\stock-ui-at\usrdata\at-stock-ui\bundles\ookla\ookla-speedtest-1.2.0-linux-armhf.tgz`
 
 Additional notes
+- first-time SSH connections to a new router IP are accepted automatically, so you should not need to type a blind `yes` for the host-key prompt
 - the router-native GitHub install/update and uninstall paths download the latest release ZIP and run the same packaged router-side install or uninstall core used by the Windows ZIP flow
 - the install flow refreshes `/usrdata/at-stock-ui`, refreshes the late-start units, and runs the overlay apply immediately
 - the GitHub ZIP intentionally does not include the old `stock-snapshots` reference folder
