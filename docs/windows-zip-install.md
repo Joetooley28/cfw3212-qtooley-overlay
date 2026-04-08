@@ -1,4 +1,4 @@
-# Windows ZIP Install Guide
+# Windows ZIP Install Guide (No internet on modem yet? Use this method)
 
 Use this page for the normal Windows ZIP install, update, and uninstall flow.
 
@@ -19,33 +19,28 @@ Use this page for the normal Windows ZIP install, update, and uninstall flow.
 3. Open PowerShell in the extracted folder.
 4. Run exactly:
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\install_stock_ui_at.ps1
-```
+    powershell -ExecutionPolicy Bypass -File .\install_stock_ui_at.ps1
 
 5. Enter the router IP.
 6. Enter the SSH username: `root`
 7. Enter the SSH password when prompted. The Windows ZIP flow now uses one SSH session for the package transfer and install/update run, so you should normally only need the password once unless your SSH setup itself asks again.
 8. Answer the simple `y/n` prompts.
+9. Only use the recapture setting if the saved uninstall baseline is missing or known-bad. Treat recapture as an emergency recovery option, not a normal install/update step.
 
 ## Normal Windows Update
 
 Run the same command from a newer extracted release ZIP:
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\install_stock_ui_at.ps1
-```
+    powershell -ExecutionPolicy Bypass -File .\install_stock_ui_at.ps1
 
-The normal update path reuses the saved first-install baseline unless you intentionally force a recapture.
+The normal update path reuses the saved first-install baseline unless you intentionally force a recapture in an emergency.
 
 ## Normal Windows Uninstall
 
 1. Open PowerShell in the extracted folder from the same release ZIP.
 2. Run exactly:
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\uninstall_stock_ui_at.ps1
-```
+    powershell -ExecutionPolicy Bypass -File .\uninstall_stock_ui_at.ps1
 
 3. Choose uninstall mode:
    - `1` remove Qtooley and bundled Ookla

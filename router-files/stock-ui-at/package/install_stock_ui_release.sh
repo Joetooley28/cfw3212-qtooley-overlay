@@ -31,6 +31,32 @@ require_path() {
     fi
 }
 
+require_manifest_paths() {
+    local manifest_path relative_path missing
+
+    manifest_path="$PACKAGE_ROOT/package/required_release_files.txt"
+    require_path "$manifest_path"
+
+    missing=0
+    while IFS= read -r relative_path || [ -n "$relative_path" ]; do
+        case "$relative_path" in
+            ""|\#*)
+                continue
+                ;;
+        esac
+
+        if [ ! -e "$PACKAGE_ROOT/$relative_path" ]; then
+            echo "Incomplete release package: missing $relative_path" >&2
+            missing=1
+        fi
+    done < "$manifest_path"
+
+    if [ "$missing" -ne 0 ]; then
+        echo "Refusing to install an incomplete Qtooley release package." >&2
+        exit 1
+    fi
+}
+
 get_free_kb() {
     df -k /usrdata 2>/dev/null | awk 'NR==2 {print $4}'
 }
@@ -145,6 +171,7 @@ capture_baseline_once() {
 verify_prerequisites() {
     local free_kb required_kb baseline_required_kb
 
+    require_manifest_paths
     require_path "$PACKAGE_ROOT/www"
     require_path "$PACKAGE_ROOT/usr"
     require_path "$PACKAGE_ROOT/usrdata/at-stock-ui/apply_stock_ui_overlay.sh"
