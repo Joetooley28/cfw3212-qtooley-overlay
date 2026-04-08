@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.3.8-qtooley-2026-04-08
+
+Box 2 stock-page compatibility and release-flow hardening for the Qtooley stock UI overlay.
+
+Included:
+- restored stock auth coverage for `LoginTimeCheck`, `lteCellInfo`, and `nr5gCellInfo` in the shared `userGroupAuth.lua` overlay
+- removed the older temporary `status.html` invalid-request suppression from shared `genHeader.js` after the authenticated Box 2 retest passed
+- refreshed the shared `genHeader.js` cache token across the Jtools page shells
+- fixed release packaging so `JTOOLS_RELEASE.txt` token lines are retokenized to match the packaged asset versions
+
+Key behavior:
+- clean-stock Box 2 no longer throws the broad post-install `Invalid request` banner across many stock Networking / Services / System pages
+- `status.html` now succeeds using the real stock auth objects instead of relying on the earlier hide/suppress workaround
+- install and update packages now carry the Box 2 auth fix
+- uninstall still restores the tracked shared stock files back to the saved baseline
+- local release builds in the safe `main` worktree now keep `dist/` untracked
+
 ## v0.3.3-qtooley-2026-04-04
 
 Public release cleanup for the Qtooley stock UI overlay.
