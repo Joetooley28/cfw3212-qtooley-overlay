@@ -28,11 +28,3 @@ Current backend order:
 1. `smd7_direct`
 2. `at_mdm0_direct`
 3. `smd11_direct`
-
-## Browser Access
-
-Current intended browser access is:
-
-- `http://192.168.1.1:8088/`
-
-The AT terminal is separate from stock Casa Turbo and does not replace stock web services.
