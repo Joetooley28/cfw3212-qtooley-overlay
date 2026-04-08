@@ -3,38 +3,26 @@ Qtooley install and uninstall guide
 Feature status
 - cell locking is still under development and is not working yet
 
-What this package is for
-- install or update the Qtooley stock UI overlay on a rooted Casa Systems `CFW-3212`
-- uninstall Qtooley later from a normal Windows PC over SSH
-- preserve a router-specific uninstall baseline on first install
-- install bundled Ookla as part of the base Qtooley release when that archive is present
-- leave Tailscale as an optional extra after base install
+Use this page as the full install, update, and uninstall reference.
 
-What this package is not for
-- it does not root the router
-- for rooting, full credit to [@Luke](https://github.com/lukejenkins/cellular/tree/main/casasystems/cfw3212) for the root script and the broader `CFW-3212` platform research
-- if you need the root script itself, start in Luke's [`casasystems/cfw3212/tools`](https://github.com/lukejenkins/cellular/tree/main/casasystems/cfw3212/tools) folder
-- if you are starting from a stock carrier-managed box, also read Luke's [`guide_block_carrier_remote_mgmt`](https://github.com/lukejenkins/cellular/blob/main/casasystems/cfw3212/guide_block_carrier_remote_mgmt.md) to block the carrier remote-management path
-- it does not enable SSH for you
-- it does not turn cell locking into a working feature yet
+For the short version first:
+- quick summary page: [`../../docs/quick-must-read.md`](../../docs/quick-must-read.md)
 
-Choose your install path first
-- if the router does not already have working internet, use the Windows ZIP path from your PC over SSH
-- if the router already has working internet, you can either keep using the Windows ZIP path or run the direct GitHub commands from an SSH shell on the router
-
-Before you start
+Prerequisites
 - the router must already be rooted
 - full credit to [@Luke](https://github.com/lukejenkins/cellular/tree/main/casasystems/cfw3212) for the root script and the broader `CFW-3212` platform research
 - if you need the root script itself, start in Luke's [`casasystems/cfw3212/tools`](https://github.com/lukejenkins/cellular/tree/main/casasystems/cfw3212/tools) folder
 - if you are starting from a stock carrier-managed box, also read Luke's [`guide_block_carrier_remote_mgmt`](https://github.com/lukejenkins/cellular/blob/main/casasystems/cfw3212/guide_block_carrier_remote_mgmt.md) to block the carrier remote-management path
-- quick summary page: [`../../docs/quick-must-read.md`](../../docs/quick-must-read.md)
 - SSH must already be reachable
 - you need the router IP, SSH username, and SSH password
 - Windows needs the built-in `ssh` client available
 - the public Windows installer flow is SSH-only
 
+Choose your install path
+- if the router does not already have working internet, use the Windows ZIP path from your PC over SSH
+- if the router already has working internet, you can either keep using the Windows ZIP path or run the direct GitHub commands from an SSH shell on the router
 
-Important install behavior
+Install behavior
 - on first install, the installer captures a compact router-specific stock baseline from the live stock `/www` and `/usr/share/lua/5.1/webif` trees before any Qtooley overlay mounts are active
 - that first-install baseline is then reused across normal updates so uninstall can verify the router is back on its install-time stock web files after the overlay is removed
 - install treats the router as already baselined only when these saved files exist under `/usrdata/at-stock-ui/installer-state/install-baseline`:
@@ -108,7 +96,7 @@ REMOVE_TAILSCALE=0 /bin/sh /usrdata/at-stock-ui/uninstall_from_github_release.sh
 REMOVE_TAILSCALE=1 /bin/sh /usrdata/at-stock-ui/uninstall_from_github_release.sh
 ```
 
-Important uninstall behavior
+Uninstall behavior
 - uninstall removes the live overlay mounts and verifies key shared stock files against the saved first-install baseline when that baseline is available
 - the current verification set includes:
   - `/www/js/generatedMenuEntries.js`
@@ -124,13 +112,6 @@ Bundled Ookla behavior
 - if the archive is missing, the installer leaves Ookla unchanged and reports that state
 - expected bundle path inside the ZIP:
   - `router-files\stock-ui-at\usrdata\at-stock-ui\bundles\ookla\ookla-speedtest-1.2.0-linux-armhf.tgz`
-
-Recovery note
-- run the normal Qtooley uninstall first
-- the router-specific first-install baseline is the preferred uninstall and recovery path
-- if that saved baseline is missing or known-bad, use the fallback stock web package only if uninstall or manual overlay removal does not leave you with a working stock-style Casa web UI
-- fallback recovery guide:
-  - `..\..\docs\fallback-stock-recovery.md`
 
 Additional notes
 - the router-native GitHub install/update and uninstall paths download the latest release ZIP and run the same packaged router-side install or uninstall core used by the Windows ZIP flow

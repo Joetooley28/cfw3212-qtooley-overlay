@@ -29,10 +29,3 @@ Current backend order:
 2. `at_mdm0_direct`
 3. `smd11_direct`
 
-## Browser Access
-
-Current intended browser access is through the stock Casa web UI with the Qtooley tab added by the overlay.
-
-Important browser note:
-
-- if uninstall finishes but you still see Qtooley, try a hard refresh, a private/incognito window, or a different browser before assuming recovery is needed
