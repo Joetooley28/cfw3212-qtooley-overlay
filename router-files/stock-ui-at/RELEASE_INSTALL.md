@@ -12,6 +12,8 @@ What this package is for
 
 What this package is not for
 - it does not root the router
+- for rooting, full credit to [@Luke](https://github.com/lukejenkins/cellular/tree/main/casasystems/cfw3212) for the root script and the broader `CFW-3212` platform research
+- if you are starting from a stock carrier-managed box, also read Luke's [`guide_block_carrier_remote_mgmt`](https://github.com/lukejenkins/cellular/blob/main/casasystems/cfw3212/guide_block_carrier_remote_mgmt.md) to block the carrier remote-management path
 - it does not enable SSH for you
 - it does not turn cell locking into a working feature yet
 
@@ -21,6 +23,8 @@ Choose your install path first
 
 Before you start
 - the router must already be rooted
+- full credit to [@Luke](https://github.com/lukejenkins/cellular/tree/main/casasystems/cfw3212) for the root script and the broader `CFW-3212` platform research
+- if you are starting from a stock carrier-managed box, also read Luke's [`guide_block_carrier_remote_mgmt`](https://github.com/lukejenkins/cellular/blob/main/casasystems/cfw3212/guide_block_carrier_remote_mgmt.md) to block the carrier remote-management path
 - SSH must already be reachable
 - you need the router IP, SSH username, and SSH password
 - Windows needs the built-in `ssh` client available
@@ -49,7 +53,7 @@ Important cleanup note
 - before deleting a file like that, save an off-box copy first and record its SHA-256 hash if you can, because it may be a useful stock firmware artifact later
 
 **Normal Windows install (No internet on modem yet)**
-1. Open the latest GitHub release page.
+1. Open the latest GitHub [release page](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest).
 2. Download the top file in the `Assets` section at the bottom of this release page.
 3. Do not use GitHub's auto-generated `Source code` download.
 4. Extract the ZIP.

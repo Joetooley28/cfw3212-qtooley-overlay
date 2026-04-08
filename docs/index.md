@@ -46,7 +46,7 @@ Dark mode note:
 **Normal Windows install (No internet on modem yet)**
 
 1. Open the latest GitHub release page.
-2. Download the top file in the `Assets` section at the bottom of this release page.
+2. Download the top file in the `Assets` section at the bottom of this [release page](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest).
 3. Do not use the auto-generated `Source code` download.
 4. Extract the ZIP.
 5. Open PowerShell in the extracted folder.
@@ -81,6 +81,8 @@ sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley
 Prerequisites:
 
 - rooted router
+  Full credit to [@Luke](https://github.com/lukejenkins/cellular/tree/main/casasystems/cfw3212) for the root script and the broader `CFW-3212` platform research.
+- if you are starting from a stock carrier-managed box, also read Luke's [`guide_block_carrier_remote_mgmt`](https://github.com/lukejenkins/cellular/blob/main/casasystems/cfw3212/guide_block_carrier_remote_mgmt.md) to block the carrier remote-management path
 - SSH already enabled and reachable
 - Windows built-in `ssh` client available
 
