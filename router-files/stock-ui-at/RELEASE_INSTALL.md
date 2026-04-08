@@ -57,6 +57,7 @@ powershell -ExecutionPolicy Bypass -File .\install_stock_ui_at.ps1
 ```
 7. Enter the router IP and SSH username.
 8. Enter the SSH password when prompted. The Windows ZIP flow now uses one SSH session for the package transfer and install/update run, so you should normally only need the password once unless your SSH setup itself asks again.
+9. Only use the recapture setting if the saved uninstall baseline is missing or known-bad. Treat recapture as an emergency recovery option, not a normal install/update step.
 9. Answer the simple `y/n` prompts.
 
 **Normal Windows uninstall (No internet on modem yet)**
