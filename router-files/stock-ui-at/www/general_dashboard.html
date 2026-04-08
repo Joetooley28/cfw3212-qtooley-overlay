@@ -15,7 +15,6 @@
     if (!prefersDark) {
         return;
     }
-    document.documentElement.className += (document.documentElement.className ? " " : "") + "jtools-preload-dark";
     var style = document.createElement("style");
     style.textContent = "html,body,.site-content,#content,#content>.container,#content .grid-9.omega,#content .body-box,#content .body-box>.pad,#htmlGoesHere{background:#1e1e1e!important;color:#d7dde4;}#body{background:transparent;}";
     document.head.appendChild(style);
@@ -26,12 +25,12 @@
 <link rel="stylesheet" href="/css/validationEngine.jquery.css?1.1.79.0">
 <link rel="stylesheet" href="/css/qtooley.css?qtooley-v20260329e">
 <link rel="stylesheet" href="/css/jtools_dark_mode.css?jtools-dark-v20260329a">
-<link rel="stylesheet" href="/css/screensaver_settings.css?jtools-ss-v20260405b">
+<link rel="stylesheet" href="/css/at_terminal.css?jtools-general-css-v20260331h">
 <script>
 if (top !== self) top.location = self.location;
 var nas_installed = '<<<system.package.installed.nas>>>';
 var service_pppoe_server_0_enable = '<<<service.pppoe.server.0.enable>>>';
-var relUrlOfPage = 'screensaver_settings.html';
+var relUrlOfPage = 'general_dashboard.html';
 var user = '{{loggedInUser}}';
 var userGroup = '{{loggedInUserGroup}}';
 var userGroups = userGroup.split(',');
@@ -55,30 +54,33 @@ for (const [key, value] of searchParams) { queryParams[key] = value; }
 <script src="/js/generatedMenuEntries.js?jtools-menu-v20260405c"></script>
 <script src="/theme/js/genHeader.js?jtools-genheader-v20260408a"></script>
 <script src="/theme/js/genFooter.js?1.1.79.0"></script>
-<script src="/js/screensaver_settings.js?jtools-ss-v20260405b"></script>
+<script src="/js/general_dashboard_core.js?jtools-general-core-v20260330i"></script>
+<script src="/js/general_dashboard.js?jtools-general-v20260406a"></script>
 <script>
 var pageData = {
-    title: "Settings",
-    menuPos: ["JtoolServices", "ScreensaverSettings"],
-    pageObjects: [],
+    title: "Qtooley General Info",
+    menuPos: ["JtoolServices", "GeneralDashboard"],
+    pageObjects: window.JtoolGeneralDashboard ? window.JtoolGeneralDashboard.createPageObjects() : [],
     onReady: function () {
-        if (window.JtoolsScreensaverSettings) {
-            window.JtoolsScreensaverSettings.init();
+        if (window.JtoolGeneralDashboard) {
+            window.JtoolGeneralDashboard.init();
         }
     }
 };
-if (pageData.disabled !== true) {
-    if (pageData.pageObjects.length) {
-        requestPageObjects();
-    } else {
-        $(document).ready(function () {
-            if (typeof pageData.onReady === "function") {
-                pageData.onReady();
-            }
-            setVisible("#body", "1");
-        });
+$(document).ready(function () {
+    if (pageData.disabled === true) {
+        setVisible("#body", "1");
+        return;
     }
-}
+    if (window.JtoolGeneralDashboard && typeof window.JtoolGeneralDashboard.bootstrap === "function") {
+        window.JtoolGeneralDashboard.bootstrap();
+        return;
+    }
+    if (typeof pageData.onReady === "function") {
+        pageData.onReady();
+    }
+    setVisible("#body", "1");
+});
 </script>
 </head>
 <body id="body" style="display: none;"></body>

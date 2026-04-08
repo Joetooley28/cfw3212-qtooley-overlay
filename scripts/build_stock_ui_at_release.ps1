@@ -167,13 +167,41 @@ function Apply-ReleaseCacheTokens {
 
     if (Test-Path $releaseInfoPath) {
         $lines = Get-Content $releaseInfoPath
+        $releaseTokenPrefixes = @(
+            "qtooley",
+            "jtools-dark",
+            "jtools-menu",
+            "jtools-genheader",
+            "jtools-qo",
+            "jtools-session",
+            "jtools-ss",
+            "jtools-at",
+            "jtools-general-css",
+            "jtools-general-core",
+            "jtools-general",
+            "jtools-bandlock-core",
+            "jtools-bandlock",
+            "jtools-sms",
+            "jtools-tailscale",
+            "jtools-ttl",
+            "jtools-speedtest-ui",
+            "jtools-speedtest"
+        )
         $updatedLines = foreach ($line in $lines) {
             if ($line -match '^Jtools asset tokens$') {
                 $line
             } elseif ($line -match '^\s*-\s*release-cache-token=') {
                 " - release-cache-token=$token"
             } else {
-                $line
+                $updatedLine = $line
+                foreach ($prefix in $releaseTokenPrefixes) {
+                    $updatedLine = [regex]::Replace(
+                        $updatedLine,
+                        ('\?' + [regex]::Escape($prefix) + '-v[^"\s]+'),
+                        ('?' + $prefix + '-' + $token)
+                    )
+                }
+                $updatedLine
             }
         }
         if (-not ($updatedLines -match '^\s*-\s*release-cache-token=')) {

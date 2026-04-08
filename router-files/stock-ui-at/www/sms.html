@@ -15,9 +15,8 @@
     if (!prefersDark) {
         return;
     }
-    document.documentElement.className += (document.documentElement.className ? " " : "") + "jtools-preload-dark";
     var style = document.createElement("style");
-    style.textContent = "html,body,.site-content,#content,#content>.container,#content .grid-9.omega,#content .body-box,#content .body-box>.pad,#htmlGoesHere{background:#1e1e1e!important;color:#d7dde4;}#body{background:transparent;}";
+    style.textContent = "html,body,.site-content,#content,#content>.container,#content .grid-9.omega,#content .body-box,#content .body-box>.pad,#htmlGoesHere,#sms-panel,.sms-page,.sms-card,.sms-tabs,.sms-tab,.sms-btn,.sms-input,.sms-textarea,.sms-select{background:#1e1e1e!important;color:#d7dde4!important;border-color:#343b43!important;}#body{background:transparent;}.sms-tab,.sms-btn,.sms-input,.sms-textarea,.sms-select{box-shadow:none!important;}";
     document.head.appendChild(style);
 })();
 </script>
@@ -26,12 +25,12 @@
 <link rel="stylesheet" href="/css/validationEngine.jquery.css?1.1.79.0">
 <link rel="stylesheet" href="/css/qtooley.css?qtooley-v20260329e">
 <link rel="stylesheet" href="/css/jtools_dark_mode.css?jtools-dark-v20260329a">
-<link rel="stylesheet" href="/css/screensaver_settings.css?jtools-ss-v20260405b">
+<link rel="stylesheet" href="/css/sms.css?jtools-sms-v20260405d">
 <script>
 if (top !== self) top.location = self.location;
 var nas_installed = '<<<system.package.installed.nas>>>';
 var service_pppoe_server_0_enable = '<<<service.pppoe.server.0.enable>>>';
-var relUrlOfPage = 'screensaver_settings.html';
+var relUrlOfPage = 'sms.html';
 var user = '{{loggedInUser}}';
 var userGroup = '{{loggedInUserGroup}}';
 var userGroups = userGroup.split(',');
@@ -55,15 +54,15 @@ for (const [key, value] of searchParams) { queryParams[key] = value; }
 <script src="/js/generatedMenuEntries.js?jtools-menu-v20260405c"></script>
 <script src="/theme/js/genHeader.js?jtools-genheader-v20260408a"></script>
 <script src="/theme/js/genFooter.js?1.1.79.0"></script>
-<script src="/js/screensaver_settings.js?jtools-ss-v20260405b"></script>
+<script src="/js/sms.js?jtools-sms-v20260405d"></script>
 <script>
 var pageData = {
-    title: "Settings",
-    menuPos: ["JtoolServices", "ScreensaverSettings"],
+    title: "SMS",
+    menuPos: ["JtoolServices", "Sms"],
     pageObjects: [],
     onReady: function () {
-        if (window.JtoolsScreensaverSettings) {
-            window.JtoolsScreensaverSettings.init();
+        if (window.JtoolsSmsPage) {
+            window.JtoolsSmsPage.init();
         }
     }
 };

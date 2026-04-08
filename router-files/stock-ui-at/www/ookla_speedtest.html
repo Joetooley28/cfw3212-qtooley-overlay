@@ -1,10 +1,17 @@
 {{#loggedIn}}<!doctype html>
+
 <html>
+
 <head>
+
 <meta charset="utf-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+
 <meta http-equiv="format-detection" content="telephone=no">
+
 <script>
 (function () {
     "use strict";
@@ -15,72 +22,132 @@
     if (!prefersDark) {
         return;
     }
-    document.documentElement.className += (document.documentElement.className ? " " : "") + "jtools-preload-dark";
     var style = document.createElement("style");
-    style.textContent = "html,body,.site-content,#content,#content>.container,#content .grid-9.omega,#content .body-box,#content .body-box>.pad,#htmlGoesHere{background:#1e1e1e!important;color:#d7dde4;}#body{background:transparent;}";
+    style.textContent = "html,body,.site-content,#content,#content>.container,#content .grid-9.omega,#content .body-box,#content .body-box>.pad,#htmlGoesHere,#ookla-speedtest-panel,.ookla-page,.ookla-field,.ookla-select,.ookla-static,.ookla-phase-step,.ookla-ca-card,.qt-btn,.ookla-run-button,.ookla-secondary-button,.ookla-recover-button{background:#1e1e1e!important;color:#d7dde4!important;border-color:#343b43!important;}#body{background:transparent;}.qt-btn,.ookla-run-button,.ookla-secondary-button,.ookla-recover-button{box-shadow:none!important;}";
     document.head.appendChild(style);
 })();
 </script>
+
 <link rel="stylesheet" href="/css/style.css?1.1.79.0">
+
 <link rel="stylesheet" href="/css/jquery-ui.css?1.1.79.0">
+
 <link rel="stylesheet" href="/css/validationEngine.jquery.css?1.1.79.0">
+
 <link rel="stylesheet" href="/css/qtooley.css?qtooley-v20260329e">
 <link rel="stylesheet" href="/css/jtools_dark_mode.css?jtools-dark-v20260329a">
-<link rel="stylesheet" href="/css/screensaver_settings.css?jtools-ss-v20260405b">
+<link rel="stylesheet" href="/css/at_terminal.css?jtools-at-v20260331h">
+
+<link rel="stylesheet" href="/css/ookla_speedtest.css?jtools-speedtest-ui-v20260405b">
 <script>
+
 if (top !== self) top.location = self.location;
+
 var nas_installed = '<<<system.package.installed.nas>>>';
+
 var service_pppoe_server_0_enable = '<<<service.pppoe.server.0.enable>>>';
-var relUrlOfPage = 'screensaver_settings.html';
+
+var relUrlOfPage = 'ookla_speedtest.html';
+
 var user = '{{loggedInUser}}';
+
 var userGroup = '{{loggedInUserGroup}}';
+
 var userGroups = userGroup.split(',');
+
 var csrfToken = '{{csrfToken}}';
+
 var currentLanguage = '{{lang}}';
+
 var searchParams = new URLSearchParams(location.search);
+
 var queryParams = {};
+
 for (const [key, value] of searchParams) { queryParams[key] = value; }
+
 </script>
+
 <script src="/js/{{lang}}/xlat.js?1.1.79.0"></script>
+
 <script src="/js/jquery.min.js?1.1.79.0"></script>
+
 <script src="/js/jquery.validate.min.js?1.1.79.0"></script>
+
 <script src="/js/jquery.validationEngine.min.js?1.1.79.0"></script>
+
 <script src="/js/jquery.blockUI.min.js?1.1.79.0"></script>
+
 <script src="/js/jquery-ui.min.js?1.1.79.0"></script>
+
 <script src="/js/jquery.ui.touch-punch.min.js?1.1.79.0"></script>
+
 <script src="/js/NTC_UI.js?1.1.79.0"></script>
+
 <script src="/js/script.js?1.1.79.0"></script>
+
 <script src="/js/language_selection.js?1.1.79.0"></script>
+
 <script src="/js/generatedSupportedLanguages.js?1.1.79.0"></script>
+
 <script src="/js/generatedMenuEntries.js?jtools-menu-v20260405c"></script>
 <script src="/theme/js/genHeader.js?jtools-genheader-v20260408a"></script>
+
 <script src="/theme/js/genFooter.js?1.1.79.0"></script>
-<script src="/js/screensaver_settings.js?jtools-ss-v20260405b"></script>
+
+<script src="/js/ookla_speedtest.js?jtools-speedtest-v20260405b"></script>
+
 <script>
+
 var pageData = {
-    title: "Settings",
-    menuPos: ["JtoolServices", "ScreensaverSettings"],
+
+    title: "Ookla Speedtest",
+
+    menuPos: ["JtoolServices", "OoklaSpeedtest"],
+
     pageObjects: [],
+
     onReady: function () {
-        if (window.JtoolsScreensaverSettings) {
-            window.JtoolsScreensaverSettings.init();
+
+        if (window.JtoolsOoklaSpeedtest) {
+
+            window.JtoolsOoklaSpeedtest.init();
+
         }
+
     }
+
 };
+
 if (pageData.disabled !== true) {
+
     if (pageData.pageObjects.length) {
+
         requestPageObjects();
+
     } else {
+
         $(document).ready(function () {
+
             if (typeof pageData.onReady === "function") {
+
                 pageData.onReady();
+
             }
+
             setVisible("#body", "1");
+
         });
+
     }
+
 }
+
 </script>
+
 </head>
+
 <body id="body" style="display: none;"></body>
+
 </html>
+
 {{/loggedIn}}

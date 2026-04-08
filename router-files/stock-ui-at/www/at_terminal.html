@@ -15,7 +15,6 @@
     if (!prefersDark) {
         return;
     }
-    document.documentElement.className += (document.documentElement.className ? " " : "") + "jtools-preload-dark";
     var style = document.createElement("style");
     style.textContent = "html,body,.site-content,#content,#content>.container,#content .grid-9.omega,#content .body-box,#content .body-box>.pad,#htmlGoesHere{background:#1e1e1e!important;color:#d7dde4;}#body{background:transparent;}";
     document.head.appendChild(style);
@@ -26,12 +25,12 @@
 <link rel="stylesheet" href="/css/validationEngine.jquery.css?1.1.79.0">
 <link rel="stylesheet" href="/css/qtooley.css?qtooley-v20260329e">
 <link rel="stylesheet" href="/css/jtools_dark_mode.css?jtools-dark-v20260329a">
-<link rel="stylesheet" href="/css/screensaver_settings.css?jtools-ss-v20260405b">
+<link rel="stylesheet" href="/css/at_terminal.css?jtools-at-v20260331h">
 <script>
 if (top !== self) top.location = self.location;
 var nas_installed = '<<<system.package.installed.nas>>>';
 var service_pppoe_server_0_enable = '<<<service.pppoe.server.0.enable>>>';
-var relUrlOfPage = 'screensaver_settings.html';
+var relUrlOfPage = 'at_terminal.html';
 var user = '{{loggedInUser}}';
 var userGroup = '{{loggedInUserGroup}}';
 var userGroups = userGroup.split(',');
@@ -55,15 +54,15 @@ for (const [key, value] of searchParams) { queryParams[key] = value; }
 <script src="/js/generatedMenuEntries.js?jtools-menu-v20260405c"></script>
 <script src="/theme/js/genHeader.js?jtools-genheader-v20260408a"></script>
 <script src="/theme/js/genFooter.js?1.1.79.0"></script>
-<script src="/js/screensaver_settings.js?jtools-ss-v20260405b"></script>
+<script src="/js/at_terminal.js?jtools-at-v20260331c"></script>
 <script>
 var pageData = {
-    title: "Settings",
-    menuPos: ["JtoolServices", "ScreensaverSettings"],
+    title: "AT terminal",
+    menuPos: ["JtoolServices", "AtTerminal"],
     pageObjects: [],
     onReady: function () {
-        if (window.JtoolsScreensaverSettings) {
-            window.JtoolsScreensaverSettings.init();
+        if (window.StockAtTerminal) {
+            window.StockAtTerminal.init();
         }
     }
 };
