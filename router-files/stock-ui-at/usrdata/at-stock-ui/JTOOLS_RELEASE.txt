@@ -15,7 +15,7 @@ Jtools asset tokens
 - qtooley.css?qtooley-v20260329e
 - jtools_dark_mode.css?jtools-dark-v20260329a
 - generatedMenuEntries.js?jtools-menu-v20260405c
-- genHeader.js?jtools-genheader-v20260405h
+- genHeader.js?jtools-genheader-v20260408a
 - jtools_screensaver.js?jtools-qo-v20260405a
 - jtools_session_keepalive.js?jtools-session-v20260330a
 - quick_overview.css?jtools-qo-v20260331g

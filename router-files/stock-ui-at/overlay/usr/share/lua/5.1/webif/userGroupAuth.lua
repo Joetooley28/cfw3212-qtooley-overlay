@@ -20,6 +20,11 @@ return { authTable = {
         writeGroups = {root=true,admin=true},
         skipAuth = false
     },
+    ["LoginTimeCheck"] = {
+        readGroups = {root=true,admin=true,user=true},
+        writeGroups = {root=true,admin=true,user=true},
+        skipAuth = false
+    },
     ["NAT.html"] = {
         readGroups = {root=true,admin=true,user=true},
         writeGroups = {root=true,admin=true,user=true},
@@ -606,6 +611,16 @@ return { authTable = {
         skipAuth = true
     },
     ["StsAdvStatus"] = {
+        readGroups = {root=true,admin=true},
+        writeGroups = {root=true,admin=true},
+        skipAuth = true
+    },
+    ["lteCellInfo"] = {
+        readGroups = {root=true,admin=true},
+        writeGroups = {root=true,admin=true},
+        skipAuth = true
+    },
+    ["nr5gCellInfo"] = {
         readGroups = {root=true,admin=true},
         writeGroups = {root=true,admin=true},
         skipAuth = true
