@@ -109,49 +109,63 @@ function Assert-SshAvailable {
     }
 }
 
+function Get-SshOptions {
+    return @(
+        "-o", "StrictHostKeyChecking=accept-new",
+        "-o", "ServerAliveInterval=15"
+    )
+}
+
 function Invoke-SshCommand {
     param(
         [string]$Target,
         [string]$Command
     )
 
-    & ssh $Target $Command | Out-Host
+    $sshOptions = Get-SshOptions
+    & ssh @sshOptions $Target $Command | Out-Host
     if ($LASTEXITCODE -ne 0) {
         throw "SSH command failed."
     }
 }
 
-function Push-PackageViaSsh {
+function Invoke-RemotePackageScriptViaSsh {
     param(
         [string]$PackageRoot,
         [string]$Target,
-        [string]$RemoteStageRoot
+        [string]$RemoteStageRoot,
+        [string]$RemoteScriptPath,
+        [string]$RemoteEnvPrefix = ""
     )
 
     $parent = [System.IO.Path]::GetDirectoryName($RemoteStageRoot).Replace("\", "/")
-    $tempTar = Join-Path ([System.IO.Path]::GetTempPath()) ("qtooley-stock-ui-" + [System.Guid]::NewGuid().ToString("N") + ".tar")
-    $remoteTar = "$parent/qtooley-stock-ui-package.tar"
+    $sshOptions = Get-SshOptions
+    $remoteCommandParts = @(
+        "set -e",
+        "rm -rf '$RemoteStageRoot'",
+        "mkdir -p '$parent'",
+        "mkdir -p '$RemoteStageRoot'",
+        "tar -xf - -C '$RemoteStageRoot'",
+        "chmod 755 '$RemoteScriptPath'"
+    )
 
-    try {
-        Invoke-SshCommand -Target $Target -Command "rm -rf '$RemoteStageRoot' && mkdir -p '$parent' && mkdir -p '$RemoteStageRoot'"
-
-        & tar -cf $tempTar -C $PackageRoot . | Out-Host
-        if ($LASTEXITCODE -ne 0 -or -not (Test-Path $tempTar)) {
-            throw "Local package tar creation failed."
-        }
-
-        & scp -O $tempTar "${Target}:$remoteTar" | Out-Host
-        if ($LASTEXITCODE -ne 0) {
-            throw "SCP package push failed."
-        }
-
-        Invoke-SshCommand -Target $Target -Command "tar -xf '$remoteTar' -C '$RemoteStageRoot' && rm -f '$remoteTar'"
+    if ($RemoteEnvPrefix) {
+        $remoteCommandParts += "$RemoteEnvPrefix /bin/sh '$RemoteScriptPath'"
+    } else {
+        $remoteCommandParts += "/bin/sh '$RemoteScriptPath'"
     }
-    finally {
-        if (Test-Path $tempTar) {
-            Remove-Item -Force $tempTar -ErrorAction SilentlyContinue
-        }
+
+    $remoteCommand = $remoteCommandParts -join " && "
+
+    Write-Host "SSH transport: first-time connections to a new router IP are accepted automatically."
+    & tar -cf - -C $PackageRoot . | & ssh @sshOptions $Target $remoteCommand | Out-Host
+    if ($LASTEXITCODE -ne 0) {
+        throw "SSH package transfer or remote script execution failed."
     }
+}
+
+function Select-SshTransport {
+    return Select-Transport -AllowAdb:$false
 }
 
 function Select-Transport {

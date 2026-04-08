@@ -29,7 +29,7 @@ $remoteStageRoot = "/tmp/qtooley-stock-ui-at-package"
 $remoteScriptPath = "$remoteStageRoot/package/uninstall_stock_ui_release.sh"
 
 Write-Host "Qtooley stock UI uninstall"
-$transport = Select-Transport -AllowAdb:$false
+$transport = Select-SshTransport
 $mode = Read-MenuChoice -Prompt "Choose uninstall mode: 1) Remove Qtooley and bundled Ookla 2) Remove Qtooley, bundled Ookla, and Tailscale" -Allowed @("1", "2")
 $removeTailscale = if ($mode -eq "2") { $true } else { $false }
 
@@ -45,12 +45,11 @@ if (-not (Read-YesNo -Prompt "Proceed with uninstall?" -DefaultYes $false)) {
     exit 0
 }
 
-if ($transport.Name -eq "adb") {
-    Push-PackageViaAdb -PackageRoot $packageRoot -RemoteStageRoot $remoteStageRoot
-    Invoke-AdbShell "chmod 755 '$remoteScriptPath' && REMOVE_TAILSCALE=$([int]$removeTailscale) REMOVE_PAYLOAD=1 /bin/sh '$remoteScriptPath'"
-} else {
-    Push-PackageViaSsh -PackageRoot $packageRoot -Target $transport.Target -RemoteStageRoot $remoteStageRoot
-    Invoke-SshCommand -Target $transport.Target -Command "chmod 755 '$remoteScriptPath' && REMOVE_TAILSCALE=$([int]$removeTailscale) REMOVE_PAYLOAD=1 /bin/sh '$remoteScriptPath'"
-}
+Invoke-RemotePackageScriptViaSsh `
+    -PackageRoot $packageRoot `
+    -Target $transport.Target `
+    -RemoteStageRoot $remoteStageRoot `
+    -RemoteScriptPath $remoteScriptPath `
+    -RemoteEnvPrefix "REMOVE_TAILSCALE=$([int]$removeTailscale) REMOVE_PAYLOAD=1"
 
 Write-Host "Uninstall finished."

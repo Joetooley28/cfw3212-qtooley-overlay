@@ -31,7 +31,7 @@ $remoteScriptPath = "$remoteStageRoot/package/install_stock_ui_release.sh"
 Write-Host "Qtooley stock UI install / update"
 Show-BundledOoklaStatus -PackageRoot $packageRoot
 
-$transport = Select-Transport -AllowAdb:$false
+$transport = Select-SshTransport
 Write-Host "Note: on a normal first install, the stock uninstall baseline is captured automatically. You do not need forced recapture."
 $forceRecaptureBaseline = Read-YesNo -Prompt "Last-resort only: force recapture of the uninstall stock baseline from this router right now?" -DefaultYes $false
 
@@ -49,12 +49,11 @@ if (-not (Read-YesNo -Prompt "Proceed with install/update?" -DefaultYes $false))
     exit 0
 }
 
-if ($transport.Name -eq "adb") {
-    Push-PackageViaAdb -PackageRoot $packageRoot -RemoteStageRoot $remoteStageRoot
-    Invoke-AdbShell "chmod 755 '$remoteScriptPath' && INSTALL_BUNDLED_OOKLA=1 FORCE_RECAPTURE_BASELINE=$([int]$forceRecaptureBaseline) /bin/sh '$remoteScriptPath'"
-} else {
-    Push-PackageViaSsh -PackageRoot $packageRoot -Target $transport.Target -RemoteStageRoot $remoteStageRoot
-    Invoke-SshCommand -Target $transport.Target -Command "chmod 755 '$remoteScriptPath' && INSTALL_BUNDLED_OOKLA=1 FORCE_RECAPTURE_BASELINE=$([int]$forceRecaptureBaseline) /bin/sh '$remoteScriptPath'"
-}
+Invoke-RemotePackageScriptViaSsh `
+    -PackageRoot $packageRoot `
+    -Target $transport.Target `
+    -RemoteStageRoot $remoteStageRoot `
+    -RemoteScriptPath $remoteScriptPath `
+    -RemoteEnvPrefix "INSTALL_BUNDLED_OOKLA=1 FORCE_RECAPTURE_BASELINE=$([int]$forceRecaptureBaseline)"
 
 Write-Host "Install/update finished."
