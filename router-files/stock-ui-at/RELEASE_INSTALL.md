@@ -40,7 +40,7 @@ Space note
 - if space is tight, clean up old files first instead of trying to install with only a few MB left
 
 Important cleanup note
-- on one used unit, most of the missing space turned out to be a staged firmware file named `upgrade.star` under `/cache/upgrade.star` and `/usrdata/cache/upgrade.star`
+- on one of my units, most of the missing space turned out to be a staged firmware file named `upgrade.star` under `/cache/upgrade.star` and `/usrdata/cache/upgrade.star`
 - in that logged case, `upgrade.star` was about `104 MB`
 - if you find one, pull and save an off-box copy before deleting it
 - before deleting a file like that, save an off-box copy first and record its SHA-256 hash if you can, because it may be a useful stock firmware artifact later
