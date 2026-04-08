@@ -140,6 +140,7 @@ function Invoke-RemotePackageScriptViaSsh {
 
     $parent = [System.IO.Path]::GetDirectoryName($RemoteStageRoot).Replace("\", "/")
     $sshOptions = Get-SshOptions
+    $tempTar = Join-Path ([System.IO.Path]::GetTempPath()) ("qtooley-stock-ui-" + [System.Guid]::NewGuid().ToString("N") + ".tar")
     $remoteCommandParts = @(
         "set -e",
         "rm -rf '$RemoteStageRoot'",
@@ -157,10 +158,34 @@ function Invoke-RemotePackageScriptViaSsh {
 
     $remoteCommand = $remoteCommandParts -join " && "
 
-    Write-Host "SSH transport: first-time connections to a new router IP are accepted automatically."
-    & tar -cf - -C $PackageRoot . | & ssh @sshOptions $Target $remoteCommand | Out-Host
-    if ($LASTEXITCODE -ne 0) {
-        throw "SSH package transfer or remote script execution failed."
+    try {
+        & tar -cf $tempTar -C $PackageRoot . | Out-Host
+        if ($LASTEXITCODE -ne 0 -or -not (Test-Path $tempTar)) {
+            throw "Local package tar creation failed."
+        }
+
+        $escapedTarPath = $tempTar.Replace('"', '""')
+        $sshArgs = @()
+        foreach ($part in $sshOptions) {
+            $escapedPart = $part.Replace('"', '""')
+            $sshArgs += '"' + $escapedPart + '"'
+        }
+        $escapedTarget = $Target.Replace('"', '""')
+        $escapedRemoteCommand = $remoteCommand.Replace('"', '\"')
+        $sshArgs += '"' + $escapedTarget + '"'
+        $sshArgs += '"' + $escapedRemoteCommand + '"'
+
+        Write-Host "SSH transport: first-time connections to a new router IP are accepted automatically."
+        $cmdLine = '/c type "' + $escapedTarPath + '" | ssh ' + ($sshArgs -join ' ')
+        & cmd.exe $cmdLine | Out-Host
+        if ($LASTEXITCODE -ne 0) {
+            throw "SSH package transfer or remote script execution failed."
+        }
+    }
+    finally {
+        if (Test-Path $tempTar) {
+            Remove-Item -Force $tempTar -ErrorAction SilentlyContinue
+        }
     }
 }
 
