@@ -13,7 +13,8 @@ This is not a generic web app and it is not a generic USB modem project.
 - [Latest Release](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
 - [Quick Must Read](docs/quick-must-read.md)
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
-- [Emergency Stock Web Recovery](docs/fallback-stock-recovery.md)
+- [Docs Index](docs/index.md)
+- [Platform Notes](docs/platform-notes.md)
 
 ## What You Get
 
@@ -30,36 +31,15 @@ Dark mode note:
 
 - the shared dark mode toggle applies across themed stock UI pages and Qtooley pages
 
-## Choose Your Install Path
+## Install Summary
 
-**Normal Windows install (No internet on modem yet)**
-
-- the router does not already have working internet
-- you want the normal Windows-assisted install, update, or uninstall flow over SSH
-- download the top file in the `Assets` section at the bottom of this [release page](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
-- read [Quick Must Read](docs/quick-must-read.md) first
-- do not use the auto-generated `Source code` download
-- extract the ZIP before running anything
-- follow the packaged `README.txt` for the exact Windows commands
-- the public Windows installer flow is SSH-only
-
-
-**Direct router install/update/uninstall (Internet already working on modem)**
-
-- the router already has working internet
-- you want to install, update, or uninstall from an SSH shell on the router itself
-
-Direct GitHub install or update:
-
-```sh
-sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/update_from_github_release.sh)"
-```
-
-Direct GitHub uninstall:
-
-```sh
-sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley-overlay/main/router-files/stock-ui-at/usrdata/at-stock-ui/uninstall_from_github_release.sh)"
-```
+- start with [Quick Must Read](docs/quick-must-read.md)
+- for normal Windows install, update, or uninstall:
+  - use the top ZIP in the `Assets` section of the latest [release page](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
+  - extract the ZIP
+  - follow the packaged `README.txt`
+- for the direct router `wget` install/update and uninstall commands:
+  - use [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
 
 ## Before You Install
 
@@ -163,5 +143,5 @@ If you are new to the project, use `main`.
 
 - [Quick Must Read](docs/quick-must-read.md)
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
-- [Emergency Stock Web Recovery](docs/fallback-stock-recovery.md)
+- [Docs Index](docs/index.md)
 - [Platform Notes](docs/platform-notes.md)
