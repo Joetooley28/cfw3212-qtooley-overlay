@@ -206,7 +206,7 @@ try {
     Copy-Item -Force (Join-Path $scriptsRoot "stock_ui_at_release_common.ps1") (Join-Path $releaseRoot "scripts\stock_ui_at_release_common.ps1")
     Copy-Item -Force (Join-Path $scriptsRoot "install_stock_ui_at.ps1") (Join-Path $releaseRoot "install_stock_ui_at.ps1")
     Copy-Item -Force (Join-Path $scriptsRoot "uninstall_stock_ui_at.ps1") (Join-Path $releaseRoot "uninstall_stock_ui_at.ps1")
-    Copy-Item -Force (Join-Path $packageRoot "RELEASE_INSTALL.md") (Join-Path $releaseRoot "README.txt")
+    Copy-Item -Force (Join-Path $RepoRoot "docs\\windows-zip-install.md") (Join-Path $releaseRoot "README.txt")
 
     @(
         "release_version=$version"
