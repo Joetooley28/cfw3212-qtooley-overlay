@@ -1,0 +1,10 @@
+[Unit]
+Description=Reapply Jtools stock UI overlay
+After=local-fs.target turbontc.service
+Wants=turbontc.service
+ConditionPathExists=/usrdata/at-stock-ui/apply_stock_ui_overlay.sh
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh /usrdata/at-stock-ui/apply_stock_ui_overlay.sh
+RemainAfterExit=yes
