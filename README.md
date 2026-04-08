@@ -11,6 +11,7 @@ This is not a generic web app and it is not a generic USB modem project.
 ## Start Here
 
 - [Latest Release](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
+- [Quick Must Read](docs/quick-must-read.md)
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
 - [Emergency Stock Web Recovery](docs/fallback-stock-recovery.md)
 
@@ -36,6 +37,7 @@ Dark mode note:
 - the router does not already have working internet
 - you want the normal Windows-assisted install, update, or uninstall flow over SSH
 - download the top file in the `Assets` section at the bottom of this [release page](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
+- read [Quick Must Read](docs/quick-must-read.md) first
 - do not use the auto-generated `Source code` download
 - extract the ZIP before running anything
 - follow the packaged `README.txt` for the exact Windows commands
@@ -64,6 +66,7 @@ sh -c "$(wget -qO- https://raw.githubusercontent.com/Joetooley28/cfw3212-qtooley
 - the router must already be rooted
   Full credit to [@Luke](https://github.com/lukejenkins/cellular/tree/main/casasystems/cfw3212) for the root script and the broader `CFW-3212` platform research.
 - if you are starting from a stock carrier-managed box, also read Luke's [`guide_block_carrier_remote_mgmt`](https://github.com/lukejenkins/cellular/blob/main/casasystems/cfw3212/guide_block_carrier_remote_mgmt.md) to block the carrier remote-management path
+- read [Quick Must Read](docs/quick-must-read.md) for the first-install snapshot behavior and space notes
 - SSH must already be enabled and reachable
 - the normal public release asset is the Windows ZIP
 - bundled Ookla is expected in public release ZIPs
@@ -157,6 +160,7 @@ If you are new to the project, use `main`.
 
 ## More Docs
 
+- [Quick Must Read](docs/quick-must-read.md)
 - [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
 - [Emergency Stock Web Recovery](docs/fallback-stock-recovery.md)
 - [Platform Notes](docs/platform-notes.md)

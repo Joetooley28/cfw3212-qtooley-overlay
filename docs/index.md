@@ -22,6 +22,7 @@ It is not a generic web app and it is not a generic USB modem project.
 ## Download
 
 - [Latest Release](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
+- [Quick Must Read](quick-must-read.md)
 - Install guide: [RELEASE_INSTALL.md](../router-files/stock-ui-at/RELEASE_INSTALL.md)
 - Emergency recovery: [fallback-stock-recovery.md](fallback-stock-recovery.md)
 - Main repo README: [README.md](../README.md)
@@ -47,16 +48,17 @@ Dark mode note:
 
 1. Open the latest GitHub release page.
 2. Download the top file in the `Assets` section at the bottom of this [release page](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest).
-3. Do not use the auto-generated `Source code` download.
-4. Extract the ZIP.
-5. Open PowerShell in the extracted folder.
-6. Run:
+3. Read [Quick Must Read](quick-must-read.md).
+4. Do not use the auto-generated `Source code` download.
+5. Extract the ZIP.
+6. Open PowerShell in the extracted folder.
+7. Run:
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install_stock_ui_at.ps1
 ```
-7. Connect over SSH with the router IP, username, and password.
-8. Let the installer place the Qtooley overlay and bundled Ookla base components.
-9. If you want Tailscale, install it afterward from the Qtooley UI as the optional extra.
+8. Connect over SSH with the router IP, username, and password.
+9. Let the installer place the Qtooley overlay and bundled Ookla base components.
+10. If you want Tailscale, install it afterward from the Qtooley UI as the optional extra.
 
 Important notes:
 
@@ -83,6 +85,7 @@ Prerequisites:
 - rooted router
   Full credit to [@Luke](https://github.com/lukejenkins/cellular/tree/main/casasystems/cfw3212) for the root script and the broader `CFW-3212` platform research.
 - if you are starting from a stock carrier-managed box, also read Luke's [`guide_block_carrier_remote_mgmt`](https://github.com/lukejenkins/cellular/blob/main/casasystems/cfw3212/guide_block_carrier_remote_mgmt.md) to block the carrier remote-management path
+- read [Quick Must Read](quick-must-read.md) for the first-install snapshot behavior and space notes
 - SSH already enabled and reachable
 - Windows built-in `ssh` client available
 
@@ -177,6 +180,7 @@ Important warning:
 
 ## Docs
 
+- [Quick Must Read](quick-must-read.md)
 - [Release Install Guide](../router-files/stock-ui-at/RELEASE_INSTALL.md)
 - [Emergency Stock Web Recovery](fallback-stock-recovery.md)
 - [platform-notes.md](platform-notes.md)

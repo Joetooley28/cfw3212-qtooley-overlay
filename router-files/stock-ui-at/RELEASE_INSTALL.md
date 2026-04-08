@@ -25,6 +25,7 @@ Before you start
 - the router must already be rooted
 - full credit to [@Luke](https://github.com/lukejenkins/cellular/tree/main/casasystems/cfw3212) for the root script and the broader `CFW-3212` platform research
 - if you are starting from a stock carrier-managed box, also read Luke's [`guide_block_carrier_remote_mgmt`](https://github.com/lukejenkins/cellular/blob/main/casasystems/cfw3212/guide_block_carrier_remote_mgmt.md) to block the carrier remote-management path
+- quick summary page: [`../../docs/quick-must-read.md`](../../docs/quick-must-read.md)
 - SSH must already be reachable
 - you need the router IP, SSH username, and SSH password
 - Windows needs the built-in `ssh` client available
@@ -42,14 +43,16 @@ Important install behavior
 
 Space note
 - first install stores a router-specific stock baseline under `/usrdata` in addition to the base Qtooley payload
-- bundled Ookla adds a few more MB
-- Tailscale is a separate optional runtime under `/usrdata/tailscale` and uses noticeably more space than the core Qtooley files alone
-- practical recommendation: try to have at least `15 MB` to `20 MB` free on `/usrdata` before first install, and leave more headroom if you plan to add optional runtimes later
+- real Box 2 measurement for Qtooley with bundled Ookla installed was about `13.7 MB` under `/usrdata/at-stock-ui`
+- the bundled Ookla `speedtest` binary itself was about `2.2 MB`
+- Tailscale is a separate optional runtime under `/usrdata/tailscale` and should be treated as about `60 MB` of additional space
+- practical recommendation: try to have at least `20 MB` free for the base install and more if you plan to add optional runtimes later
 - if space is tight, clean up old files first instead of trying to install with only a few MB left
 
 Important cleanup note
 - on one used unit, most of the missing space turned out to be a staged firmware file named `upgrade.star` under `/cache/upgrade.star` and `/usrdata/cache/upgrade.star`
-- in that logged case, `upgrade.star` was about `108.8 MB`
+- in that logged case, `upgrade.star` was about `104 MB`
+- if you find one, pull and save an off-box copy before deleting it
 - before deleting a file like that, save an off-box copy first and record its SHA-256 hash if you can, because it may be a useful stock firmware artifact later
 
 **Normal Windows install (No internet on modem yet)**
