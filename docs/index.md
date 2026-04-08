@@ -51,7 +51,7 @@ Dark mode note:
 - use the top ZIP in the `Assets` section of the latest [release page](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
 - do not use the auto-generated `Source code` download
 - extract the ZIP
-- follow the packaged `README.txt` or [Windows ZIP Install Guide](windows-zip-install.md)
+- follow the packaged `README.txt`
 - the public Windows installer flow is SSH-only
 
 

@@ -29,7 +29,7 @@ Practical advice:
 
 ## Important Space Warning: `upgrade.star`
 
-- on one unit, the biggest hidden space consumer was a staged firmware file named `upgrade.star`
+- on one of my units, the biggest hidden space consumer was a staged firmware file named `upgrade.star`
 - the copy found on-box was about `104 MB`
 - check:
   - `/cache/upgrade.star`
