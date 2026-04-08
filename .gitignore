@@ -15,3 +15,6 @@ router-files/stock-ui-at/usrdata/at-stock-ui/bundles/ookla/
 docs/github-publish-plan.md
 docs/standalone-at-terminal-readme-draft.md
 docs/publish-safety-checklist.md
+
+# Local release build output
+dist/
