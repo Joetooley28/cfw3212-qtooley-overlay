@@ -1,3 +1,15 @@
+<#
+Usage:
+  Dry run:
+    powershell -ExecutionPolicy Bypass -File C:\at_terminal\repo-public\scripts\promote_to_main.ps1
+
+  Apply promotion into main:
+    powershell -ExecutionPolicy Bypass -File C:\at_terminal\repo-public\scripts\promote_to_main.ps1 -Apply
+
+  Apply promotion and verify a release ZIP with bundled Ookla:
+    powershell -ExecutionPolicy Bypass -File C:\at_terminal\repo-public\scripts\promote_to_main.ps1 -Apply -VerifyReleaseBuild
+#>
+
 param(
     [string]$SourceRepo = "C:\at_terminal\repo-public",
     [string]$DestinationRepo = "C:\at_terminal\repo-public-main",
