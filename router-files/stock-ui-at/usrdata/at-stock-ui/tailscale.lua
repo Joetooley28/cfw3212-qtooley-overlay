@@ -266,6 +266,22 @@ local function backend_state_text(backend_state, auth_url, active, installed)
     return "Tailscale state is available."
 end
 
+local function classify_action_failure(action_name, output, default_status)
+    local raw = tostring(output or "")
+    if action_name == "install" or action_name == "update" then
+        if raw:find("Could not reach the Tailscale package site", 1, true) or
+           raw:find("Failed to download the Tailscale package", 1, true) or
+           raw:find("Failed resolving", 1, true) or
+           raw:find("bad address", 1, true) or
+           raw:find("timed out", 1, true) or
+           raw:find("Connection timed out", 1, true) or
+           raw:find("Network is unreachable", 1, true) then
+            return "tailscale_download_unreachable", "Tailscale install/update failed because the router could not reach the Tailscale download site. Check router internet access and DNS."
+        end
+    end
+    return nil, default_status
+end
+
 local function is_pending_login_state(state)
     if type(state) ~= "table" then
         return false
@@ -372,8 +388,9 @@ local function action_result(ok, action_name, output, opts)
         end
     end
     if not ok then
-        state.error = opts.error or "tailscale_action_failed"
-        state.status_text = opts.status_text or state.status_text
+        local classified_error, classified_status = classify_action_failure(action_name, output, opts.status_text or state.status_text)
+        state.error = classified_error or opts.error or "tailscale_action_failed"
+        state.status_text = classified_status or opts.status_text or state.status_text
     end
     return state
 end
