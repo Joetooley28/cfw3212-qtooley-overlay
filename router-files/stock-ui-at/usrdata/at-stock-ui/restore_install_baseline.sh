@@ -5,11 +5,9 @@ set -eu
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
 BASELINE_DIR="${1:-/usrdata/at-stock-ui/installer-state/install-baseline}"
 VERIFY_ROOT="/tmp/install-baseline-verify.$$"
-TRACKED_FILE_LIST="$BASELINE_DIR/tracked_stock_files.txt"
-
-if [ ! -f "$TRACKED_FILE_LIST" ]; then
-    TRACKED_FILE_LIST="$SCRIPT_DIR/tracked_stock_files.txt"
-fi
+BASELINE_TRACKED_FILE_LIST="$BASELINE_DIR/tracked_stock_files.txt"
+PACKAGE_TRACKED_FILE_LIST="$SCRIPT_DIR/tracked_stock_files.txt"
+MERGED_TRACKED_FILE_LIST="$VERIFY_ROOT/tracked_stock_files.merged.txt"
 
 for required in "$BASELINE_DIR/install_www.tar" "$BASELINE_DIR/install_webif.tar"; do
     if [ ! -f "$required" ]; then
@@ -30,16 +28,31 @@ trap 'rm -rf "$VERIFY_ROOT"' EXIT INT TERM
 tar -xf "$BASELINE_DIR/install_www.tar" -C "$VERIFY_ROOT"
 tar -xf "$BASELINE_DIR/install_webif.tar" -C "$VERIFY_ROOT"
 
-if [ ! -f "$TRACKED_FILE_LIST" ]; then
+if [ ! -f "$BASELINE_TRACKED_FILE_LIST" ] && [ ! -f "$PACKAGE_TRACKED_FILE_LIST" ]; then
     echo "Missing tracked stock file list for uninstall verification." >&2
+    exit 1
+fi
+
+{
+    if [ -f "$BASELINE_TRACKED_FILE_LIST" ]; then
+        cat "$BASELINE_TRACKED_FILE_LIST"
+    fi
+    if [ -f "$PACKAGE_TRACKED_FILE_LIST" ]; then
+        cat "$PACKAGE_TRACKED_FILE_LIST"
+    fi
+} | awk '
+    /^[[:space:]]*$/ { next }
+    /^[[:space:]]*#/ { next }
+    !seen[$0]++ { print }
+' > "$MERGED_TRACKED_FILE_LIST"
+
+if [ ! -s "$MERGED_TRACKED_FILE_LIST" ]; then
+    echo "Tracked stock file list is empty; refusing uninstall verification." >&2
     exit 1
 fi
 
 while IFS= read -r live_path; do
     [ -n "$live_path" ] || continue
-    case "$live_path" in
-        \#*) continue ;;
-    esac
 
     rel_path="${live_path#/}"
     baseline_path="$VERIFY_ROOT/$rel_path"
@@ -59,6 +72,6 @@ while IFS= read -r live_path; do
             exit 1
         fi
     fi
-done < "$TRACKED_FILE_LIST"
+done < "$MERGED_TRACKED_FILE_LIST"
 
 echo "verified_install_baseline=$BASELINE_DIR"
