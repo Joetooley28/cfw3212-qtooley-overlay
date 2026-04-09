@@ -75,7 +75,9 @@ Target platform:
 
 - router: Casa Systems `CFW-3212`
 - modem: Quectel `RG520N-NA`
-- tested router firmware: `USC_1.1.79.0`
+- tested so far on router firmware: `USC_1.1.79.0` and `USC_1.1.99.0`
+- `USC_1.2.24.0` appears in the stock comparison notes, but Qtooley release testing on that version still needs confirmation
+- other router firmware versions may work, but still need confirmation
 - tested module firmware seen in notes: `RG520NNADAR03A03M4G`
 
 Important platform truths:
