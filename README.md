@@ -43,10 +43,12 @@ Dark mode note:
 
 - start with [Quick Must Read](docs/quick-must-read.md)
 - for normal Windows install, update, or uninstall:
+  - note: no internet connection on the modem yet
   - use the top ZIP in the `Assets` section of the latest [release page](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
   - extract the ZIP
   - use [windows-zip-install.md](docs/windows-zip-install.md) or the packaged `README.txt`
 - for the direct router `wget` install/update and uninstall commands:
+  - note: modem already has internet
   - use [Direct Router Install Guide](docs/direct-router-install.md)
 
 ## Before You Install
