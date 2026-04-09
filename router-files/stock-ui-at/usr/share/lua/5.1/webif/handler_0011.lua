@@ -2634,7 +2634,7 @@ function TailscaleApiHandler:post(url, action)
         self:write({ ok = false, error = "tailscale_action_failed" })
         return
     end
-    if result and result.ok == false then
+    if result and result.ok == false and action ~= "install" and action ~= "update" then
         self:set_status(400)
     end
     self:write(result)
