@@ -25,18 +25,18 @@ need_cmd() {
 
 fetch_url() {
     if need_cmd curl; then
-        curl -fsSL "$1"
+        curl --connect-timeout 8 --max-time 20 -fsSL "$1"
         return
     fi
-    wget -qO- "$1"
+    wget --timeout=20 -qO- "$1"
 }
 
 download_file() {
     if need_cmd curl; then
-        curl -fsSL "$1" -o "$2"
+        curl --connect-timeout 8 --max-time 30 -fsSL "$1" -o "$2"
         return
     fi
-    wget -qO "$2" "$1"
+    wget --timeout=30 -qO "$2" "$1"
 }
 
 remount_rw() {
@@ -48,7 +48,10 @@ remount_ro() {
 }
 
 log "Detecting latest stable Tailscale ARM build..."
-INDEX_HTML="$(fetch_url "$PKG_INDEX")"
+if ! INDEX_HTML="$(fetch_url "$PKG_INDEX")"; then
+    log "Could not reach the Tailscale package site. Check router internet access and DNS, then try again."
+    exit 1
+fi
 TARBALL="$(printf '%s\n' "$INDEX_HTML" | grep -o 'tailscale_[0-9][0-9.]*_arm\.tgz' | sort -uV | tail -n 1 || true)"
 
 if [ -z "$TARBALL" ]; then
@@ -73,7 +76,10 @@ mkdir -p "$TMPDIR"
 trap 'remount_ro; rm -rf "$TMPDIR"' EXIT INT TERM
 
 log "Downloading $TARBALL ..."
-download_file "${PKG_INDEX}${TARBALL}" "$ARCHIVE"
+if ! download_file "${PKG_INDEX}${TARBALL}" "$ARCHIVE"; then
+    log "Failed to download the Tailscale package. The router may not have working internet access."
+    exit 1
+fi
 
 log "Extracting Tailscale runtime..."
 tar -xzf "$ARCHIVE" -C "$TMPDIR"

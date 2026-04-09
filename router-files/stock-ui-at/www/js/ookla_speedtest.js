@@ -793,7 +793,6 @@
             if (!silentAutoRecover) {
                 setBanner("ok", "Speedtest backend restarted. Ready to run again.");
             }
-            fetchServers(false);
         }).fail(function (xhr) {
             setBanner("error", window.QtooleyXhrMessage(xhr, "Failed to restart the speedtest backend."));
         });
@@ -814,7 +813,6 @@
             window.setTimeout(function () {
                 startPolling();
                 fetchState();
-                fetchServers(false);
             }, 500);
         }
     };

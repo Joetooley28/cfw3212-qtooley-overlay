@@ -266,6 +266,36 @@ local function backend_state_text(backend_state, auth_url, active, installed)
     return "Tailscale state is available."
 end
 
+local function install_update_failed(action_name, output)
+    if action_name ~= "install" and action_name ~= "update" then
+        return false
+    end
+    local raw = tostring(output or "")
+    return raw:find("Could not reach the Tailscale package site", 1, true) or
+           raw:find("Failed to download the Tailscale package", 1, true) or
+           raw:find("Failed resolving", 1, true) or
+           raw:find("bad address", 1, true) or
+           raw:find("timed out", 1, true) or
+           raw:find("Connection timed out", 1, true) or
+           raw:find("Network is unreachable", 1, true)
+end
+
+local function classify_action_failure(action_name, output, default_status)
+    local raw = tostring(output or "")
+    if action_name == "install" or action_name == "update" then
+        if raw:find("Could not reach the Tailscale package site", 1, true) or
+           raw:find("Failed to download the Tailscale package", 1, true) or
+           raw:find("Failed resolving", 1, true) or
+           raw:find("bad address", 1, true) or
+           raw:find("timed out", 1, true) or
+           raw:find("Connection timed out", 1, true) or
+           raw:find("Network is unreachable", 1, true) then
+            return "tailscale_download_unreachable", "Tailscale install/update failed because the router could not reach the Tailscale download site. Check router internet access and DNS."
+        end
+    end
+    return nil, default_status
+end
+
 local function is_pending_login_state(state)
     if type(state) ~= "table" then
         return false
@@ -318,6 +348,11 @@ function M.get_state()
 
     raw_output = effective_raw_output(status_raw)
 
+    local last_action = read_last_action()
+    if not installed and install_update_failed(last_action, raw_output) then
+        last_action = last_action .. "_failed"
+    end
+
     return {
         ok = true,
         installed = installed,
@@ -331,7 +366,7 @@ function M.get_state()
         auth_url = auth_url,
         peers = peers,
         raw_output = raw_output,
-        last_action = read_last_action(),
+        last_action = last_action,
         backend_state = backend_state,
         install_script = M.paths.install_script,
         remove_script = M.paths.remove_script
@@ -340,16 +375,26 @@ end
 
 function M.get_raw()
     local status, status_raw = status_json()
+    local raw_output = effective_raw_output(status_raw)
+    local last_action = read_last_action()
+    if install_update_failed(last_action, raw_output) then
+        last_action = last_action .. "_failed"
+    end
+
     return {
         ok = true,
-        raw_output = effective_raw_output(status_raw),
-        last_action = read_last_action()
+        raw_output = raw_output,
+        last_action = last_action
     }
 end
 
 local function action_result(ok, action_name, output, opts)
     opts = opts or {}
-    record_output(action_name, output)
+    local recorded_action = action_name
+    if not ok and install_update_failed(action_name, output) then
+        recorded_action = action_name .. "_failed"
+    end
+    record_output(recorded_action, output)
     local state = M.get_state()
     state.action = action_name
     state.action_output = trim(output or "")
@@ -372,8 +417,9 @@ local function action_result(ok, action_name, output, opts)
         end
     end
     if not ok then
-        state.error = opts.error or "tailscale_action_failed"
-        state.status_text = opts.status_text or state.status_text
+        local classified_error, classified_status = classify_action_failure(action_name, output, opts.status_text or state.status_text)
+        state.error = classified_error or opts.error or "tailscale_action_failed"
+        state.status_text = classified_status or opts.status_text or state.status_text
     end
     return state
 end

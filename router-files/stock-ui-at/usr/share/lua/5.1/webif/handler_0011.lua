@@ -2218,8 +2218,13 @@ function OoklaSpeedtestApiHandler:get(url, action)
         })
 
         if not payload then
+            local failure = speedtest.describe_failure(err or "", { kind = err }, {})
             self:set_status(502)
-            self:write({ ok = false, error = err or "speedtest_server_list_failed" })
+            self:write({
+                ok = false,
+                error = err or "speedtest_server_list_failed",
+                status_text = failure.status_text or "The router could not reach Ookla servers."
+            })
             return
         end
 
@@ -2629,7 +2634,7 @@ function TailscaleApiHandler:post(url, action)
         self:write({ ok = false, error = "tailscale_action_failed" })
         return
     end
-    if result and result.ok == false then
+    if result and result.ok == false and action ~= "install" and action ~= "update" then
         self:set_status(400)
     end
     self:write(result)

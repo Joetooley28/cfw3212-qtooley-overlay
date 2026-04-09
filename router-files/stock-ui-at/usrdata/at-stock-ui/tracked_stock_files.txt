@@ -1,3 +1,8 @@
+# Script-facing manifest for install/uninstall/recovery verification.
+# Keep this list aligned with:
+#   C:\at_terminal\notes\QTOOLEY_STOCK_TOUCH_INVENTORY_PRIVATE.md
+# Use one absolute live-tree path per line.
+# Lines starting with "#" are comments and are ignored by the helpers.
 /www/theme/js/genHeader.js
 /www/js/generatedMenuEntries.js
 /www/css/style.css
@@ -7,6 +12,8 @@
 /www/general_dashboard.html
 /www/at_terminal.html
 /www/band_cell_locking.html
+/www/js/ookla_speedtest.js
+/www/js/tailscale.js
 /www/ookla_speedtest.html
 /www/ttl_helper.html
 /www/tailscale.html

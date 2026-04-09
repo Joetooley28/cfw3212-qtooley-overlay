@@ -67,6 +67,43 @@ local function trim(value)
     return value:gsub("^%s+", ""):gsub("%s+$", "")
 end
 
+local function classify_failure_message(raw_message, raw_text, snapshot)
+    local message = trim(raw_message or "")
+    local raw = tostring(raw_text or "")
+    local snapshot_stage = snapshot and snapshot.stage or ""
+
+    if message:find("Couldn%'t resolve host name", 1, false) or
+       raw:find("Couldn%'t resolve host name", 1, false) or
+       message:find("HostNotFoundException", 1, true) or
+       raw:find("HostNotFoundException", 1, true) or
+       message:find("Could not retrieve or read configuration", 1, true) or
+       raw:find("Could not retrieve or read configuration", 1, true) or
+       message:find("Cannot retrieve configuration document", 1, true) or
+       raw:find("Cannot retrieve configuration document", 1, true) then
+        return "speedtest_configuration_error", "The router could not reach Ookla because internet access or DNS is not working."
+    end
+
+    if message:find("NoServers", 1, true) or raw:find("NoServers", 1, true) then
+        return "speedtest_no_servers", "The router could not reach a working Ookla server. Check router internet access and DNS, then try again."
+    end
+
+    if message:find("Cannot open socket", 1, true) or raw:find("Cannot open socket", 1, true) or
+       message:find("Cannot read from socket", 1, true) or raw:find("Cannot read from socket", 1, true) or
+       message:find("Timeout", 1, true) or raw:find("Timeout", 1, true) then
+        return "speedtest_network_error", "The router could not reach the Ookla test server. Check router internet access and try again."
+    end
+
+    if message:find("Cannot write", 1, true) or raw:find("Cannot write", 1, true) then
+        return "speedtest_write_error", "The Ookla CLI could not finish writing the final result payload."
+    end
+
+    if snapshot_stage == "upload" and tonumber(snapshot and snapshot.progress or 0) > 0.9 then
+        return "speedtest_result_missing", "The test reached late upload, but the CLI never returned a final result."
+    end
+
+    return nil, message
+end
+
 local function round(value, decimals)
     value = tonumber(value)
     if not value then
@@ -436,15 +473,9 @@ function M.capture_error_details(decoded, current)
         return current
     end
 
-    local message = current.message
-    if message:find("NoServers", 1, true) then
-        current.kind = "speedtest_no_servers"
-    elseif message:find("Configuration", 1, true) then
-        current.kind = "speedtest_configuration_error"
-    elseif message:find("Cannot open socket", 1, true) or message:find("Cannot read from socket", 1, true) or message:find("Timeout", 1, true) then
-        current.kind = "speedtest_network_error"
-    elseif message:find("Cannot write", 1, true) then
-        current.kind = "speedtest_write_error"
+    local kind = classify_failure_message(current.message, current.message, {})
+    if kind then
+        current.kind = kind
     end
 
     return current
@@ -458,23 +489,10 @@ function M.describe_failure(raw, error_details, snapshot)
     local kind = error_details.kind or "speedtest_failed"
     local message = trim(error_details.message or "")
 
-    if message == "" then
-        if raw:find("NoServers", 1, true) then
-            kind = "speedtest_no_servers"
-            message = "Failed to find a working Ookla test server."
-        elseif raw:find("Configuration", 1, true) then
-            kind = "speedtest_configuration_error"
-            message = "Could not retrieve Ookla configuration from the router connection."
-        elseif raw:find("Cannot open socket", 1, true) or raw:find("Cannot read from socket", 1, true) or raw:find("Timeout", 1, true) then
-            kind = "speedtest_network_error"
-            message = "Socket or timeout error while contacting the Ookla test server."
-        elseif raw:find("Cannot write", 1, true) then
-            kind = "speedtest_write_error"
-            message = "The Ookla CLI could not finish writing the final result payload."
-        elseif snapshot.stage == "upload" and tonumber(snapshot.progress or 0) > 0.9 then
-            kind = "speedtest_result_missing"
-            message = "The test reached late upload, but the CLI never returned a final result."
-        end
+    local classified_kind, classified_message = classify_failure_message(message, raw, snapshot)
+    if classified_kind then
+        kind = classified_kind
+        message = classified_message or message
     end
 
     local status_text = "Ookla Speedtest failed on the router."
