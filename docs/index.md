@@ -11,8 +11,6 @@ Qtooley is a stock UI overlay for the Casa Systems `CFW-3212` with a Quectel `RG
 
 This is the public landing page for the current project direction: a top-level authenticated Qtooley tab inside the stock Casa Turbo web UI, with custom pages for modem visibility, control, and diagnostics.
 
-A lot of time and effort went into the uninstall path so the router can return as closely as possible to a clean stock UI state after Qtooley is removed. The install process captures a router-specific stock baseline on first install, and uninstall uses that saved baseline plus tracked stock-file verification to restore shared stock UI files cleanly.
-
 It is not a generic web app and it is not a generic USB modem project.
 
 ## Contents
