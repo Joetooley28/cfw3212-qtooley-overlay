@@ -120,75 +120,75 @@ If you are new to the project, use `main`.
 <table>
   <tr>
     <td align="center">
+      Quick Overview
+      <br>
       <a href="docs/images/qtooley/quick-overview.jpg">
         <img src="docs/images/qtooley/quick-overview.jpg" alt="Quick Overview" width="360">
       </a>
-      <br>
-      Quick Overview
     </td>
     <td align="center">
+      General Info
+      <br>
       <a href="docs/images/qtooley/general-info.jpg">
         <img src="docs/images/qtooley/general-info.jpg" alt="General Info" width="360">
       </a>
-      <br>
-      General Info
     </td>
   </tr>
   <tr>
     <td align="center">
+      AT Terminal
+      <br>
       <a href="docs/images/qtooley/at-terminal.jpg">
         <img src="docs/images/qtooley/at-terminal.jpg" alt="AT Terminal" width="360">
       </a>
-      <br>
-      AT Terminal
     </td>
     <td align="center">
+      SMS
+      <br>
       <a href="docs/images/qtooley/sms.jpg">
         <img src="docs/images/qtooley/sms.jpg" alt="SMS" width="360">
       </a>
-      <br>
-      SMS
     </td>
   </tr>
   <tr>
     <td align="center">
+      Settings
+      <br>
       <a href="docs/images/qtooley/screensaver-settings.jpg">
         <img src="docs/images/qtooley/screensaver-settings.jpg" alt="Settings" width="360">
       </a>
-      <br>
-      Settings
     </td>
     <td align="center">
+      RAT / Band / Cell Locking
+      <br>
       <a href="docs/images/qtooley/rat-band.jpg">
         <img src="docs/images/qtooley/rat-band.jpg" alt="RAT / Band / Cell Locking" width="360">
       </a>
-      <br>
-      RAT / Band / Cell Locking
     </td>
   </tr>
   <tr>
     <td align="center">
+      Ookla Speedtest
+      <br>
       <a href="docs/images/qtooley/speedtest.jpg">
         <img src="docs/images/qtooley/speedtest.jpg" alt="Ookla Speedtest" width="360">
       </a>
-      <br>
-      Ookla Speedtest
     </td>
     <td align="center">
+      Tailscale
+      <br>
       <a href="docs/images/qtooley/tailscale.jpg">
         <img src="docs/images/qtooley/tailscale.jpg" alt="Tailscale" width="360">
       </a>
-      <br>
-      Tailscale
     </td>
   </tr>
   <tr>
     <td align="center">
+      TTL Helper
+      <br>
       <a href="docs/images/qtooley/ttl-helper.jpg">
         <img src="docs/images/qtooley/ttl-helper.jpg" alt="TTL Helper" width="360">
       </a>
-      <br>
-      TTL Helper
     </td>
     <td></td>
   </tr>
