@@ -2,6 +2,7 @@ Quick Must Read
 
 - [Quick Must Read](https://github.com/Joetooley28/cfw3212-qtooley-overlay/blob/main/docs/quick-must-read.md)
 - [Windows ZIP Install Guide](https://github.com/Joetooley28/cfw3212-qtooley-overlay/blob/main/docs/windows-zip-install.md)
+- [Direct Router Install Guide](https://github.com/Joetooley28/cfw3212-qtooley-overlay/blob/main/docs/direct-router-install.md)
 
 Prerequisite
 

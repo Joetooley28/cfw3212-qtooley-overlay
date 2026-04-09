@@ -51,4 +51,4 @@ The normal update path reuses the saved first-install baseline unless you intent
 - first-time SSH connections to a new router IP are accepted automatically, so you should not need to type a blind `yes` for the host-key prompt
 - the packaged `README.txt` inside the release ZIP is this Windows ZIP guide
 - for first-install snapshot behavior, space notes, and the `upgrade.star` warning, read [Quick Must Read](quick-must-read.md)
-- for direct router `wget` install/update and uninstall commands, use [Release Install Guide](../router-files/stock-ui-at/RELEASE_INSTALL.md)
+- for direct router `wget` install/update and uninstall commands, use [Direct Router Install Guide](direct-router-install.md)
