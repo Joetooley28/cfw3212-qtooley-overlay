@@ -1,6 +1,9 @@
 # CFW-3212 Qtooley Overlay
 
-> READY FOR PUBLIC TESTING: this branch is ready for public testing. Cell locking is still under development and not working yet.
+> [!IMPORTANT]
+> Ready for public testing on router firmware `USC_1.1.79.0` and `USC_1.1.99.0`.
+> Cell locking is still under development and not working yet.
+> `USC_1.2.24.0` appears in the stock comparison notes, but Qtooley release testing on that version still needs confirmation.
 
 Qtooley is a stock UI overlay for the Casa Systems `CFW-3212` with a Quectel `RG520N-NA`.
 
