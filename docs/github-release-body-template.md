@@ -14,8 +14,6 @@ Prerequisite
 - you need the router IP, SSH username (`root`), and SSH password
 - for the normal Windows path, Windows needs the built-in ssh client available
 
-{{RELEASE_VERSION}}
-
 Does your modem have an active internet connection?
 
 If NO:
