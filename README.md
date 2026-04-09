@@ -20,6 +20,7 @@ This is not a generic web app and it is not a generic USB modem project.
 - [Quick Must Read](docs/quick-must-read.md)
 - [Latest Release](https://github.com/Joetooley28/cfw3212-qtooley-overlay/releases/latest)
 - [Windows ZIP Install Guide](docs/windows-zip-install.md)
+- [Direct Router Install Guide](docs/direct-router-install.md)
 - [Screenshots](#screenshots)
 - [Platform Notes](docs/platform-notes.md)
 
@@ -46,7 +47,7 @@ Dark mode note:
   - extract the ZIP
   - follow the packaged `README.txt`
 - for the direct router `wget` install/update and uninstall commands:
-  - use [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
+  - use [Direct Router Install Guide](docs/direct-router-install.md)
 
 ## Before You Install
 
@@ -114,44 +115,86 @@ If you are new to the project, use `main`.
 
 ## Screenshots
 
-![Quick Overview](docs/images/qtooley/quick-overview.jpg)
-
-### General Info
-
-![General Info](docs/images/qtooley/general-info.jpg)
-
-### AT Terminal
-
-![AT terminal](docs/images/qtooley/at-terminal.jpg)
-
-### SMS
-
-![SMS](docs/images/qtooley/sms.jpg)
-
-### Settings
-
-![Settings](docs/images/qtooley/screensaver-settings.jpg)
-
-### RAT / Band / Cell Locking
-
-![RAT / band / cell locking](docs/images/qtooley/rat-band.jpg)
-
-### Ookla Speedtest
-
-![Ookla Speedtest](docs/images/qtooley/speedtest.jpg)
-
-### Tailscale
-
-![Tailscale](docs/images/qtooley/tailscale.jpg)
-
-### TTL Helper
-
-![TTL helper](docs/images/qtooley/ttl-helper.jpg)
+<table>
+  <tr>
+    <td align="center">
+      <a href="docs/images/qtooley/quick-overview.jpg">
+        <img src="docs/images/qtooley/quick-overview.jpg" alt="Quick Overview" width="360">
+      </a>
+      <br>
+      Quick Overview
+    </td>
+    <td align="center">
+      <a href="docs/images/qtooley/general-info.jpg">
+        <img src="docs/images/qtooley/general-info.jpg" alt="General Info" width="360">
+      </a>
+      <br>
+      General Info
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="docs/images/qtooley/at-terminal.jpg">
+        <img src="docs/images/qtooley/at-terminal.jpg" alt="AT Terminal" width="360">
+      </a>
+      <br>
+      AT Terminal
+    </td>
+    <td align="center">
+      <a href="docs/images/qtooley/sms.jpg">
+        <img src="docs/images/qtooley/sms.jpg" alt="SMS" width="360">
+      </a>
+      <br>
+      SMS
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="docs/images/qtooley/screensaver-settings.jpg">
+        <img src="docs/images/qtooley/screensaver-settings.jpg" alt="Settings" width="360">
+      </a>
+      <br>
+      Settings
+    </td>
+    <td align="center">
+      <a href="docs/images/qtooley/rat-band.jpg">
+        <img src="docs/images/qtooley/rat-band.jpg" alt="RAT / Band / Cell Locking" width="360">
+      </a>
+      <br>
+      RAT / Band / Cell Locking
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="docs/images/qtooley/speedtest.jpg">
+        <img src="docs/images/qtooley/speedtest.jpg" alt="Ookla Speedtest" width="360">
+      </a>
+      <br>
+      Ookla Speedtest
+    </td>
+    <td align="center">
+      <a href="docs/images/qtooley/tailscale.jpg">
+        <img src="docs/images/qtooley/tailscale.jpg" alt="Tailscale" width="360">
+      </a>
+      <br>
+      Tailscale
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="docs/images/qtooley/ttl-helper.jpg">
+        <img src="docs/images/qtooley/ttl-helper.jpg" alt="TTL Helper" width="360">
+      </a>
+      <br>
+      TTL Helper
+    </td>
+    <td></td>
+  </tr>
+</table>
 
 ## More Docs
 
 - [Quick Must Read](docs/quick-must-read.md)
 - [Windows ZIP Install Guide](docs/windows-zip-install.md)
-- [Release Install Guide](router-files/stock-ui-at/RELEASE_INSTALL.md)
-- [Docs Index](docs/index.md)
+- [Direct Router Install Guide](docs/direct-router-install.md)
 - [Platform Notes](docs/platform-notes.md)
