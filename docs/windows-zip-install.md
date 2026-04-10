@@ -5,7 +5,6 @@ Use this page for the normal Windows ZIP install, update, and uninstall flow.
 ## Before You Start
 
 - the router must already be rooted
-- if you need the root script itself, start in Luke's [casasystems/cfw3212/tools](https://github.com/lukejenkins/cellular/tree/main/casasystems/cfw3212/tools) folder
 - SSH must already be enabled and reachable
 - you need the router IP, SSH username (`root`), and SSH password
 - Windows needs the built-in `ssh` client available
