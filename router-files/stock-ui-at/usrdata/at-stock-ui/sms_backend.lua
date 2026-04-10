@@ -1,3 +1,7 @@
+-- Copyright (C) 2026 Joe Tooley
+-- SPDX-License-Identifier: GPL-2.0-or-later
+-- See repository root LICENSE for full license text.
+
 local socket = require("socket")
 local backend = require("at_backend")
 local at_lock = require("at_lock")

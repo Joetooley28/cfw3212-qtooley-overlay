@@ -1,3 +1,7 @@
+# Copyright (C) 2026 Joe Tooley
+# SPDX-License-Identifier: GPL-2.0-or-later
+# See repository root LICENSE for full license text.
+
 param(
     [string]$SourceRepo = "C:\at_terminal\repo-public",
     [string]$DestinationRepo = "C:\at_terminal\repo-public-main",
@@ -231,7 +235,7 @@ Write-Host "GitHub release body written to: $BodyOutputPath"
 $destinationStatus = Invoke-Git -RepoRoot $DestinationRepo status --porcelain
 if ($destinationStatus.Count -gt 0) {
     Write-Host "Committing main release state..."
-    Invoke-Git -RepoRoot $DestinationRepo add README.md CHANGELOG.md VERSION.txt docs scripts router-files/stock-ui-at | Out-Null
+    Invoke-Git -RepoRoot $DestinationRepo add README.md CHANGELOG.md VERSION.txt LICENSE LICENSE-docs.md NOTICE.md docs scripts router-files/stock-ui-at | Out-Null
     $postAddStatus = Invoke-Git -RepoRoot $DestinationRepo status --porcelain
     if ($postAddStatus.Count -gt 0) {
         Invoke-Git -RepoRoot $DestinationRepo commit -m $CommitMessage | Out-Host

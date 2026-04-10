@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Copyright (C) 2026 Joe Tooley
+# SPDX-License-Identifier: GPL-2.0-or-later
+# See repository root LICENSE for full license text.
+
 set -eu
 
 REPO_OWNER="${REPO_OWNER:-Joetooley28}"
