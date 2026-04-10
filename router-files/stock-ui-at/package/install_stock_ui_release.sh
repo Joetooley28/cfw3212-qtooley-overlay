@@ -12,9 +12,7 @@ BASELINE_INFO="$INSTALLER_STATE_DIR/installer-baseline-info.txt"
 INSTALL_BASELINE_DIR="$INSTALLER_STATE_DIR/install-baseline"
 FORCE_RECAPTURE_BASELINE="${FORCE_RECAPTURE_BASELINE:-0}"
 UNIT_SRC="$PACKAGE_ROOT/etc/systemd/system"
-DEFAULT_BUNDLED_OOKLA="$TARGET_BASE/bundles/ookla/ookla-speedtest-1.2.0-linux-armhf.tgz"
-INSTALL_BUNDLED_OOKLA="${INSTALL_BUNDLED_OOKLA:-1}"
-OOKLA_ARCHIVE_PATH="${OOKLA_ARCHIVE_PATH:-$DEFAULT_BUNDLED_OOKLA}"
+INSTALL_OOKLA_CLI="${INSTALL_OOKLA_CLI:-0}"
 LIVE_WWW="/www"
 LIVE_WEBIF="/usr/share/lua/5.1/webif"
 PIVOT_WWW="/overlay/pivot/www"
@@ -256,18 +254,17 @@ install_units() {
     fi
 }
 
-install_bundled_ookla_if_requested() {
-    if [ "$INSTALL_BUNDLED_OOKLA" != "1" ]; then
-        log "Bundled Ookla install skipped by request."
+install_ookla_if_requested() {
+    if [ "$INSTALL_OOKLA_CLI" != "1" ]; then
+        log "Ookla CLI install skipped during base package install."
         return 0
     fi
 
-    if [ -f "$OOKLA_ARCHIVE_PATH" ]; then
-        /bin/sh "$TARGET_BASE/install_ookla_speedtest_cli.sh" "$OOKLA_ARCHIVE_PATH"
-        return 0
+    if [ -x "$TARGET_BASE/install_ookla_speedtest_cli.sh" ]; then
+        /bin/sh "$TARGET_BASE/install_ookla_speedtest_cli.sh"
+    else
+        log "Ookla install helper not found; leaving Ookla CLI install unchanged."
     fi
-
-    log "Bundled Ookla archive not present; leaving Ookla CLI install unchanged."
 }
 
 apply_overlay_now() {
@@ -291,7 +288,7 @@ capture_baseline_once
 sync_payload
 normalize_shell_scripts
 install_units
-install_bundled_ookla_if_requested
+install_ookla_if_requested
 apply_overlay_now
 verify_result
 

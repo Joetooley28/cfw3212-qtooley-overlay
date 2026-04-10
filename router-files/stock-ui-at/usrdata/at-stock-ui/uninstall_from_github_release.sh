@@ -213,7 +213,7 @@ fi
 
 if [ -z "${REMOVE_TAILSCALE+x}" ]; then
     log "Choose uninstall mode:"
-    log "- default: remove Qtooley and bundled Ookla, keep Tailscale"
+    log "- default: remove Qtooley and the installed Ookla CLI, keep Tailscale"
     log "- optional: also remove Tailscale"
     REMOVE_TAILSCALE="$(read_yes_no 'Also remove Tailscale?' 0)"
 fi

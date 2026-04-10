@@ -2244,6 +2244,28 @@ function OoklaSpeedtestApiHandler:post(url, action)
         return
     end
 
+    if action == "install" or action == "remove" then
+        local state = speedtest.get_state()
+        if state.running then
+            self:set_status(409)
+            self:write({ ok = false, error = "speedtest_busy" })
+            return
+        end
+
+        local fn = action == "install" and speedtest.install or speedtest.remove
+        local ok, result = pcall(fn)
+        if not ok then
+            self:set_status(500)
+            self:write({ ok = false, error = "speedtest_action_failed" })
+            return
+        end
+        if result and result.ok == false then
+            self:set_status(400)
+        end
+        self:write(result)
+        return
+    end
+
     if action ~= "start" then
         self:set_status(404)
         self:write({ ok = false, error = "unknown_action" })
@@ -2848,6 +2870,8 @@ return {
         table.insert(handlers, 1, {"^/(tailscale_api)/(logout)$", TailscaleApiHandler})
         table.insert(handlers, 1, {"^/(ookla_speedtest_api)/(state)$", OoklaSpeedtestApiHandler})
         table.insert(handlers, 1, {"^/(ookla_speedtest_api)/(servers)$", OoklaSpeedtestApiHandler})
+        table.insert(handlers, 1, {"^/(ookla_speedtest_api)/(install)$", OoklaSpeedtestApiHandler})
+        table.insert(handlers, 1, {"^/(ookla_speedtest_api)/(remove)$", OoklaSpeedtestApiHandler})
         table.insert(handlers, 1, {"^/(ookla_speedtest_api)/(start)$", OoklaSpeedtestApiHandler})
         table.insert(handlers, 1, {"^/(ookla_speedtest_api)/(recover)$", OoklaSpeedtestApiHandler})
         table.insert(handlers, 1, {"^/(ttl_helper_api)/(status)$", TtlHelperApiHandler})

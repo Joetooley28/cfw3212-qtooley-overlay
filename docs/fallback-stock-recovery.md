@@ -143,7 +143,7 @@ This fallback method restores the stock-style Casa web shell only.
 It does not by itself perform a full Qtooley uninstall and does not by itself guarantee removal of:
 
 - the saved Qtooley payload under `/usrdata/at-stock-ui`
-- bundled Ookla
+- the installed Ookla CLI
 - Tailscale
 
 In the normal recovery flow, run uninstall first and use this fallback method only if the stock-style Casa web shell does not come back correctly afterward.

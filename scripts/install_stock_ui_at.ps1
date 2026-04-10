@@ -29,7 +29,7 @@ $remoteStageRoot = "/tmp/qtooley-stock-ui-at-package"
 $remoteScriptPath = "$remoteStageRoot/package/install_stock_ui_release.sh"
 
 Write-Host "Qtooley stock UI install / update"
-Show-BundledOoklaStatus -PackageRoot $packageRoot
+Show-OoklaInstallMode -PackageRoot $packageRoot
 
 $transport = Select-SshTransport
 Write-Host "Note: on a normal first install, the stock uninstall baseline is captured automatically. You do not need forced recapture."
@@ -54,6 +54,6 @@ Invoke-RemotePackageScriptViaSsh `
     -Target $transport.Target `
     -RemoteStageRoot $remoteStageRoot `
     -RemoteScriptPath $remoteScriptPath `
-    -RemoteEnvPrefix "INSTALL_BUNDLED_OOKLA=1 FORCE_RECAPTURE_BASELINE=$([int]$forceRecaptureBaseline)"
+    -RemoteEnvPrefix "FORCE_RECAPTURE_BASELINE=$([int]$forceRecaptureBaseline)"
 
 Write-Host "Install/update finished."

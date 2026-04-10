@@ -54,14 +54,6 @@ function Get-StockUiPackageRoot {
     return $path
 }
 
-function Get-BundledOoklaArchivePath {
-    param(
-        [string]$PackageRoot
-    )
-
-    return Join-Path $PackageRoot "usrdata\at-stock-ui\bundles\ookla\ookla-speedtest-1.2.0-linux-armhf.tgz"
-}
-
 function Assert-AdbAvailable {
     & adb version | Out-Null
 }
@@ -226,15 +218,10 @@ function Select-Transport {
     }
 }
 
-function Show-BundledOoklaStatus {
+function Show-OoklaInstallMode {
     param(
         [string]$PackageRoot
     )
 
-    $archive = Get-BundledOoklaArchivePath -PackageRoot $PackageRoot
-    if (Test-Path $archive) {
-        Write-Host "Bundled Ookla archive found: $archive"
-    } else {
-        Write-Host "Bundled Ookla archive not found in this working tree."
-    }
+    Write-Host "Ookla Speedtest is optional and can be installed later from the Qtooley UI when the router has working internet access."
 }

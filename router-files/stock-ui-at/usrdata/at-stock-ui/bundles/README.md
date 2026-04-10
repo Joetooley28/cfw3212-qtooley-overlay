@@ -1,9 +1,7 @@
-Place offline release bundle assets here when preparing a versioned ZIP.
-The release build now downloads the expected Ookla archive automatically when it is not already present in this folder.
+Place optional offline helper assets here only for local/private workflows.
 
-Expected Ookla archive path for offline installs:
+Public release ZIPs should not include the Ookla CLI archive.
+The public Qtooley flow now installs the Ookla CLI later from the router UI by downloading it directly from Ookla when the router already has working internet access.
+
+If you are doing a private/local-only test and intentionally want to keep a manual archive around, the expected path is:
 - `bundles/ookla/ookla-speedtest-1.2.0-linux-armhf.tgz`
-
-The installer will use the bundled archive automatically when it exists.
-Public release ZIPs are expected to include this archive.
-If it is missing during an ad-hoc build, the install flow leaves the current Ookla CLI state unchanged.

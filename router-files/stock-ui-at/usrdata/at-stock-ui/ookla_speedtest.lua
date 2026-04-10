@@ -127,6 +127,35 @@ local function command_status(command)
     return trim(output)
 end
 
+local function run_capture(command)
+    local marker = "__QTOOLEY_SPEEDTEST_RC__="
+    local wrapped = "(" .. command .. ") 2>&1; printf '\\n" .. marker .. "%s\\n' $?"
+    local handle = io.popen(wrapped, "r")
+    if not handle then
+        return nil, nil, "popen_failed"
+    end
+    local raw = handle:read("*a") or ""
+    handle:close()
+    local rc = tonumber(raw:match(marker .. "(%d+)"))
+    raw = trim((raw:gsub("\n?" .. marker .. "%d+\n?$", "")))
+    return rc or 1, raw, nil
+end
+
+local function classify_action_failure(action_name, output, default_status)
+    local raw = tostring(output or "")
+    if action_name == "install" then
+        if raw:find("Failed to download the Ookla CLI", 1, true) or
+           raw:find("Could not resolve host", 1, true) or
+           raw:find("Failed resolving", 1, true) or
+           raw:find("bad address", 1, true) or
+           raw:find("Connection timed out", 1, true) or
+           raw:find("Network is unreachable", 1, true) then
+            return "speedtest_install_download_failed", "Ookla install failed because the router could not reach the Ookla download site. Check router internet access and DNS."
+        end
+    end
+    return nil, default_status
+end
+
 function M.file_exists(path)
     local f = io.open(path, "rb")
     if not f then
@@ -203,20 +232,25 @@ function M.detect_default_interface()
     return ""
 end
 
+local function not_installed_status_text()
+    return "Ookla CLI is not installed on this router. Install it from this page when the router has internet access."
+end
+
 function M.default_state()
+    local installed = M.file_exists(M.paths.binary)
     return {
         ok = true,
         phase = "idle",
         running = false,
-        installed = M.file_exists(M.paths.binary),
-        binary_present = M.file_exists(M.paths.binary),
+        installed = installed,
+        binary_present = installed,
         binary_path = M.paths.binary,
         install_script = M.paths.install_script,
         remove_script = M.paths.remove_script,
         default_interface = M.detect_default_interface() or "",
         result = nil,
         error = nil,
-        status_text = "Ready to run Ookla Speedtest from the router.",
+        status_text = installed and "Ready to run Ookla Speedtest from the router." or not_installed_status_text(),
         last_started_at = nil,
         last_completed_at = nil
     }
@@ -250,6 +284,27 @@ function M.get_state()
             state.status_text = failure.status_text or "The speed test process ended without a final result."
             state.last_error_message = failure.detail or state.last_error_message
             state.last_completed_at = state.last_completed_at or os.date("!%Y-%m-%dT%H:%M:%SZ")
+            M.write_state_file(state)
+        end
+    end
+
+    if not state.installed then
+        local changed = false
+        if state.running or
+           state.phase ~= "idle" or
+           state.error ~= nil or
+           state.live ~= nil or
+           state.result ~= nil or
+           state.status_text ~= not_installed_status_text() then
+            changed = true
+        end
+        state.running = false
+        state.phase = "idle"
+        state.error = nil
+        state.live = nil
+        state.result = nil
+        state.status_text = not_installed_status_text()
+        if changed then
             M.write_state_file(state)
         end
     end
@@ -555,7 +610,8 @@ function M.list_servers(options)
         default_interface = options.interface or M.detect_default_interface() or "",
         installed = M.file_exists(M.paths.binary),
         binary_path = M.paths.binary,
-        install_script = M.paths.install_script
+        install_script = M.paths.install_script,
+        remove_script = M.paths.remove_script
     }, nil, raw
 end
 
@@ -586,6 +642,59 @@ function M.start_background(options)
     os.execute(command)
 
     return state
+end
+
+local function action_result(ok, action_name, output, opts)
+    opts = opts or {}
+
+    if ok and (action_name == "install" or action_name == "remove") then
+        M.recover_backend()
+    end
+
+    local state = M.get_state()
+    state.action = action_name
+    state.action_output = trim(output or "")
+    state.ok = ok
+
+    if ok then
+        if action_name == "install" then
+            state.status_text = "Ookla CLI installed successfully on the router."
+        elseif action_name == "remove" then
+            state.status_text = "Ookla CLI removed from the router."
+        end
+        return state
+    end
+
+    local classified_error, classified_status = classify_action_failure(action_name, output, opts.status_text or state.status_text)
+    state.error = classified_error or opts.error or "speedtest_action_failed"
+    state.status_text = classified_status or opts.status_text or state.status_text
+    return state
+end
+
+local function run_system_action(action_name, command, opts)
+    local rc, output, err = run_capture(command)
+    if err then
+        return {
+            ok = false,
+            error = err,
+            status_text = opts and opts.status_text or "Speedtest action failed on the router."
+        }
+    end
+    return action_result(rc == 0, action_name, output, opts)
+end
+
+function M.install()
+    return run_system_action("install", "/bin/sh " .. shell_quote(M.paths.install_script), {
+        error = "speedtest_install_failed",
+        status_text = "Ookla install failed on the router."
+    })
+end
+
+function M.remove()
+    return run_system_action("remove", "/bin/sh " .. shell_quote(M.paths.remove_script), {
+        error = "speedtest_remove_failed",
+        status_text = "Ookla remove failed on the router."
+    })
 end
 
 return M

@@ -10,7 +10,6 @@ BASE="/usrdata/at-stock-ui"
 BIN_DIR="$BASE/bin"
 TMP_DIR="/tmp/ookla-speedtest-install.$$"
 DEFAULT_URL="https://install.speedtest.net/app/cli/ookla-speedtest-1.2.0-linux-armhf.tgz"
-BUNDLED_ARCHIVE="$BASE/bundles/ookla/ookla-speedtest-1.2.0-linux-armhf.tgz"
 SOURCE="${1:-}"
 
 cleanup() {
@@ -24,19 +23,21 @@ mkdir -p "$BIN_DIR" "$TMP_DIR"
 ARCHIVE="$TMP_DIR/speedtest.tgz"
 SOURCE_LABEL=""
 
-if [ -z "$SOURCE" ] && [ -f "$BUNDLED_ARCHIVE" ]; then
-    SOURCE="$BUNDLED_ARCHIVE"
-fi
-
 if [ -n "$SOURCE" ] && [ -f "$SOURCE" ]; then
     cp "$SOURCE" "$ARCHIVE"
     SOURCE_LABEL="$SOURCE"
 else
     URL="${SOURCE:-$DEFAULT_URL}"
     if command -v wget >/dev/null 2>&1; then
-        wget -O "$ARCHIVE" "$URL"
+        if ! wget -O "$ARCHIVE" "$URL"; then
+            echo "Failed to download the Ookla CLI from $URL. Check router internet access and DNS."
+            exit 1
+        fi
     elif command -v curl >/dev/null 2>&1; then
-        curl -L -o "$ARCHIVE" "$URL"
+        if ! curl -L -o "$ARCHIVE" "$URL"; then
+            echo "Failed to download the Ookla CLI from $URL. Check router internet access and DNS."
+            exit 1
+        fi
     else
         echo "Neither wget nor curl is available."
         exit 1
