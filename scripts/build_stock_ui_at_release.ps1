@@ -1,3 +1,7 @@
+# Copyright (C) 2026 Joe Tooley
+# SPDX-License-Identifier: GPL-2.0-or-later
+# See repository root LICENSE for full license text.
+
 param(
     [string]$RepoRoot = "C:\at_terminal\repo-public",
     [string]$ReleaseVersion = "",

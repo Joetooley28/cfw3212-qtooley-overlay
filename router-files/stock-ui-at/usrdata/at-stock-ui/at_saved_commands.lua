@@ -1,3 +1,7 @@
+-- Copyright (C) 2026 Joe Tooley
+-- SPDX-License-Identifier: GPL-2.0-or-later
+-- See repository root LICENSE for full license text.
+
 --[[
   Shared AT terminal reference: custom commands + hidden built-in rows.
   Persisted under /usrdata/at-stock-ui for root and admin (same file).

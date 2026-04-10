@@ -1,3 +1,7 @@
+-- Copyright (C) 2026 Joe Tooley
+-- SPDX-License-Identifier: GPL-2.0-or-later
+-- See repository root LICENSE for full license text.
+
 package.path = package.path .. ";/usrdata/at-stock-ui/?.lua"
 
 local at_lock = require("at_lock")

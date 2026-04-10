@@ -1,3 +1,7 @@
+# Copyright (C) 2026 Joe Tooley
+# SPDX-License-Identifier: GPL-2.0-or-later
+# See repository root LICENSE for full license text.
+
 <#
 Usage:
   Dry run:
@@ -256,6 +260,9 @@ if ($IncludeDocs) {
     $null = $allowedExact.Add("README.md")
     $null = $allowedExact.Add("CHANGELOG.md")
     $null = $allowedExact.Add("VERSION.txt")
+    $null = $allowedExact.Add("LICENSE")
+    $null = $allowedExact.Add("LICENSE-docs.md")
+    $null = $allowedExact.Add("NOTICE.md")
 }
 
 if ($IncludeReleasePayload) {
