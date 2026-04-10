@@ -7,9 +7,6 @@ Quick Must Read
 Prerequisite
 
 - your router must already be rooted before Qtooley can be installed
-- full credit to [@Luke](https://github.com/lukejenkins/cellular/tree/main/casasystems/cfw3212) for the root script and broader CFW-3212 platform research
-- if you need the root script itself, start in Luke's [casasystems/cfw3212/tools](https://github.com/lukejenkins/cellular/tree/main/casasystems/cfw3212/tools) folder
-- if you are starting from a stock carrier-managed box, also read Luke's [guide_block_carrier_remote_mgmt](https://github.com/lukejenkins/cellular/blob/main/casasystems/cfw3212/guide_block_carrier_remote_mgmt.md)
 - SSH must already be enabled and reachable on the router
 - you need the router IP, SSH username (`root`), and SSH password
 - for the normal Windows path, Windows needs the built-in ssh client available

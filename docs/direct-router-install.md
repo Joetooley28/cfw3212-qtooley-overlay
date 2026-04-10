@@ -7,7 +7,6 @@ If the router does not already have internet, use the [Windows ZIP Install Guide
 ## Before You Start
 
 - the router must already be rooted
-- if you need the root script itself, start in Luke's [casasystems/cfw3212/tools](https://github.com/lukejenkins/cellular/tree/main/casasystems/cfw3212/tools) folder
 - SSH must already be enabled and reachable
 - you need the router IP, SSH username, and SSH password
 - the router needs working internet access for the GitHub download path
