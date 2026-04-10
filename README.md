@@ -59,7 +59,7 @@ Dark mode note:
 - read [Quick Must Read](docs/quick-must-read.md) for the first-install snapshot behavior and space notes
 - SSH must already be enabled and reachable
 - the normal public release asset is the Windows ZIP
-- bundled Ookla is expected in public release ZIPs
+- Ookla Speedtest is optional and installs later from the Qtooley UI when the router already has working internet access
 - Tailscale is optional and is installed later from the Qtooley UI
 
 ## Device Scope

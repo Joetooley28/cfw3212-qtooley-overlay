@@ -10,7 +10,7 @@ Usage:
   Apply promotion into main:
     powershell -ExecutionPolicy Bypass -File C:\at_terminal\repo-public\scripts\promote_to_main.ps1 -Apply
 
-  Apply promotion and verify a release ZIP with bundled Ookla:
+  Apply promotion and verify a release ZIP:
     powershell -ExecutionPolicy Bypass -File C:\at_terminal\repo-public\scripts\promote_to_main.ps1 -Apply -VerifyReleaseBuild
 #>
 
@@ -93,7 +93,7 @@ function Assert-ReleaseVersionAligned {
     }
 }
 
-function Assert-BuildScriptSupportsOokla {
+function Assert-BuildScriptDoesNotBundleOokla {
     param(
         [string]$RepoRoot
     )
@@ -104,14 +104,14 @@ function Assert-BuildScriptSupportsOokla {
     }
 
     $content = [System.IO.File]::ReadAllText($buildScriptPath)
-    foreach ($needle in @("Ensure-OoklaBundle", "Assert-OoklaBundlePresent", "ookla-speedtest-1.2.0-linux-armhf.tgz")) {
-        if ($content -notmatch [regex]::Escape($needle)) {
-            throw "Release build script does not clearly enforce bundled Ookla: missing '$needle'."
+    foreach ($needle in @("Ensure-OoklaBundle", "Assert-OoklaBundlePresent", "OoklaBundleSource", "OoklaBundleUrl")) {
+        if ($content -match [regex]::Escape($needle)) {
+            throw "Release build script still appears to enforce bundled Ookla: found '$needle'."
         }
     }
 }
 
-function Test-ZipContainsOoklaBundle {
+function Test-ZipReleaseMetadata {
     param(
         [string]$ZipPath,
         [string]$ExpectedVersion
@@ -122,8 +122,8 @@ function Test-ZipContainsOoklaBundle {
         Expand-Archive -LiteralPath $ZipPath -DestinationPath $expandRoot -Force
 
         $bundlePath = Join-Path $expandRoot "router-files\stock-ui-at\usrdata\at-stock-ui\bundles\ookla\ookla-speedtest-1.2.0-linux-armhf.tgz"
-        if (-not (Test-Path $bundlePath)) {
-            throw "Built ZIP is missing bundled Ookla archive: $bundlePath"
+        if (Test-Path $bundlePath) {
+            throw "Built ZIP still contains bundled Ookla archive: $bundlePath"
         }
 
         $releaseInfoPath = Join-Path $expandRoot "router-files\stock-ui-at\usrdata\at-stock-ui\JTOOLS_RELEASE.txt"
@@ -164,8 +164,8 @@ function Invoke-ReleaseBuildVerification {
             throw "Expected release ZIP not found after build verification: $zipPath"
         }
 
-        Test-ZipContainsOoklaBundle -ZipPath $zipPath -ExpectedVersion $version
-        Write-Host "Verified release ZIP contains bundled Ookla and matching release metadata."
+        Test-ZipReleaseMetadata -ZipPath $zipPath -ExpectedVersion $version
+        Write-Host "Verified release ZIP metadata and confirmed bundled Ookla archive is absent."
     }
     finally {
         if (Test-Path $outputRoot) {
@@ -248,7 +248,7 @@ Assert-GitRepo -Path $DestinationRepo
 
 $sourceReleaseLabel = Get-ReleaseLabel -RepoRoot $SourceRepo
 Assert-ReleaseVersionAligned -RepoRoot $SourceRepo -Label $sourceReleaseLabel
-Assert-BuildScriptSupportsOokla -RepoRoot $SourceRepo
+Assert-BuildScriptDoesNotBundleOokla -RepoRoot $SourceRepo
 
 $destinationTracked = Get-TrackedFiles -RepoRoot $DestinationRepo
 $sourceTracked = Get-TrackedFiles -RepoRoot $SourceRepo
@@ -321,7 +321,7 @@ if (-not $Apply) {
 } else {
     $destinationReleaseLabel = Get-ReleaseLabel -RepoRoot $DestinationRepo
     Assert-ReleaseVersionAligned -RepoRoot $DestinationRepo -Label $destinationReleaseLabel
-    Assert-BuildScriptSupportsOokla -RepoRoot $DestinationRepo
+    Assert-BuildScriptDoesNotBundleOokla -RepoRoot $DestinationRepo
 
     if ($VerifyReleaseBuild) {
         Invoke-ReleaseBuildVerification -RepoRoot $DestinationRepo

@@ -179,7 +179,7 @@ fi
 
 log "Preserving first-install baseline behavior: normal GitHub updates reuse the saved installer baseline unless FORCE_RECAPTURE_BASELINE=1."
 log "Running packaged Qtooley install/update..."
-INSTALL_BUNDLED_OOKLA="${INSTALL_BUNDLED_OOKLA:-1}" \
+INSTALL_OOKLA_CLI="${INSTALL_OOKLA_CLI:-0}" \
 FORCE_RECAPTURE_BASELINE="${FORCE_RECAPTURE_BASELINE:-0}" \
 /bin/sh "$INSTALL_SCRIPT"
 

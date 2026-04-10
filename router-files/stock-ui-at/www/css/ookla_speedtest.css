@@ -96,6 +96,10 @@ body.jtools-page-ookla-speedtest #htmlGoesHere {
     min-width: 230px;
 }
 
+.ookla-stage-actions-admin {
+    margin-top: 2px;
+}
+
 /* ── Above-fold two-column layout ─────────────────── */
 
 .ookla-above-fold {

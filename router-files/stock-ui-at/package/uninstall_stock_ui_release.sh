@@ -45,7 +45,7 @@ cleanup_extra_overlay_state() {
     rm -f "$TARGET_BASE/ttl_config.json"
 }
 
-remove_bundled_ookla() {
+remove_installed_ookla() {
     if [ -x "$TARGET_BASE/remove_ookla_speedtest_cli.sh" ]; then
         /bin/sh "$TARGET_BASE/remove_ookla_speedtest_cli.sh" || true
     else
@@ -115,7 +115,7 @@ fi
 
 verify_install_baseline_if_present
 cleanup_extra_overlay_state
-remove_bundled_ookla
+remove_installed_ookla
 remove_tailscale_if_requested
 remove_units
 

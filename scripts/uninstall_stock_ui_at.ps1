@@ -34,13 +34,13 @@ $remoteScriptPath = "$remoteStageRoot/package/uninstall_stock_ui_release.sh"
 
 Write-Host "Qtooley stock UI uninstall"
 $transport = Select-SshTransport
-$mode = Read-MenuChoice -Prompt "Choose uninstall mode: 1) Remove Qtooley and bundled Ookla 2) Remove Qtooley, bundled Ookla, and Tailscale" -Allowed @("1", "2")
+$mode = Read-MenuChoice -Prompt "Choose uninstall mode: 1) Remove Qtooley and installed Ookla CLI 2) Remove Qtooley, installed Ookla CLI, and Tailscale" -Allowed @("1", "2")
 $removeTailscale = if ($mode -eq "2") { $true } else { $false }
 
 if ($removeTailscale) {
-    Write-Host "This mode removes Qtooley, bundled Ookla, and Tailscale."
+    Write-Host "This mode removes Qtooley, the installed Ookla CLI, and Tailscale."
 } else {
-    Write-Host "This mode removes Qtooley and bundled Ookla, but leaves Tailscale installed."
+    Write-Host "This mode removes Qtooley and the installed Ookla CLI, but leaves Tailscale installed."
     Write-Host "If you keep Tailscale, it will remain usable only from the CLI after the Qtooley UI is removed."
 }
 

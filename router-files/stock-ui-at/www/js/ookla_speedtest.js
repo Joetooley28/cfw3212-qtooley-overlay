@@ -9,12 +9,15 @@
         phase: "idle",
         running: false,
         installed: false,
+        busy: false,
+        busyAction: "",
         state_loaded: false,
         state_read_failures: 0,
         auto_recover_attempted: false,
         default_interface: "",
         binary_path: "",
         install_script: "",
+        remove_script: "",
         selected_server_id: "",
         servers: [],
         result: null,
@@ -410,9 +413,6 @@
             "<div class='ookla-eyebrow'>Qtooley speed lab</div>",
             "<p class='ookla-subtitle'>Run official speed tests from the router itself, keep nearby servers handy, and jump straight to the shareable result page.</p>",
             "<div id='ookla-speedtest-banner' class='ookla-banner'></div>",
-            "<div class='ookla-banner-actions'>",
-            "<button id='ookla-recover' class='qt-btn qt-btn-secondary ookla-recover-button' type='button'>Restart speedtest backend</button>",
-            "</div>",
 
             "<div class='ookla-above-fold'>",
 
@@ -425,6 +425,13 @@
 
             "<div class='ookla-fold-right'>",
             "<div class='ookla-toolbar-stacked'>",
+            "<div class='ookla-stage-actions'>",
+            "<button id='ookla-install' class='qt-btn qt-btn-primary ookla-secondary-button' type='button'>Install / update CLI</button>",
+            "<button id='ookla-remove' class='qt-btn qt-btn-secondary ookla-secondary-button' type='button'>Remove CLI</button>",
+            "</div>",
+            "<div class='ookla-stage-actions ookla-stage-actions-admin'>",
+            "<button id='ookla-recover' class='qt-btn qt-btn-secondary ookla-recover-button' type='button'>Restart speedtest backend</button>",
+            "</div>",
             "<div class='ookla-field'>",
             "<label for='ookla-server-select'>Server</label>",
             "<select id='ookla-server-select' class='ookla-select'></select>",
@@ -475,6 +482,12 @@
 
         try {
         document.getElementById("ookla-start").addEventListener("click", startTest);
+        document.getElementById("ookla-install").addEventListener("click", function () {
+            postAction("install", "Installing the Ookla CLI on the router...", "Failed to install the Ookla CLI.");
+        });
+        document.getElementById("ookla-remove").addEventListener("click", function () {
+            postAction("remove", "Removing the Ookla CLI from the router...", "Failed to remove the Ookla CLI.");
+        });
         document.getElementById("ookla-recover").addEventListener("click", recoverBackend);
         document.getElementById("ookla-refresh-servers").addEventListener("click", function () {
             fetchServers(true);
@@ -492,7 +505,7 @@
         var serverSelect = document.getElementById("ookla-server-select");
         if (serverSelect) {
             serverSelect.innerHTML = buildServerOptions();
-            serverSelect.disabled = !!state.running || !state.installed;
+            serverSelect.disabled = !!state.busy || !!state.running || !state.installed;
             serverSelect.value = state.selected_server_id || "";
         }
 
@@ -508,13 +521,30 @@
 
         var startButton = document.getElementById("ookla-start");
         if (startButton) {
-            startButton.disabled = !!state.running || !state.installed;
+            startButton.disabled = !!state.busy || !!state.running || !state.installed;
             startButton.textContent = state.running ? "Running..." : "Run speed test";
+        }
+
+        var installButton = document.getElementById("ookla-install");
+        if (installButton) {
+            installButton.disabled = !!state.busy || !!state.running;
+            installButton.textContent = state.busyAction === "install" ? "Installing..." : "Install / update CLI";
+        }
+
+        var removeButton = document.getElementById("ookla-remove");
+        if (removeButton) {
+            removeButton.disabled = !!state.busy || !!state.running || !state.installed;
+            removeButton.textContent = state.busyAction === "remove" ? "Removing..." : "Remove CLI";
+        }
+
+        var refreshServersButton = document.getElementById("ookla-refresh-servers");
+        if (refreshServersButton) {
+            refreshServersButton.disabled = !!state.busy || !!state.running || !state.installed;
         }
 
         var recoverButton = document.getElementById("ookla-recover");
         if (recoverButton) {
-            recoverButton.disabled = !!state.running;
+            recoverButton.disabled = !!state.busy || !!state.running;
         }
 
         renderMainGauge();
@@ -568,7 +598,7 @@
             } else if (!state.state_loaded) {
                 summary.innerHTML = "<div class='ookla-empty'>Waiting for the speedtest backend to report its current state.</div>";
             } else if (!state.installed) {
-                summary.innerHTML = "<div class='ookla-empty'>The official Ookla CLI is not installed yet. Use the install script shown below when you are ready to deploy live.</div>";
+                summary.innerHTML = "<div class='ookla-empty'>The official Ookla CLI is not installed yet. Install it from this page when the router already has working internet access.</div>";
             } else {
                 summary.innerHTML = "<div class='ookla-empty'>No completed result yet.</div>";
             }
@@ -580,6 +610,7 @@
             rows.push(["Binary", state.installed ? "Installed" : "Missing"]);
             rows.push(["Binary path", state.binary_path || ""]);
             rows.push(["Install helper", state.install_script || ""]);
+            rows.push(["Remove helper", state.remove_script || ""]);
             rows.push(["Phase", state.phase || "idle"]);
             if (state.live && state.live.stage) {
                 rows.push(["Live stage", state.live.stage]);
@@ -628,8 +659,12 @@
             } else {
                 setBanner("warn", "Speedtest page is waiting for backend state after login or reboot.");
             }
+        } else if (state.busyAction === "install") {
+            setBanner("info", state.status_text || "Installing the Ookla CLI on the router...");
+        } else if (state.busyAction === "remove") {
+            setBanner("info", state.status_text || "Removing the Ookla CLI from the router...");
         } else if (!state.installed) {
-            setBanner("error", "Ookla CLI is not installed yet. The planned live install helper is " + (state.install_script || "/usrdata/at-stock-ui/install_ookla_speedtest_cli.sh") + ".");
+            setBanner("warn", state.status_text || "Ookla CLI is not installed yet. Install it from this page when the router has internet access.");
         } else if (state.running) {
             setBanner("info", state.status_text || "Running Ookla Speedtest on the router...");
         } else if (state.phase === "completed") {
@@ -682,16 +717,62 @@
         state.default_interface = response.default_interface || "";
         state.binary_path = response.binary_path || "";
         state.install_script = response.install_script || "";
+        state.remove_script = response.remove_script || "";
         state.status_text = response.status_text || "";
         state.error = response.error || "";
         state.live = response.live || null;
         state.ca_info = response.ca_info || null;
         state.last_error_message = response.last_error_message || "";
         state.result = response.result || ((response.running || response.phase === "preparing" || response.phase === "running" || response.phase === "failed") ? previousResult : null);
+        if (!state.installed) {
+            state.servers = [];
+            state.selected_server_id = "";
+        }
         if (state.result && state.phase === "completed") {
             pushHistory(state.result);
         }
         render();
+    }
+
+    function postAction(actionName, successMessage, defaultErrorMessage) {
+        if (state.busy || state.running) {
+            return;
+        }
+
+        state.busy = true;
+        state.busyAction = actionName;
+        state.status_text = successMessage || state.status_text;
+        render();
+
+        $.ajax({
+            url: "/ookla_speedtest_api/" + actionName,
+            type: "POST",
+            dataType: "json",
+            data: {
+                csrfToken: csrfToken
+            }
+        }).done(function (response) {
+            state.busy = false;
+            state.busyAction = "";
+            if (actionName === "remove") {
+                state.servers = [];
+                state.selected_server_id = "";
+            }
+            applyStatePayload(response || {});
+            if (response && response.ok === false) {
+                setBanner("error", response.status_text || response.error || defaultErrorMessage || "Speedtest action failed.");
+                return;
+            }
+            if (actionName === "install" && state.installed) {
+                fetchServers(false);
+            }
+            setBanner("ok", response && response.status_text ? response.status_text : successMessage);
+        }).fail(function (xhr) {
+            state.busy = false;
+            state.busyAction = "";
+            render();
+            setBanner("error", window.QtooleyXhrMessage(xhr, defaultErrorMessage || "Speedtest action failed."));
+        });
     }
 
     function fetchState() {
@@ -730,7 +811,9 @@
             dataType: "json"
         }).done(function (response) {
             if (!response || !response.ok) {
-                setBanner("error", (response && response.error) || "Failed to load nearby servers.");
+                if (manual) {
+                    setBanner("error", (response && response.error) || "Failed to load nearby servers.");
+                }
                 return;
             }
             state.servers = response.servers || [];
@@ -739,7 +822,9 @@
                 setBanner("ok", "Nearby Ookla servers refreshed.");
             }
         }).fail(function (xhr) {
-            setBanner("error", window.QtooleyXhrMessage(xhr, "Failed to load nearby servers."));
+            if (manual) {
+                setBanner("error", window.QtooleyXhrMessage(xhr, "Failed to load nearby servers."));
+            }
         });
     }
 
@@ -753,6 +838,9 @@
     }
 
     function startTest() {
+        if (state.busy) {
+            return;
+        }
         $.ajax({
             url: "/ookla_speedtest_api/start",
             type: "POST",
@@ -777,6 +865,9 @@
     }
 
     function recoverBackend(silentAutoRecover) {
+        if (state.busy) {
+            return;
+        }
         $.ajax({
             url: "/ookla_speedtest_api/recover",
             type: "POST",

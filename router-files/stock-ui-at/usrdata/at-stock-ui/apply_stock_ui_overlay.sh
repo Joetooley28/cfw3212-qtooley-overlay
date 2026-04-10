@@ -145,7 +145,7 @@ if [ -f "$SPEEDTEST_BINARY" ]; then
 STEOF
 else
     cat > "$SPEEDTEST_STATE" <<STEOF
-{"ok":true,"phase":"idle","running":false,"binary_present":false,"binary_path":"$SPEEDTEST_BINARY","install_script":"$BASE/install_ookla_speedtest_cli.sh","remove_script":"$BASE/remove_ookla_speedtest_cli.sh","default_interface":"","status_text":"Ookla CLI is not installed."}
+{"ok":true,"phase":"idle","running":false,"binary_present":false,"binary_path":"$SPEEDTEST_BINARY","install_script":"$BASE/install_ookla_speedtest_cli.sh","remove_script":"$BASE/remove_ookla_speedtest_cli.sh","default_interface":"","status_text":"Ookla CLI is not installed on this router. Install it from this page when the router has internet access."}
 STEOF
 fi
 echo "speedtest state initialized"
