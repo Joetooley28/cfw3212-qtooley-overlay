@@ -11,6 +11,8 @@ Qtooley is a stock UI overlay for the Casa Systems `CFW-3212` with a Quectel `RG
 
 It adds a top-level authenticated `Qtooley` tab inside the stock Casa Turbo web UI for modem visibility, control, and diagnostics.
 
+Big credit to [Luke Jenkins](https://github.com/lukejenkins/cellular/tree/main/casasystems/cfw3212) for the broader `CFW-3212` platform research and root-script work that helped make this project possible.
+
 A lot of time and effort went into the uninstall path so the router can return as closely as possible to a clean stock UI state after Qtooley is removed. The install process captures a router-specific stock baseline on first install, and uninstall uses that saved baseline plus tracked stock-file verification to restore shared stock UI files cleanly.
 
 This is not a generic web app and it is not a generic USB modem project.
@@ -54,9 +56,6 @@ Dark mode note:
 ## Before You Install
 
 - the router must already be rooted
-  Full credit to [@Luke](https://github.com/lukejenkins/cellular/tree/main/casasystems/cfw3212) for the root script and the broader `CFW-3212` platform research.
-- if you need the root script itself, start in Luke's [`casasystems/cfw3212/tools`](https://github.com/lukejenkins/cellular/tree/main/casasystems/cfw3212/tools) folder
-- if you are starting from a stock carrier-managed box, also read Luke's [`guide_block_carrier_remote_mgmt`](https://github.com/lukejenkins/cellular/blob/main/casasystems/cfw3212/guide_block_carrier_remote_mgmt.md) to block the carrier remote-management path
 - read [Quick Must Read](docs/quick-must-read.md) for the first-install snapshot behavior and space notes
 - SSH must already be enabled and reachable
 - the normal public release asset is the Windows ZIP
