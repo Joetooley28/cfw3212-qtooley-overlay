@@ -9,11 +9,14 @@ Included:
 - removed the older temporary `status.html` invalid-request suppression from shared `genHeader.js` after the authenticated Box 2 retest passed
 - refreshed the shared `genHeader.js` cache token across the Jtools page shells
 - fixed release packaging so `JTOOLS_RELEASE.txt` token lines are retokenized to match the packaged asset versions
+- fixed offline Tailscale install/update handling so failed downloads stay on the error path without reintroducing the Tailscale tab flash
 
 Key behavior:
 - clean-stock Box 2 no longer throws the broad post-install `Invalid request` banner across many stock Networking / Services / System pages
 - `status.html` now succeeds using the real stock auth objects instead of relying on the earlier hide/suppress workaround
 - install and update packages now carry the Box 2 auth fix
+- no-internet Tailscale install attempts now return the failure banner instead of a false installed-success modal
+- the tested non-flashing Tailscale page assets remain intact
 - uninstall still restores the tracked shared stock files back to the saved baseline
 - local release builds in the safe `main` worktree now keep `dist/` untracked
 
