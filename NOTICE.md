@@ -32,6 +32,11 @@ Examples of material that should be treated as excluded, third-party, upstream, 
 - known stock/vendor-derived or shared-stock integration files such as:
   - [router-files/stock-ui-at/www/theme/js/genHeader.js](router-files/stock-ui-at/www/theme/js/genHeader.js)
   - [router-files/stock-ui-at/www/js/generatedMenuEntries.js](router-files/stock-ui-at/www/js/generatedMenuEntries.js)
+  - [router-files/stock-ui-at/overlay/www/js/generatedMenuEntries.js](router-files/stock-ui-at/overlay/www/js/generatedMenuEntries.js)
+  - [router-files/stock-ui-at/usr/share/lua/5.1/webif/top_menu_entries.lua](router-files/stock-ui-at/usr/share/lua/5.1/webif/top_menu_entries.lua)
+  - [router-files/stock-ui-at/overlay/usr/share/lua/5.1/webif/top_menu_entries.lua](router-files/stock-ui-at/overlay/usr/share/lua/5.1/webif/top_menu_entries.lua)
+  - [router-files/stock-ui-at/usr/share/lua/5.1/webif/userGroupAuth.lua](router-files/stock-ui-at/usr/share/lua/5.1/webif/userGroupAuth.lua)
+  - [router-files/stock-ui-at/overlay/usr/share/lua/5.1/webif/userGroupAuth.lua](router-files/stock-ui-at/overlay/usr/share/lua/5.1/webif/userGroupAuth.lua)
   - files in [router-files/stock-ui-at/usr/share/lua/5.1/webif](router-files/stock-ui-at/usr/share/lua/5.1/webif) to the extent they are based on stock Casa webif material
   - files in [router-files/stock-ui-at/overlay](router-files/stock-ui-at/overlay) to the extent they are copies of or derived from stock router UI content
 - third-party names, marks, logos, and branding, including references to Casa Systems, Quectel, Tailscale, Ookla, and US Cellular
