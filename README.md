@@ -205,6 +205,4 @@ If you are new to the project, use `main`.
 - original Qtooley code in this repository is licensed under `GPL-2.0-or-later`
 - original repo-authored documentation and prose are licensed under `CC BY-SA 4.0`
 - reuse, modification, and commercial redistribution are allowed under those licenses as long as their terms are followed
-- GitHub may show the repo license as GPL based on the root [LICENSE](LICENSE) file; for the mixed-license details and exclusions, see [LICENSE-docs.md](LICENSE-docs.md) and [NOTICE.md](NOTICE.md)
-- some material is excluded from those blanket repo licenses, including stock/vendor-derived Casa UI material, fallback recovery archives, trademarks/logos, and bundled third-party artifacts
-- see [LICENSE](LICENSE), [LICENSE-docs.md](LICENSE-docs.md), and [NOTICE.md](NOTICE.md)
+- GitHub may show the repo license as GPL based on the root `LICENSE` file; the full mixed-license breakdown, exclusions (including stock/vendor-derived Casa UI material, fallback recovery archives, trademarks/logos, and bundled third-party artifacts), and notices are in [LICENSE](LICENSE), [LICENSE-docs.md](LICENSE-docs.md), and [NOTICE.md](NOTICE.md)
