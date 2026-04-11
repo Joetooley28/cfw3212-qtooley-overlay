@@ -90,6 +90,55 @@ function Invoke-CommandChecked {
     return $output
 }
 
+function Get-StatusBranchLine {
+    param(
+        [string]$RepoRoot
+    )
+
+    $statusLines = @(Invoke-Git -RepoRoot $RepoRoot status --short --branch)
+    foreach ($line in $statusLines) {
+        $text = "$line".TrimEnd()
+        if ($text.StartsWith("## ")) {
+            return $text
+        }
+    }
+
+    return ""
+}
+
+function Get-AheadCount {
+    param(
+        [string]$RepoRoot
+    )
+
+    $branchLine = Get-StatusBranchLine -RepoRoot $RepoRoot
+    if (-not $branchLine) {
+        return $null
+    }
+
+    $match = [regex]::Match($branchLine, '\[ahead (?<count>\d+)(, behind \d+)?\]')
+    if (-not $match.Success) {
+        return 0
+    }
+
+    return [int]$match.Groups["count"].Value
+}
+
+function Push-BranchIfNeeded {
+    param(
+        [string]$RepoRoot,
+        [string]$BranchName
+    )
+
+    $aheadCount = Get-AheadCount -RepoRoot $RepoRoot
+    if ($null -ne $aheadCount -and $aheadCount -le 0) {
+        Write-Host "Branch '$BranchName' is already aligned with origin; skipping push."
+        return
+    }
+
+    Invoke-Git -RepoRoot $RepoRoot push origin $BranchName | Out-Host
+}
+
 function Get-VersionText {
     param(
         [string]$RepoRoot,
@@ -271,8 +320,15 @@ function Test-ReleaseExists {
         [string]$Tag
     )
 
-    & gh release view $Tag -R $RepoSlugValue *> $null
-    return ($LASTEXITCODE -eq 0)
+    $releaseListJson = Invoke-CommandChecked -CommandName "gh" -Arguments @(
+        "release", "list",
+        "-R", $RepoSlugValue,
+        "--limit", "200",
+        "--json", "tagName"
+    )
+
+    $releases = @(($releaseListJson -join [Environment]::NewLine) | ConvertFrom-Json)
+    return (@($releases | Where-Object { $_.tagName -eq $Tag }).Count -gt 0)
 }
 
 Assert-Branch -RepoRoot $SourceRepo -ExpectedBranch "working-branch"
@@ -313,7 +369,7 @@ if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
 
 if (-not $SkipPushWorking) {
     Write-Step "Pushing working-branch"
-    Invoke-Git -RepoRoot $SourceRepo push origin working-branch | Out-Host
+    Push-BranchIfNeeded -RepoRoot $SourceRepo -BranchName "working-branch"
 }
 
 Write-Step "Promoting public release files into main"
@@ -355,11 +411,11 @@ if ($destinationStatus.Count -gt 0) {
 
 if (-not $SkipPushMain) {
     Write-Step "Pushing main"
-    Invoke-Git -RepoRoot $DestinationRepo push origin main | Out-Host
+    Push-BranchIfNeeded -RepoRoot $DestinationRepo -BranchName "main"
 }
 
 if (-not $SkipGitHubRelease) {
-    $target = (Invoke-Git -RepoRoot $DestinationRepo rev-parse HEAD | Select-Object -First 1).Trim()
+    $target = "main"
     if (Test-ReleaseExists -RepoSlugValue $RepoSlug -Tag $version) {
         Write-Step "Updating existing GitHub release"
         Invoke-CommandChecked -CommandName "gh" -Arguments @(
