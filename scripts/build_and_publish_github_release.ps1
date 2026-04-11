@@ -98,7 +98,7 @@ function Assert-CleanWorktree {
         [string]$Label
     )
 
-    $status = Invoke-Git -RepoRoot $RepoRoot status --porcelain
+    $status = @(Invoke-Git -RepoRoot $RepoRoot status --porcelain)
     if ($status.Count -gt 0) {
         throw "$Label worktree is not clean:`n$($status -join [Environment]::NewLine)"
     }
@@ -113,7 +113,7 @@ function Get-ReleaseNotesBlock {
         throw "Release notes file not found: $NotesPath"
     }
 
-    $bulletLines = Get-Content $NotesPath | Where-Object { $_ -match '^\s*-\s+' } | ForEach-Object { $_.TrimEnd() }
+    $bulletLines = @(Get-Content $NotesPath | Where-Object { $_ -match '^\s*-\s+' } | ForEach-Object { $_.TrimEnd() })
     if ($bulletLines.Count -eq 0) {
         return "- Release notes were not found in bullet form. See the full changelog below."
     }
@@ -232,11 +232,11 @@ $releaseBody = Render-ReleaseBody -TemplateFile $TemplatePath -Version $version 
 Write-Utf8NoBom -Path $BodyOutputPath -Content $releaseBody
 Write-Host "GitHub release body written to: $BodyOutputPath"
 
-$destinationStatus = Invoke-Git -RepoRoot $DestinationRepo status --porcelain
+$destinationStatus = @(Invoke-Git -RepoRoot $DestinationRepo status --porcelain)
 if ($destinationStatus.Count -gt 0) {
     Write-Host "Committing main release state..."
     Invoke-Git -RepoRoot $DestinationRepo add README.md CHANGELOG.md VERSION.txt LICENSE LICENSE-docs.md NOTICE.md docs scripts router-files/stock-ui-at | Out-Null
-    $postAddStatus = Invoke-Git -RepoRoot $DestinationRepo status --porcelain
+    $postAddStatus = @(Invoke-Git -RepoRoot $DestinationRepo status --porcelain)
     if ($postAddStatus.Count -gt 0) {
         Invoke-Git -RepoRoot $DestinationRepo commit -m $CommitMessage | Out-Host
     }
