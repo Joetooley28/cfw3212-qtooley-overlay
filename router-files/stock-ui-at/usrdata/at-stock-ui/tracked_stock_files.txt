@@ -4,10 +4,15 @@
 # Use one absolute live-tree path per line.
 # Lines starting with "#" are comments and are ignored by the helpers.
 /www/theme/js/genHeader.js
+/www/theme/js/genFooter.js
 /www/js/generatedMenuEntries.js
 /www/css/style.css
 /www/css/qtooley.css
 /www/css/jtools_dark_mode.css
+/www/img/nav-casa-logo.png
+/www/img/casa-logo.png
+/www/img/i_contact.png
+/www/img/log-off.png
 /www/quick_overview.html
 /www/general_dashboard.html
 /www/at_terminal.html
