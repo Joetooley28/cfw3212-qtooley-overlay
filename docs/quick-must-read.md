@@ -18,7 +18,7 @@ Important behavior:
 
 Optional Ookla Speedtest and optional Tailscale are both installed later from the Qtooley UI.
 
-- Qtooley: about `11.5 MB` under `/usrdata/at-stock-ui` (`13.7 MB` minus `2.2 MB`)
+- Qtooley: about `11.5 MB` under `/usrdata/at-stock-ui`
 - Ookla Speedtest: about `2.2 MB` for the installed `speedtest` binary
 - Tailscale: about `60 MB` under `/usrdata/tailscale`
 
