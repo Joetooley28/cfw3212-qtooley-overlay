@@ -19,7 +19,9 @@ Use this page for the normal Windows ZIP install, update, and uninstall flow.
 3. Open PowerShell in the extracted folder.
 4. Run exactly:
 
-    powershell -ExecutionPolicy Bypass -File .\install_stock_ui_at.ps1
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File .\install_stock_ui_at.ps1
+   ```
 
 5. Enter the router IP.
 6. Enter the SSH username: `root`
@@ -31,7 +33,9 @@ Use this page for the normal Windows ZIP install, update, and uninstall flow.
 
 Run the same command from a newer extracted release ZIP:
 
-    powershell -ExecutionPolicy Bypass -File .\install_stock_ui_at.ps1
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install_stock_ui_at.ps1
+```
 
 The normal update path reuses the saved first-install baseline unless you intentionally force a recapture in an emergency.
 
@@ -40,7 +44,9 @@ The normal update path reuses the saved first-install baseline unless you intent
 1. Open PowerShell in the extracted folder from the same release ZIP.
 2. Run exactly:
 
-    powershell -ExecutionPolicy Bypass -File .\uninstall_stock_ui_at.ps1
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File .\uninstall_stock_ui_at.ps1
+   ```
 
 3. Choose uninstall mode:
    - `1` remove Qtooley and the installed Ookla CLI
