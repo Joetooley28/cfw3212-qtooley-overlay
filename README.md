@@ -13,7 +13,7 @@ It adds a top-level authenticated `Qtooley` tab inside the stock Casa Turbo web 
 
 A lot of time and effort went into the uninstall path so the router can return as closely as possible to a clean stock UI state after Qtooley is removed. The install process captures a router-specific stock baseline on first install, and uninstall uses that saved baseline plus tracked stock-file verification to restore shared stock UI files cleanly.
 
-Big credit to [Luke Jenkins](https://github.com/lukejenkins/cellular/tree/main/casasystems/cfw3212) for the broader `CFW-3212` platform research and root-script work that helped make this project possible.
+Big credit to [@Luke](https://github.com/lukejenkins/cellular/blob/main/casasystems/cfw3212/README.md) for the broader `CFW-3212` platform research and root-script work that helped make this project possible.
 
 This is not a generic web app and it is not a generic USB modem project.
 
@@ -33,7 +33,7 @@ This is not a generic web app and it is not a generic USB modem project.
 - AT terminal
 - Settings page with screensaver controls and release/update status
 - RAT / band / cell locking
-- Ookla Speedtest
+- optional Ookla Speedtest after base install
 - TTL helper
 - optional Tailscale UI after base install
 
@@ -59,7 +59,7 @@ Dark mode note:
 - read [Quick Must Read](docs/quick-must-read.md) for the first-install snapshot behavior and space notes
 - SSH must already be enabled and reachable
 - the normal public release asset is the Windows ZIP
-- Ookla Speedtest is optional and installs later from the Qtooley UI when the router already has working internet access
+- Ookla Speedtest is optional and is installed later from the Qtooley UI
 - Tailscale is optional and is installed later from the Qtooley UI
 
 ## Device Scope
@@ -205,6 +205,4 @@ If you are new to the project, use `main`.
 - original Qtooley code in this repository is licensed under `GPL-2.0-or-later`
 - original repo-authored documentation and prose are licensed under `CC BY-SA 4.0`
 - reuse, modification, and commercial redistribution are allowed under those licenses as long as their terms are followed
-- GitHub may show the repo license as GPL based on the root [LICENSE](LICENSE) file; for the mixed-license details and exclusions, see [LICENSE-docs.md](LICENSE-docs.md) and [NOTICE.md](NOTICE.md)
-- some material is excluded from those blanket repo licenses, including stock/vendor-derived Casa UI material, fallback recovery archives, trademarks/logos, and bundled third-party artifacts
-- see [LICENSE](LICENSE), [LICENSE-docs.md](LICENSE-docs.md), and [NOTICE.md](NOTICE.md)
+- GitHub may show the repo license as GPL based on the root `LICENSE` file; the full mixed-license breakdown, exclusions (including stock/vendor-derived Casa UI material, fallback recovery archives, trademarks/logos, and bundled third-party artifacts), and notices are in [LICENSE](LICENSE), [LICENSE-docs.md](LICENSE-docs.md), and [NOTICE.md](NOTICE.md)

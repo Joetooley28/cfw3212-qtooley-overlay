@@ -16,16 +16,16 @@ Important behavior:
 
 ## Space Quick Check
 
-Real project measurements from Box 2:
+Optional Ookla Speedtest and optional Tailscale are both installed later from the Qtooley UI.
 
-- Qtooley with the Ookla CLI installed used about `13.7 MB` under `/usrdata/at-stock-ui`
-- the installed Ookla `speedtest` binary itself was about `2.2 MB`
-- optional Tailscale should be treated as a separate extra runtime and can add about `60 MB` under `/usrdata/tailscale`
+- Qtooley: about `11.5 MB` under `/usrdata/at-stock-ui`
+- Ookla Speedtest: about `2.2 MB` for the installed `speedtest` binary
+- Tailscale: about `60 MB` under `/usrdata/tailscale`
 
 Practical advice:
 
 - make sure `/usrdata` has comfortable free space before first install
-- leave extra headroom if you plan to add Tailscale later
+- leave extra headroom if you plan to add Ookla Speedtest or Tailscale later
 
 ## Important Space Warning: `upgrade.star`
 
@@ -44,6 +44,7 @@ If the modem does not already have working internet:
 - use the Windows ZIP from the release `Assets` section
 - extract the ZIP first
 - follow the packaged `README.txt`
+- for the full Windows ZIP install, update, and uninstall steps, see [Windows ZIP Install Guide](windows-zip-install.md)
 
 If the modem already has working internet:
 
