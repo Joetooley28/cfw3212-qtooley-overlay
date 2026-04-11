@@ -43,6 +43,7 @@ If the modem does not already have working internet:
 - use the Windows ZIP from the release `Assets` section
 - extract the ZIP first
 - follow the packaged `README.txt`
+- for the full Windows ZIP install, update, and uninstall steps, see [Windows ZIP Install Guide](windows-zip-install.md)
 
 If the modem already has working internet:
 
