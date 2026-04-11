@@ -12,6 +12,8 @@ VERIFY_ROOT="/tmp/install-baseline-verify.$$"
 BASELINE_TRACKED_FILE_LIST="$BASELINE_DIR/tracked_stock_files.txt"
 PACKAGE_TRACKED_FILE_LIST="$SCRIPT_DIR/tracked_stock_files.txt"
 MERGED_TRACKED_FILE_LIST="$VERIFY_ROOT/tracked_stock_files.merged.txt"
+RESTORED_COUNT=0
+REMOVED_COUNT=0
 
 for required in "$BASELINE_DIR/install_www.tar" "$BASELINE_DIR/install_webif.tar"; do
     if [ ! -f "$required" ]; then
@@ -60,6 +62,27 @@ while IFS= read -r live_path; do
 
     rel_path="${live_path#/}"
     baseline_path="$VERIFY_ROOT/$rel_path"
+    live_parent="$(dirname "$live_path")"
+
+    if [ -e "$baseline_path" ]; then
+        mkdir -p "$live_parent"
+        if [ ! -e "$live_path" ] || ! cmp -s "$live_path" "$baseline_path"; then
+            cp -p "$baseline_path" "$live_path"
+            RESTORED_COUNT=$((RESTORED_COUNT + 1))
+        fi
+    else
+        if [ -e "$live_path" ]; then
+            rm -f "$live_path"
+            REMOVED_COUNT=$((REMOVED_COUNT + 1))
+        fi
+    fi
+done < "$MERGED_TRACKED_FILE_LIST"
+
+while IFS= read -r live_path; do
+    [ -n "$live_path" ] || continue
+
+    rel_path="${live_path#/}"
+    baseline_path="$VERIFY_ROOT/$rel_path"
 
     if [ -e "$baseline_path" ]; then
         if [ ! -e "$live_path" ]; then
@@ -67,7 +90,7 @@ while IFS= read -r live_path; do
             exit 1
         fi
         if ! cmp -s "$live_path" "$baseline_path"; then
-            echo "Install baseline verification failed for $live_path" >&2
+            echo "Install baseline restore failed for $live_path" >&2
             exit 1
         fi
     else
@@ -79,3 +102,5 @@ while IFS= read -r live_path; do
 done < "$MERGED_TRACKED_FILE_LIST"
 
 echo "verified_install_baseline=$BASELINE_DIR"
+echo "restored_tracked_files=$RESTORED_COUNT"
+echo "removed_overlay_only_files=$REMOVED_COUNT"
