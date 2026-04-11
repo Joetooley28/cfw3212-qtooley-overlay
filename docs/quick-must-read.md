@@ -18,8 +18,6 @@ Important behavior:
 
 Optional Ookla Speedtest and optional Tailscale are both installed later from the Qtooley UI.
 
-Real project measurements from Box 2: Qtooley with the Ookla CLI installed used about `13.7 MB` under `/usrdata/at-stock-ui` (that total is Qtooley plus Ookla together in that path). Subtract about `2.2 MB` for the installed Ookla `speedtest` binary to get a Qtooley-only footprint for planning:
-
 - Qtooley: about `11.5 MB` under `/usrdata/at-stock-ui` (`13.7 MB` minus `2.2 MB`)
 - Ookla Speedtest: about `2.2 MB` for the installed `speedtest` binary
 - Tailscale: about `60 MB` under `/usrdata/tailscale`
