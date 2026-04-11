@@ -33,7 +33,7 @@ This is not a generic web app and it is not a generic USB modem project.
 - AT terminal
 - Settings page with screensaver controls and release/update status
 - RAT / band / cell locking
-- optional Ookla Speedtest (not bundled in the release ZIP; install later from the Qtooley UI when the router has working internet)
+- optional Ookla Speedtest after base install
 - TTL helper
 - optional Tailscale UI after base install
 
@@ -59,7 +59,7 @@ Dark mode note:
 - read [Quick Must Read](docs/quick-must-read.md) for the first-install snapshot behavior and space notes
 - SSH must already be enabled and reachable
 - the normal public release asset is the Windows ZIP
-- Ookla Speedtest is optional; the release ZIP does not bundle it, and you install it from the Qtooley UI when the router already has working internet access
+- Ookla Speedtest is optional and is installed later from the Qtooley UI
 - Tailscale is optional and is installed later from the Qtooley UI
 
 ## Device Scope
