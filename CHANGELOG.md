@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.3.10-qtooley-2026-04-11
+
+Screensaver update-status polish and stock dark-footer follow-up for the Qtooley stock UI overlay, plus the public doc cleanup already staged on the release lane.
+
+Included:
+- dark-moded the stock Casa footer inside the shared `jtools_dark_mode.css` treatment
+- polished the Qtooley Settings update card so the router-side GitHub update path shows a clearer running/completed state
+- kept the completed update wording focused on refreshing the page after the router finishes
+- clarified public install and optional-component wording across the README and install guides
+
+Key behavior:
+- stock Casa dark mode no longer leaves the footer as a bright strip under the page
+- the Settings page now keeps the update status card visible through the router update flow instead of relying only on a brief toast
+- the completed update state now tells the user to refresh the page for the newest release details
+- public install docs are clearer about Windows ZIP versus direct-router install paths and optional Ookla/Tailscale installs
+
 ## v0.3.9-qtooley-2026-04-10
 
 Shared theme/header cleanup for the Qtooley stock UI overlay, plus the licensing clarification work already present on `working-branch`.

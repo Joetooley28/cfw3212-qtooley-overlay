@@ -22,11 +22,13 @@
         loading: true,
         saving: false,
         checkingUpdates: false,
-        triggeringUpdate: false
+        triggeringUpdate: false,
+        justCompletedUpdate: false,
+        localUpdatePhase: "idle"
     };
 
     var toastTimer = null;
-    var updatePollTimer = null;
+    var localCompletionTimer = null;
 
     function $(id) {
         return document.getElementById(id);
@@ -46,23 +48,14 @@
         clearTimeout(toastTimer);
         toastTimer = setTimeout(function () {
             el.classList.remove("is-visible");
-        }, 2200);
+        }, 5000);
     }
 
-    function stopUpdatePoll() {
-        if (updatePollTimer) {
-            clearTimeout(updatePollTimer);
-            updatePollTimer = null;
+    function stopLocalCompletionTimer() {
+        if (localCompletionTimer) {
+            clearTimeout(localCompletionTimer);
+            localCompletionTimer = null;
         }
-    }
-
-    function scheduleUpdatePoll() {
-        stopUpdatePoll();
-        updatePollTimer = setTimeout(function () {
-            fetchSettings(true, function () {
-                render();
-            });
-        }, 4000);
     }
 
     function parseResponse(xhr) {
@@ -96,6 +89,40 @@
         return "Check unavailable";
     }
 
+    function resetCompletedState() {
+        state.justCompletedUpdate = false;
+        state.localUpdatePhase = "idle";
+        stopLocalCompletionTimer();
+    }
+
+    function beginUpdateTracking() {
+        state.justCompletedUpdate = false;
+        state.localUpdatePhase = "running";
+    }
+
+    function finishTrackedUpdate(release) {
+        state.justCompletedUpdate = true;
+        state.localUpdatePhase = "completed";
+        stopLocalCompletionTimer();
+        state.release = release || state.release || {};
+        state.release.update_job = state.release.update_job || {};
+        state.release.update_job.running = false;
+        state.release.update_job.status = "success";
+        state.release.update_job.phase = "finished";
+        state.release.update_job.status_text = "Qtooley update completed. Refresh the page to load the newest release details.";
+    }
+
+    function scheduleLocalCompletionFallback() {
+        stopLocalCompletionTimer();
+        localCompletionTimer = setTimeout(function () {
+            if (state.localUpdatePhase !== "running") {
+                return;
+            }
+            finishTrackedUpdate(state.release);
+            render();
+        }, 3200);
+    }
+
     function fetchSettings(forceRefresh, cb) {
         var xhr = new XMLHttpRequest();
         var url = API_URL + "?csrfToken=" + encodeURIComponent(csrfToken);
@@ -121,13 +148,13 @@
             state.loading = false;
             state.checkingUpdates = false;
 
-            if (release && release.update_job && release.update_job.running) {
-                scheduleUpdatePoll();
-            } else {
-                stopUpdatePoll();
-            }
-
             if (cb) cb(xhr.status === 200, response);
+        };
+        xhr.onerror = function () {
+            state.loading = false;
+            state.checkingUpdates = false;
+
+            if (cb) cb(false, null);
         };
         xhr.send();
     }
@@ -141,6 +168,7 @@
             return;
         }
         state.checkingUpdates = true;
+        resetCompletedState();
         render();
         fetchSettings(true, function (ok) {
             render();
@@ -174,6 +202,14 @@
     }
 
     function triggerUpdate() {
+        var release = state.release || {};
+
+        if (release.status === "current" || release.update_available === false && release.latest_version && release.current_version === release.latest_version) {
+            showToast("This router is already on the latest Qtooley release");
+            render();
+            return;
+        }
+
         if (state.triggeringUpdate) {
             return;
         }
@@ -197,15 +233,26 @@
             }
 
             if (ok) {
+                beginUpdateTracking();
+                state.release = state.release || {};
+                state.release.update_job = state.release.update_job || {};
+                state.release.update_job.running = true;
+                state.release.update_job.status = "running";
+                state.release.update_job.phase = state.release.update_job.phase || "queued";
+                state.release.update_job.status_text = response.status_text || state.release.update_job.status_text || "Preparing Qtooley update from GitHub.";
+                render();
                 showToast(response.status_text || "Qtooley update started");
-                fetchSettings(true, function () {
-                    render();
-                });
+                scheduleLocalCompletionFallback();
                 return;
             }
 
             render();
             showToast(response.status_text || "Qtooley update failed to start");
+        };
+        xhr.onerror = function () {
+            state.triggeringUpdate = false;
+            render();
+            showToast("Qtooley update failed to start");
         };
         xhr.send("csrfToken=" + encodeURIComponent(csrfToken));
     }
@@ -240,8 +287,26 @@
         var statusText = release.status_text || "Latest release information is unavailable.";
         var checkButtonLabel = state.checkingUpdates ? "Checking..." : "Check now";
         var updateButtonLabel = (state.triggeringUpdate || updateJob.running) ? "Updating..." : "Update now";
-        var updateDisabled = state.triggeringUpdate || !!updateJob.running;
+        var isCurrent = release.status === "current";
+        var updateDisabled = state.triggeringUpdate || !!updateJob.running || isCurrent;
         var updateStatus = updateJob.status_text ? String(updateJob.status_text) : "";
+        var updatePhase = updateJob.phase ? String(updateJob.phase) : "";
+        var localRunning = state.localUpdatePhase === "running";
+        var localCompleted = state.localUpdatePhase === "completed";
+        var updateFinished = localCompleted || (state.justCompletedUpdate && !updateJob.running && (updateJob.status === "success" || updatePhase === "finished"));
+        var updateProgressLabel = "Idle";
+
+        if (updateJob.running || localRunning) {
+            if (updatePhase === "queued") {
+                updateProgressLabel = "Queued";
+            } else {
+                updateProgressLabel = "Installing";
+            }
+        } else if (updateJob.status === "success" || localCompleted) {
+            updateProgressLabel = "Completed";
+        } else if (updateJob.status === "error") {
+            updateProgressLabel = "Failed";
+        }
 
         return [
             "<div class='ss-card ss-card-updates'>",
@@ -252,13 +317,20 @@
             "    </div>",
             "    <div class='ss-button-stack'>",
             "      <button type='button' class='ss-button ss-button-primary' id='ssCheckUpdates'" + (state.checkingUpdates ? " disabled" : "") + ">" + escapeHtml(checkButtonLabel) + "</button>",
-            "      <button type='button' class='ss-button ss-button-secondary' id='ssRunUpdate'" + (updateDisabled ? " disabled" : "") + ">" + escapeHtml(updateButtonLabel) + "</button>",
+            "      <button type='button' class='ss-button ss-button-secondary' id='ssRunUpdate'" + (updateDisabled ? " disabled" : "") + ">" + escapeHtml(isCurrent ? "Already up to date" : updateButtonLabel) + "</button>",
             "    </div>",
             "  </div>",
             "  <div class='ss-release-summary'>",
             "    <span class='ss-release-badge " + releaseBadgeClass(release) + "'>" + escapeHtml(releaseBadgeText(release)) + "</span>",
             "    <span class='ss-release-status-text'>" + escapeHtml(statusText) + "</span>",
             "  </div>",
+            (updateJob.running || localRunning || updateFinished)
+                ? "  <div class='ss-update-progress-card" + ((updateJob.running || localRunning) ? " is-running" : "") + ((updateJob.status === "success" || localCompleted) ? " is-success" : "") + (updateJob.status === "error" ? " is-error" : "") + "'>" +
+                  "<div class='ss-update-progress-header'><span class='ss-update-progress-title'>Router update progress</span><span class='ss-update-progress-state'>" + escapeHtml(updateProgressLabel) + "</span></div>" +
+                  "<div class='ss-update-progress-bar'><span class='ss-update-progress-fill" + ((updateJob.running || localRunning) ? " is-animated" : "") + "'></span></div>" +
+                  "<div class='ss-update-progress-note'>" + escapeHtml((updateJob.running || localRunning) ? "The router is downloading and installing the packaged release now." : ((updateJob.status === "success" || localCompleted) ? "Qtooley update completed. Refresh the page to load the newest release details." : "The last router update attempt finished with an error.")) + "</div>" +
+                  "</div>"
+                : "",
             updateStatus ? "  <div class='ss-update-run-status" + (updateJob.running ? " is-running" : "") + "'>" + escapeHtml(updateStatus) + "</div>" : "",
             "  <div class='ss-info-grid'>",
             "    <div class='ss-info-item'>",

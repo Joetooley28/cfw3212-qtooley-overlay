@@ -64,7 +64,7 @@ var QTOOLEY_THEMED_PAGES = {
 (function () {
     "use strict";
     var themeStorageKey = "jtoolsThemeMode";
-    var darkModeHref = "/css/jtools_dark_mode.css?jtools-dark-v20260410a";
+    var darkModeHref = "/css/jtools_dark_mode.css?jtools-dark-v20260411a";
     var pageName = typeof relUrlOfPage === "string" ? relUrlOfPage : "";
     var wantsDark = true;
 
@@ -116,7 +116,7 @@ function genThemeHeader(pageData, userGroups) {
     }
 
     function ensureJtoolsDarkModeStylesheet() {
-        const darkModeHref = "/css/jtools_dark_mode.css?jtools-dark-v20260410a";
+        const darkModeHref = "/css/jtools_dark_mode.css?jtools-dark-v20260411a";
 
         if (!themedPages[relUrlOfPage]) {
             return false;
