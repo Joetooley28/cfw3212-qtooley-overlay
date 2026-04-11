@@ -49,8 +49,8 @@ The normal update path reuses the saved first-install baseline unless you intent
 ## Notes
 
 - first-time SSH connections to a new router IP are accepted automatically, so you should not need to type a blind `yes` for the host-key prompt
-- Ookla Speedtest is optional and installs later from the Qtooley UI when the router already has working internet access
-- Tailscale is optional and is also installed later from the Qtooley UI
+- Ookla Speedtest is optional and is installed later from the Qtooley UI
+- Tailscale is optional and is installed later from the Qtooley UI
 - the packaged `README.txt` inside the release ZIP is this Windows ZIP guide
 - for first-install snapshot behavior, space notes, and the `upgrade.star` warning, read [Quick Must Read](quick-must-read.md)
 - for direct router `wget` install/update and uninstall commands, use [Direct Router Install Guide](direct-router-install.md)

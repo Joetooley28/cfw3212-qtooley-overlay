@@ -16,16 +16,15 @@ Important behavior:
 
 ## Space Quick Check
 
-Real project measurements from Box 2:
+Optional Ookla Speedtest and optional Tailscale are both installed later from the Qtooley UI. Real project measurements from Box 2 after those add-ons were in use:
 
-- Qtooley with the Ookla CLI installed used about `13.7 MB` under `/usrdata/at-stock-ui`
-- the installed Ookla `speedtest` binary itself was about `2.2 MB`
-- optional Tailscale should be treated as a separate extra runtime and can add about `60 MB` under `/usrdata/tailscale`
+- Ookla Speedtest: about `13.7 MB` under `/usrdata/at-stock-ui` for Qtooley-related usage with the CLI installed, and about `2.2 MB` for the `speedtest` binary itself
+- Tailscale: about `60 MB` under `/usrdata/tailscale`
 
 Practical advice:
 
 - make sure `/usrdata` has comfortable free space before first install
-- leave extra headroom if you plan to add Tailscale later
+- leave extra headroom if you plan to add Ookla Speedtest or Tailscale later
 
 ## Important Space Warning: `upgrade.star`
 

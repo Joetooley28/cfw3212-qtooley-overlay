@@ -57,6 +57,6 @@ REMOVE_TAILSCALE=1 /bin/sh /usrdata/at-stock-ui/uninstall_from_github_release.sh
 
 - the router-native GitHub install/update and uninstall paths download the latest release ZIP and run the same packaged router-side install or uninstall core used by the Windows ZIP flow
 - first-time SSH connections to a new router IP are accepted automatically, so you should not need to type a blind `yes` for the host-key prompt
-- Ookla Speedtest is optional and installs later from the Qtooley UI when the router has working internet access
-- Tailscale remains optional
+- Ookla Speedtest is optional and is installed later from the Qtooley UI
+- Tailscale is optional and is installed later from the Qtooley UI
 - for first-install baseline behavior, uninstall verification expectations, space notes, and the `upgrade.star` warning, read [Quick Must Read](quick-must-read.md)
