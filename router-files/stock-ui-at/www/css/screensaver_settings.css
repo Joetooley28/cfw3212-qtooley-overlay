@@ -195,6 +195,95 @@ body.jtools-page-screensaver-settings .sidemenu {
     background: rgba(107, 182, 255, 0.08);
 }
 
+.ss-update-progress-card {
+    margin: -2px 0 16px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.ss-update-progress-card.is-running {
+    border-color: rgba(107, 182, 255, 0.24);
+    background: rgba(107, 182, 255, 0.08);
+}
+
+.ss-update-progress-card.is-success {
+    border-color: rgba(84, 226, 161, 0.25);
+    background: rgba(43, 182, 115, 0.08);
+}
+
+.ss-update-progress-card.is-error {
+    border-color: rgba(255, 92, 120, 0.24);
+    background: rgba(255, 92, 120, 0.08);
+}
+
+.ss-update-progress-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.ss-update-progress-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--ss-text-bright);
+}
+
+.ss-update-progress-state {
+    font-family: var(--ss-font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--ss-accent-cyan);
+}
+
+.ss-update-progress-bar {
+    position: relative;
+    overflow: hidden;
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.ss-update-progress-fill {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #7fd6ff 0%, #4bbdff 45%, #39d5ff 100%);
+    opacity: 0.92;
+}
+
+.ss-update-progress-fill.is-animated {
+    width: 42%;
+    background-size: 200% 100%;
+    animation: ss-update-progress 1.5s linear infinite;
+}
+
+.ss-update-progress-note {
+    margin-top: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.6;
+    color: var(--ss-text-bright);
+}
+
+.ss-update-progress-card.is-success .ss-update-progress-state {
+    color: var(--ss-green-bright);
+}
+
+.ss-update-progress-card.is-success .ss-update-progress-note {
+    font-size: 16px;
+    font-weight: 700;
+    color: #eefcf5;
+}
+
 .ss-info-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(260px, 1fr));
@@ -582,6 +671,15 @@ body.jtools-page-screensaver-settings .sidemenu {
     50% { opacity: 0.3; }
 }
 
+@keyframes ss-update-progress {
+    0% {
+        transform: translateX(-110%);
+    }
+    100% {
+        transform: translateX(260%);
+    }
+}
+
 @media (max-width: 900px) {
     .ss-info-grid {
         grid-template-columns: 1fr;
@@ -605,7 +703,8 @@ body.jtools-page-screensaver-settings .sidemenu {
     .ss-card-title-row,
     .ss-page-header,
     .ss-setting-row,
-    .ss-update-help-line {
+    .ss-update-help-line,
+    .ss-update-progress-header {
         flex-direction: column;
         align-items: flex-start;
     }
