@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.3.11-qtooley-2026-04-11
+
+Hardened stock-shell uninstall restoration for the Qtooley stock UI overlay, validated from the fresh local release package on clean Box 2.
+
+Included:
+- expanded uninstall restore handling so the packaged `restore_install_baseline.sh` restores tracked stock-touched files from the saved install baseline and removes overlay-only leftovers generically
+- widened `tracked_stock_files.txt` so shared stock shell assets like the header/footer-adjacent files and stock logo/contact/logout images are part of the protected uninstall restore set
+- verified the fresh local package includes the current hardened `restore_install_baseline.sh` instead of the older stale-release variant
+- ran a full package-level install and uninstall validation on clean Box 2 using the fresh local ZIP and the normal Windows SSH installer/uninstaller entrypoints
+
+Key behavior:
+- uninstall now restores the clean stock shell more completely than the older main-line fixed-file verification path
+- clean Box 2 returned to the expected stock hash set after uninstall, with no `/usrdata/at-stock-ui`, no `jtools-stock-ui` units, and no live bind mounts left behind
+- the fresh packaged uninstall flow now matches the current working-branch hardened logic that was validated on Box 2
+
 ## v0.3.10-qtooley-2026-04-11
 
 Screensaver update-status polish and stock dark-footer follow-up for the Qtooley stock UI overlay, plus the public doc cleanup already staged on the release lane.
