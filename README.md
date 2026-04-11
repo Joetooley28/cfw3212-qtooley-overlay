@@ -1,5 +1,9 @@
 # CFW-3212 Qtooley Overlay
 
+<p align="center">
+  <img src="docs/images/qtooley/qtooley-hero.png" alt="Qtooley Quick Overview" width="720">
+</p>
+
 > [!IMPORTANT]
 > Now ready for public testing.
 > Confirmed working so far on router firmware `USC_1.1.79.0` and `USC_1.1.99.0`.
