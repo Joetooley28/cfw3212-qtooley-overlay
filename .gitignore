@@ -11,10 +11,19 @@ router-files/stock-ui-at/usrdata/at-stock-ui/bundles/ookla/
 **/authorized_keys
 **/exports/settings_backup_unpack/
 
-# Internal publish/build planning notes (keep local, not public repo content)
+# Main-branch model:
+# - keep public docs, release payload, and release scripts tracked
+# - keep engineering notes, publish scratch docs, and local planning files untracked
 docs/github-publish-plan.md
 docs/standalone-at-terminal-readme-draft.md
 docs/publish-safety-checklist.md
+docs/*PRIVATE*.md
+docs/*_PRIVATE*.md
+docs/*private*.md
+docs/*engineering*.md
+docs/*publish-plan*.md
+docs/*safety-checklist*.md
+docs/*-draft.md
 
 # Local release build output
 dist/

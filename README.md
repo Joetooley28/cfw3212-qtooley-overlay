@@ -118,6 +118,11 @@ There are three branch roles in the current project layout:
 
 If you are new to the project, use `main`.
 
+Repository hygiene note:
+
+- `main` is meant to hold public docs, release payload, and release tooling only
+- engineering notes, publish scratch docs, local capture material, and workstation-specific planning files should stay local and untracked
+
 ## Screenshots
 
 <table>
