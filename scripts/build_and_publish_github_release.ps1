@@ -1,6 +1,30 @@
 # Copyright (C) 2026 Joe Tooley
 # SPDX-License-Identifier: GPL-2.0-or-later
 # See repository root LICENSE for full license text.
+<#
+.SYNOPSIS
+Builds and publishes the public GitHub release from the safe main worktree.
+
+.DESCRIPTION
+This helper is the safest one-command path after `working-branch` is committed
+and verified. It:
+1. pushes `working-branch`
+2. promotes the tracked public payload into `repo-public-main`
+3. builds the release ZIP from `repo-public-main`
+4. composes the full GitHub release page body from the stable template plus the
+   bottom release-notes block
+5. commits/pushes `main`
+6. creates or updates the GitHub release
+
+Important rule:
+- do NOT pass `release-notes-v*.txt` directly to `gh --notes-file`
+- that text file is only the changing bottom changelog block
+- this script always renders the full release body first and sends the composed
+  `github-release-body-v*.md` file to GitHub
+
+If `release-notes-v*.txt` is missing, the script will generate it from the top
+matching `## <version>` section in `CHANGELOG.md`.
+#>
 
 param(
     [string]$SourceRepo = "C:\at_terminal\repo-public",
@@ -21,6 +45,12 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 if ($PSVersionTable.PSVersion.Major -ge 7) {
     $PSNativeCommandUseErrorActionPreference = $false
+}
+
+function Write-Step {
+    param([string]$Message)
+    Write-Host ""
+    Write-Host "==> $Message"
 }
 
 function Invoke-Git {
@@ -83,6 +113,17 @@ function Get-VersionText {
     return $version
 }
 
+function Assert-PathExists {
+    param(
+        [string]$Path,
+        [string]$Label
+    )
+
+    if (-not (Test-Path $Path)) {
+        throw "$Label not found: $Path"
+    }
+}
+
 function Assert-Branch {
     param(
         [string]$RepoRoot,
@@ -122,6 +163,63 @@ function Get-ReleaseNotesBlock {
     }
 
     return ($bulletLines -join [Environment]::NewLine)
+}
+
+function Get-TopChangelogSection {
+    param(
+        [string]$ChangelogPath,
+        [string]$Version
+    )
+
+    if (-not (Test-Path $ChangelogPath)) {
+        throw "CHANGELOG not found: $ChangelogPath"
+    }
+
+    $lines = Get-Content $ChangelogPath
+    $header = "## $Version"
+    $startIndex = -1
+    for ($i = 0; $i -lt $lines.Count; $i++) {
+        if ($lines[$i].Trim() -eq $header) {
+            $startIndex = $i
+            break
+        }
+    }
+
+    if ($startIndex -lt 0) {
+        throw "Could not find changelog section for $Version in $ChangelogPath"
+    }
+
+    $section = New-Object System.Collections.Generic.List[string]
+    for ($i = $startIndex + 1; $i -lt $lines.Count; $i++) {
+        $line = $lines[$i]
+        if ($line -match '^##\s+') {
+            break
+        }
+        $section.Add($line)
+    }
+
+    return @($section.ToArray())
+}
+
+function Ensure-ReleaseNotesFile {
+    param(
+        [string]$NotesPath,
+        [string]$ChangelogPath,
+        [string]$Version
+    )
+
+    if (Test-Path $NotesPath) {
+        return
+    }
+
+    $sectionLines = Get-TopChangelogSection -ChangelogPath $ChangelogPath -Version $Version
+    if ($sectionLines.Count -eq 0) {
+        throw "Changelog section for $Version was empty; cannot generate release notes file."
+    }
+
+    Write-Host "Release notes file missing; generating from CHANGELOG.md..."
+    $content = @($Version, "") + $sectionLines
+    Write-Utf8NoBom -Path $NotesPath -Content (($content -join [Environment]::NewLine).TrimEnd() + [Environment]::NewLine)
 }
 
 function Render-ReleaseBody {
@@ -202,17 +300,23 @@ if (-not $CommitMessage) {
 $promoteScript = Join-Path $SourceRepo "scripts\promote_to_main.ps1"
 $buildScript = Join-Path $SourceRepo "scripts\build_stock_ui_at_release.ps1"
 $zipPath = Join-Path $OutputRoot ("stock-ui-at-installer-" + $version + ".zip")
+$sourceChangelogPath = Join-Path $SourceRepo "CHANGELOG.md"
+
+Assert-PathExists -Path $TemplatePath -Label "GitHub release body template"
+Assert-PathExists -Path $promoteScript -Label "Promotion helper"
+Assert-PathExists -Path $buildScript -Label "Release build helper"
+Assert-PathExists -Path $sourceChangelogPath -Label "Source changelog"
 
 if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
     throw "GitHub CLI 'gh' is not available in PATH."
 }
 
 if (-not $SkipPushWorking) {
-    Write-Host "Pushing working-branch..."
+    Write-Step "Pushing working-branch"
     Invoke-Git -RepoRoot $SourceRepo push origin working-branch | Out-Host
 }
 
-Write-Host "Promoting public release files into main..."
+Write-Step "Promoting public release files into main"
 Invoke-CommandChecked -CommandName "powershell" -Arguments @(
     "-ExecutionPolicy", "Bypass",
     "-File", $promoteScript,
@@ -221,7 +325,7 @@ Invoke-CommandChecked -CommandName "powershell" -Arguments @(
     "-Apply"
 ) | Out-Host
 
-Write-Host "Building release ZIP from main..."
+Write-Step "Building release ZIP from main"
 Invoke-CommandChecked -CommandName "powershell" -Arguments @(
     "-ExecutionPolicy", "Bypass",
     "-File", $buildScript,
@@ -230,6 +334,10 @@ Invoke-CommandChecked -CommandName "powershell" -Arguments @(
     "-OutputRoot", $OutputRoot
 ) | Out-Host
 
+Assert-PathExists -Path $zipPath -Label "Release ZIP"
+
+Write-Step "Preparing release notes and composed GitHub release body"
+Ensure-ReleaseNotesFile -NotesPath $ReleaseNotesPath -ChangelogPath $sourceChangelogPath -Version $version
 $releaseNotesBlock = Get-ReleaseNotesBlock -NotesPath $ReleaseNotesPath
 $releaseBody = Render-ReleaseBody -TemplateFile $TemplatePath -Version $version -RepoSlugValue $RepoSlug -ReleaseNotesBlock $releaseNotesBlock
 Write-Utf8NoBom -Path $BodyOutputPath -Content $releaseBody
@@ -237,7 +345,7 @@ Write-Host "GitHub release body written to: $BodyOutputPath"
 
 $destinationStatus = @(Invoke-Git -RepoRoot $DestinationRepo status --porcelain)
 if ($destinationStatus.Count -gt 0) {
-    Write-Host "Committing main release state..."
+    Write-Step "Committing main release state"
     Invoke-Git -RepoRoot $DestinationRepo add README.md CHANGELOG.md VERSION.txt LICENSE LICENSE-docs.md NOTICE.md docs scripts router-files/stock-ui-at | Out-Null
     $postAddStatus = @(Invoke-Git -RepoRoot $DestinationRepo status --porcelain)
     if ($postAddStatus.Count -gt 0) {
@@ -246,14 +354,14 @@ if ($destinationStatus.Count -gt 0) {
 }
 
 if (-not $SkipPushMain) {
-    Write-Host "Pushing main..."
+    Write-Step "Pushing main"
     Invoke-Git -RepoRoot $DestinationRepo push origin main | Out-Host
 }
 
 if (-not $SkipGitHubRelease) {
     $target = (Invoke-Git -RepoRoot $DestinationRepo rev-parse HEAD | Select-Object -First 1).Trim()
     if (Test-ReleaseExists -RepoSlugValue $RepoSlug -Tag $version) {
-        Write-Host "Updating existing GitHub release..."
+        Write-Step "Updating existing GitHub release"
         Invoke-CommandChecked -CommandName "gh" -Arguments @(
             "release", "upload", $version, $zipPath,
             "-R", $RepoSlug,
@@ -266,7 +374,7 @@ if (-not $SkipGitHubRelease) {
             "--notes-file", $BodyOutputPath
         ) | Out-Host
     } else {
-        Write-Host "Creating new GitHub release..."
+        Write-Step "Creating new GitHub release"
         Invoke-CommandChecked -CommandName "gh" -Arguments @(
             "release", "create", $version, $zipPath,
             "-R", $RepoSlug,
