@@ -61,6 +61,19 @@ footer {
     color: #d7dde4;
 }
 
+.footer {
+    background: #202327;
+    border-top: 1px solid #343b43;
+}
+
+.footer .container {
+    background: transparent;
+}
+
+.copy-right {
+    color: #c7d0d9;
+}
+
 a {
     color: #9ac7ff;
 }
