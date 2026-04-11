@@ -35,6 +35,25 @@ body {
 
     --qt-shadow-card: 0 4px 16px rgba(0, 0, 0, 0.30);
     --qt-shadow-card-hover: 0 6px 24px rgba(0, 0, 0, 0.40);
+
+    /* Qtooley shared sidebar tabs - dark mode overrides */
+    --qt-tab-bg: rgba(255, 255, 255, 0.03);
+    --qt-tab-bg-hover: rgba(255, 255, 255, 0.07);
+    --qt-tab-bg-open: rgba(255, 255, 255, 0.05);
+    --qt-tab-bg-active: linear-gradient(135deg, rgba(255, 138, 0, 0.15) 0%, rgba(255, 100, 0, 0.06) 100%);
+    --qt-tab-border: rgba(255, 255, 255, 0.04);
+    --qt-tab-border-hover: rgba(141, 185, 255, 0.15);
+    --qt-tab-border-active: rgba(255, 138, 0, 0.18);
+    --qt-tab-border-left: transparent;
+    --qt-tab-border-left-hover: rgba(141, 185, 255, 0.4);
+    --qt-tab-border-left-active: #ff8a00;
+    --qt-tab-text: #8a95a8;
+    --qt-tab-text-hover: #e2e8f0;
+    --qt-tab-text-open: #e2e8f0;
+    --qt-tab-text-active: #ff8a00;
+    --qt-tab-shadow: none;
+    --qt-tab-shadow-hover: 0 2px 12px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    --qt-tab-shadow-active: 0 0 20px rgba(255, 138, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.15), inset 0 0 30px rgba(255, 138, 0, 0.04);
 }
 
 header,
@@ -83,8 +102,10 @@ select {
 }
 
 .header-wrap {
+    background: #2f2f33;
     border: 1px solid #343b43;
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+    box-shadow: none;
+    color: #d7dde4;
 }
 
 .top-right {
@@ -100,55 +121,60 @@ select {
 }
 
 .right-item.account-btn {
-    align-items: center;
-    display: flex;
-    gap: 8px;
-    height: 40px;
-    justify-content: flex-end;
-    margin-right: 16px;
-    min-width: 0;
-    pointer-events: none;
-    padding-right: 0;
     position: relative;
-    top: -6px;
-    width: auto;
-    z-index: 2;
+    pointer-events: none;
+    z-index: 6;
 }
 
 .right-item.account-btn .login-foot {
-    background-position: center center;
-    flex: 0 0 35px;
-    margin-left: 0;
-    margin-top: 0;
+    opacity: 0.88;
 }
 
 .right-item.account-btn .login-foot-user {
-    margin-left: 0;
-    position: static;
-    top: auto;
-}
-
-.right-item.account-btn #logOff {
-    display: flex;
+    color: #d7dde4;
 }
 
 .right-item.account-btn .log-off,
 .right-item.account-btn #logOffForm button {
-    left: auto;
-    margin: 0;
-    position: static;
-    top: auto;
+    opacity: 0.92;
 }
 
+.right-item.account-btn .login-foot,
 .right-item.account-btn .login-foot-user,
 .right-item.account-btn #logOff,
 .right-item.account-btn #logOffForm,
 .right-item.account-btn #logOffForm button {
     pointer-events: auto;
+    position: relative;
+    z-index: 7;
 }
 
 .site-header h1 {
+    background-position: 0 0;
+    background-size: cover;
     filter: sepia(1) saturate(6.6) hue-rotate(338deg) brightness(1.16);
+    height: 40px;
+    margin-top: 2px;
+    position: relative;
+    top: 0;
+}
+
+.top-right .list-inline li a {
+    border-left-color: #6d7178;
+    color: #eef4ff;
+}
+
+.top-right .list-inline li.active a {
+    color: #ff8a00;
+}
+
+.top-right .list-inline li a:hover {
+    background-color: #3a3b41;
+}
+
+.top-right .list-inline li a:active,
+.top-right .list-inline li a:focus {
+    background: #454850;
 }
 
 h2,
@@ -312,15 +338,15 @@ button:disabled {
     color: #8693a1;
 }
 
-/* ── Qtooley sidebar nav ── */
-.sidemenu,
-.sidemenu ul {
+/* ── Stock sidebar nav in dark mode ── */
+body:not(.jtools-layout-wide-sticky) .sidemenu,
+body:not(.jtools-layout-wide-sticky) .sidemenu ul {
     background: transparent;
     overflow: visible;
     padding: 0;
 }
 
-.sidemenu li {
+body:not(.jtools-layout-wide-sticky) .sidemenu li {
     background-color: transparent;
     border-radius: 0;
     margin: 0 0 1px 0;
@@ -328,10 +354,9 @@ button:disabled {
     width: auto;
 }
 
-.sidemenu li a {
+body:not(.jtools-layout-wide-sticky) .sidemenu li a {
     background: rgba(255, 255, 255, 0.03);
     background-color: rgba(255, 255, 255, 0.03);
-    background-image: none;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.04);
@@ -349,7 +374,8 @@ button:disabled {
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.sidemenu li a:hover {
+body:not(.jtools-layout-wide-sticky) .sidemenu li a:hover,
+body:not(.jtools-layout-wide-sticky) .sidemenu li a:focus {
     background: rgba(255, 255, 255, 0.07);
     background-color: rgba(255, 255, 255, 0.07);
     border-color: rgba(141, 185, 255, 0.15);
@@ -358,30 +384,22 @@ button:disabled {
     color: #e2e8f0;
 }
 
-.sidemenu li a:focus {
-    background: rgba(255, 255, 255, 0.07);
-    border-color: rgba(141, 185, 255, 0.15);
-    border-left-color: rgba(141, 185, 255, 0.4);
-    color: #e2e8f0;
-}
-
-.sidemenu li a:active {
+body:not(.jtools-layout-wide-sticky) .sidemenu li a:active {
     background-color: rgba(255, 255, 255, 0.09);
 }
 
-.sidemenu li.open > a {
+body:not(.jtools-layout-wide-sticky) .sidemenu li.open > a {
     background: rgba(255, 255, 255, 0.05);
     background-color: rgba(255, 255, 255, 0.05);
-    background-image: none;
     border-radius: 10px;
     color: #e2e8f0;
 }
 
-.sidemenu li.open > a:after {
+body:not(.jtools-layout-wide-sticky) .sidemenu li.open > a:after {
     border-bottom: none;
 }
 
-.sidemenu li a.active {
+body:not(.jtools-layout-wide-sticky) .sidemenu li a.active {
     background: linear-gradient(135deg, rgba(255, 138, 0, 0.15) 0%, rgba(255, 100, 0, 0.06) 100%);
     background-color: transparent;
     border-color: rgba(255, 138, 0, 0.18);
@@ -392,9 +410,7 @@ button:disabled {
     margin-bottom: 0;
 }
 
-
-
-.sidemenu li a.inactive {
+body:not(.jtools-layout-wide-sticky) .sidemenu li a.inactive {
     background: rgba(255, 255, 255, 0.03);
     background-color: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.04);
@@ -407,14 +423,14 @@ button:disabled {
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.sidemenu li.open > div.submenu {
+body:not(.jtools-layout-wide-sticky) .sidemenu li.open > div.submenu {
     background: transparent;
     background-color: transparent;
     border-radius: 0;
     padding: 4px 0 0 0;
 }
 
-.sidemenu li.open > div.submenu > a {
+body:not(.jtools-layout-wide-sticky) .sidemenu li.open > div.submenu > a {
     background: rgba(255, 255, 255, 0.03);
     background-color: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.04);
@@ -429,8 +445,8 @@ button:disabled {
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.sidemenu li.open > div.submenu > a:hover,
-.sidemenu li.open > div.submenu > a:focus {
+body:not(.jtools-layout-wide-sticky) .sidemenu li.open > div.submenu > a:hover,
+body:not(.jtools-layout-wide-sticky) .sidemenu li.open > div.submenu > a:focus {
     background: rgba(255, 255, 255, 0.07);
     border-color: rgba(141, 185, 255, 0.15);
     border-left-color: rgba(141, 185, 255, 0.4);
@@ -438,8 +454,8 @@ button:disabled {
     color: #e2e8f0;
 }
 
-.sidemenu li.open > div.submenu > a.active,
-.sidemenu li.open > div.submenu > a.active:visited {
+body:not(.jtools-layout-wide-sticky) .sidemenu li.open > div.submenu > a.active,
+body:not(.jtools-layout-wide-sticky) .sidemenu li.open > div.submenu > a.active:visited {
     background: linear-gradient(135deg, rgba(255, 138, 0, 0.15) 0%, rgba(255, 100, 0, 0.06) 100%);
     background-color: transparent;
     border-color: rgba(255, 138, 0, 0.18);
@@ -449,9 +465,21 @@ button:disabled {
     font-weight: 600;
 }
 
+body:not(.jtools-layout-wide-sticky) .sidemenu li > a.expandable {
+    background-image: url("/img/dashboard_arrow_pod_closed.png");
+    background-position: 9px center;
+    background-repeat: no-repeat;
+    padding-left: 30px;
+}
 
+body:not(.jtools-layout-wide-sticky) .sidemenu li.open > a.expandable {
+    background-image: url("/img/dashboard_arrow_pod_open2.png");
+    background-position: 9px center;
+    background-repeat: no-repeat;
+    padding-left: 30px;
+}
 
-.sidemenu li > a.expandable {
+body.jtools-layout-wide-sticky .sidemenu li > a.expandable {
     background-image: none;
 }
 
