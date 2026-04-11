@@ -1,6 +1,5 @@
 # Script-facing manifest for install/uninstall/recovery verification.
-# Keep this list aligned with:
-#   C:\at_terminal\notes\QTOOLEY_STOCK_TOUCH_INVENTORY_PRIVATE.md
+# Keep this list aligned with the stock-touch inventory used for install/uninstall verification.
 # Use one absolute live-tree path per line.
 # Lines starting with "#" are comments and are ignored by the helpers.
 /www/theme/js/genHeader.js

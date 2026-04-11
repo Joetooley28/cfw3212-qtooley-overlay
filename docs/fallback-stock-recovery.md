@@ -62,7 +62,7 @@ The current public fallback stock web package is from a clean post-reset `CFW-32
 
 Package path in this repo:
 
-- [`recovery/stock-ui-fallback/USC_1.1.99.0/stock-ui-fallback-USC_1.1.99.0.zip`](/C:/at_terminal/repo-public/recovery/stock-ui-fallback/USC_1.1.99.0/stock-ui-fallback-USC_1.1.99.0.zip)
+- [`recovery/stock-ui-fallback/USC_1.1.99.0/stock-ui-fallback-USC_1.1.99.0.zip`](../recovery/stock-ui-fallback/USC_1.1.99.0/stock-ui-fallback-USC_1.1.99.0.zip)
 - folder contents: `README.md`, `stock_www.tar`, `stock_webif.tar`, `SHA256SUMS.txt`
 
 ## Important Limits
