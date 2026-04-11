@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.3.9-qtooley-2026-04-10
+
+Shared theme/header cleanup for the Qtooley stock UI overlay, plus the licensing clarification work already present on `working-branch`.
+
+Included:
+- promoted the approved shared Qtooley header and tab styling work from the side branch into `working-branch`
+- fixed dark-header hit areas so the `Qtooley` top tab and logout icon both keep the right click targets
+- made Qtooley light and dark mode share one tab shape/spacing system while keeping theme-specific tab colors
+- restored stock Casa dark-mode sidebar readability and expandable arrow behavior on non-Qtooley pages
+- kept the newer mixed-license notice and licensing clarifications already added on `working-branch`
+
+Key behavior:
+- Qtooley header now keeps the accepted dark header look without the earlier broken click/hit-area behavior
+- Qtooley left tabs now keep one shared shape between light and dark mode instead of falling back to the older stock light-tab look
+- stock dark-mode sidebars keep readable text and dropdown arrows instead of regressing during the Qtooley tab-sharing work
+- the release still includes the licensing clarification files already added on this branch:
+  - `LICENSE`
+  - `LICENSE-docs.md`
+  - `NOTICE.md`
+
 ## v0.3.8-qtooley-2026-04-08
 
 Box 2 stock-page compatibility and release-flow hardening for the Qtooley stock UI overlay.
